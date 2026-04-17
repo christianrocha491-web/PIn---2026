@@ -1,0 +1,225 @@
+recuperando alteração de interface da branch master
+d2c01e3 (alteração de interface)
+                    </a>
+                </nav>
+
+                <div class="mt-auto">
+                    <button class="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-500 hover:text-white font-semibold transition-all duration-300 group shadow-sm">
+                        <i class="ph-fill ph-warning-circle text-xl animate-pulse"></i>
+                        <span class="hidden md:block">Emergência 192</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Card de Detalhes da Unidade (Aparece ao clicar no mapa) -->
+            <!-- Escondido inicialmente via CSS -->
+            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 interactive-ui z-30 pointer-events-none" id="details-container">
+                <div id="unit-card" class="glass-panel rounded-3xl p-6 slide-up-enter shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] pointer-events-auto">
+                    
+                    <!-- Botão Fechar -->
+                    <button id="close-card" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-colors">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+
+                    <div class="flex gap-5">
+                        <!-- Imagem/Ícone da Unidade -->
+                        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-100 to-indigo-50 flex items-center justify-center flex-shrink-0 border border-white/50">
+                            <i class="ph-fill ph-hospital text-4xl text-blue-500"></i>
+                        </div>
+
+                        <!-- Info Principal -->
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Aberto
+                                </span>
+                                <span class="text-xs text-slate-500 font-medium"><i class="ph-fill ph-clock"></i> 08h - 17h</span>
+                            </div>
+                            
+                            <h2 id="unit-name" class="text-2xl font-bold text-slate-800 leading-tight mb-1">UBS Cidade Alta</h2>
+                            
+                            <div class="flex items-center gap-1 text-sm text-slate-600 mb-3">
+                                <div class="flex text-amber-400 text-xs">
+                                    <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star-half"></i>
+                                </div>
+                                <span class="font-semibold text-slate-700 ml-1">4.9</span>
+                                <span>(120 avaliações)</span>
+                            </div>
+
+                            <!-- Tags de Especialidades -->
+                            <div id="unit-tags" class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded-md font-medium border border-slate-200">Clínica Geral</span>
+                                <span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded-md font-medium border border-slate-200">Pediatria</span>
+                                <span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded-md font-medium border border-slate-200">Fisioterapia</span>
+                            </div>
+
+                            <!-- Endereço e Ações -->
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-slate-200/60">
+                                <p class="text-sm text-slate-500 flex items-center gap-1.5 line-clamp-1">
+                                    <i class="ph-bold ph-map-pin-line text-blue-500"></i>
+                                    <span id="unit-address">Rua Benedito Passuti, 301</span>
+                                </p>
+                                
+                                <div class="flex items-center gap-3 w-full sm:w-auto">
+                                    <button class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-blue-600 font-semibold hover:bg-blue-50 transition-colors border border-blue-100 bg-white">
+                                        <i class="ph-bold ph-phone"></i> Ligar
+                                    </button>
+                                    <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all transform hover:-translate-y-0.5">
+                                        <i class="ph-bold ph-calendar-check"></i> Agendar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <script>
+        // Inicialização do Mapa centrado em Piracicaba
+        const map = L.map('map', {
+            zoomControl: false, // Vamos usar controles customizados ou mover a posição
+            attributionControl: false
+        }).setView([-22.7338, -47.6476], 13);
+
+        // Estilo de mapa moderno e limpo (CartoDB Positron) para dar contraste com a UI premium
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // Reposicionar controle de zoom para não sobrepor a UI
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Dados simulados das Unidades de Saúde
+        const healthUnits = [
+            {
+                id: 1,
+                name: "UBS Cidade Alta",
+                address: "Rua Benedito Passuti, 301",
+                lat: -22.7350,
+                lng: -47.6500,
+                rating: 4.9,
+                reviews: 120,
+                status: "Aberto",
+                time: "08h - 17h",
+                tags: ["Clínica Geral", "Pediatria", "Fisioterapia"]
+            },
+            {
+                id: 2,
+                name: "UPA Piracicamirim",
+                address: "Rua Rio Grande do Norte, 135",
+                lat: -22.7420,
+                lng: -47.6200,
+                rating: 4.5,
+                reviews: 345,
+                status: "24 Horas",
+                time: "Aberto 24h",
+                tags: ["Pronto Socorro", "Raio-X", "Ortopedia"]
+            },
+            {
+                id: 3,
+                name: "CRAB Vila Sônia",
+                address: "Rua João Zem, 450",
+                lat: -22.7050,
+                lng: -47.6600,
+                rating: 4.7,
+                reviews: 89,
+                status: "Aberto",
+                time: "07h - 16h",
+                tags: ["Odontologia", "Ginecologia", "Vacinação"]
+            }
+        ];
+
+        // Criação de Ícone Customizado Animado
+        const createPulsingIcon = () => {
+            return L.divIcon({
+                className: 'custom-div-icon',
+                html: '<div class="pulse-marker"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+        };
+
+        const activeIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: '<div class="pulse-marker" style="background:#10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.8);"></div>',
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+        });
+
+        // Referências da UI
+        const card = document.getElementById('unit-card');
+        const closeBtn = document.getElementById('close-card');
+        let currentMarker = null;
+
+        // Função para atualizar os dados do card
+        function updateCardData(unit) {
+            document.getElementById('unit-name').textContent = unit.name;
+            document.getElementById('unit-address').textContent = unit.address;
+            
+            const tagsContainer = document.getElementById('unit-tags');
+            tagsContainer.innerHTML = '';
+            unit.tags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded-md font-medium border border-slate-200';
+                span.textContent = tag;
+                tagsContainer.appendChild(span);
+            });
+        }
+
+        // Função para mostrar o card com animação
+        function showCard() {
+            card.classList.remove('slide-up-enter', 'slide-out');
+            card.classList.add('slide-up-active');
+        }
+
+        // Função para esconder o card
+        function hideCard() {
+            card.classList.remove('slide-up-active');
+            card.classList.add('slide-out');
+            if (currentMarker) {
+                currentMarker.setIcon(createPulsingIcon());
+                currentMarker = null;
+            }
+        }
+
+        closeBtn.addEventListener('click', hideCard);
+
+        // Adicionar marcadores ao mapa
+        healthUnits.forEach(unit => {
+            const marker = L.marker([unit.lat, unit.lng], { icon: createPulsingIcon() }).addTo(map);
+            
+            marker.on('click', () => {
+                // Resetar ícone do marcador anterior
+                if (currentMarker) {
+                    currentMarker.setIcon(createPulsingIcon());
+                }
+                
+                // Mudar cor do marcador clicado
+                marker.setIcon(activeIcon);
+                currentMarker = marker;
+
+                // Centralizar o mapa com um leve deslocamento para acomodar o card
+                map.flyTo([unit.lat - 0.005, unit.lng], 14, {
+                    duration: 1.5,
+                    easeLinearity: 0.25
+                });
+
+                updateCardData(unit);
+                showCard();
+            });
+        });
+
+        // Fechar card ao clicar no mapa
+        map.on('click', () => {
+            hideCard();
+        });
+
+    </script>
+</body>
+</html>
