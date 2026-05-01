@@ -8,200 +8,265 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-6
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #020617; /* Fundo ultra dark estilo Voka */
-            color: #f8fafc;
-        }
-
-        .glass {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .category-card:hover {
-            border-color: #38bdf8;
-            background: rgba(56, 189, 248, 0.1);
-            transform: translateY(-5px);
-        }
-
-        /* Animação de transição do mapa */
-        #map-overlay {
-            transform: translateY(100%);
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        #map-overlay.active {
-            transform: translateY(0);
-        }
-
-        .unit-card:hover .btn-map {
-            opacity: 1;
-        }
-
-        /* Esconder scrollbar */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; }
+        .glass { background: rgba(15,23,42,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .category-card:hover { border-color: #38bdf8; background: rgba(56,189,248,0.1); transform: translateY(-5px); position: relative; z-index: 10; }
+        .category-card.active { border-color: rgba(59,130,246,0.5) !important; background: rgba(59,130,246,0.1) !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        #map { height: 100%; width: 100%; border-radius: 24px 24px 0 0; }
+        #sidebar-overlay { transition: opacity 0.3s; }
+        #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <header class="fixed top-0 w-full z-40 glass px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <i class="ph-bold ph-activity text-white"></i>
+    <!-- Overlay do Sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeSidebar()"></div>
+
+    <!-- Sidebar Drawer -->
+    <aside id="sidebar-drawer" class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col -translate-x-full border-r border-white/10 overflow-y-auto" style="background:rgba(2,6,23,0.98);backdrop-filter:blur(20px);">
+        <div class="flex items-center justify-between p-5 border-b border-white/10 flex-shrink-0">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i class="ph-bold ph-activity text-white"></i>
+                </div>
+                <span class="font-bold text-lg">Saúde<span class="text-blue-500">Pira</span></span>
             </div>
-            <span class="font-bold text-lg tracking-tight">Saúde<span class="text-blue-500">Pira</span></span>
+            <button onclick="closeSidebar()" class="text-slate-400 hover:text-white transition-colors">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
         </div>
-        
-        <div class="hidden md:flex bg-slate-800/50 rounded-full px-4 py-2 border border-white/10 items-center gap-3">
-            <i class="ph ph-magnifying-glass text-slate-400"></i>
-            <input type="text" placeholder="Qual especialidade você busca?" class="bg-transparent border-none outline-none text-sm w-64">
+        <nav class="flex-1 p-4 flex flex-col gap-1">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1 mt-2">Navegação</span>
+            <a href="index3.html" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-500/10 text-blue-400 font-medium">
+                <i class="ph-bold ph-house text-xl"></i> Início
+            </a>
+            <a href="mapa.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+                <i class="ph-bold ph-map-trifold text-xl"></i> Ver Mapa
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+                <i class="ph-bold ph-calendar-plus text-xl"></i> Agendamentos
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+                <i class="ph-bold ph-pill text-xl"></i> Medicamentos
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+                <i class="ph-bold ph-file-text text-xl"></i> Meus Laudos
+            </a>
+            <div class="h-px bg-white/10 my-2"></div>
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1">Especialidades</span>
+            <a href="clinico-geral.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-white/5 transition-colors text-sm">
+                <i class="ph ph-stethoscope text-blue-400 text-lg"></i> Clínico Geral
+            </a>
+            <a href="pediatria.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-white/5 transition-colors text-sm">
+                <i class="ph ph-baby text-cyan-400 text-lg"></i> Pediatria
+            </a>
+            <a href="dentista.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-white/5 transition-colors text-sm">
+                <i class="ph ph-tooth text-emerald-400 text-lg"></i> Dentista
+            </a>
+            <a href="urgencia.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-white/5 transition-colors text-sm">
+                <i class="ph ph-first-aid text-red-400 text-lg"></i> Urgência
+            </a>
+            <a href="psicologia.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-white/5 transition-colors text-sm">
+                <i class="ph ph-brain text-purple-400 text-lg"></i> Psicologia
+            </a>
+            <div class="h-px bg-white/10 my-2"></div>
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1">Conta</span>
+            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+                <i class="ph-bold ph-user text-xl"></i> Meu Perfil
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+                <i class="ph-bold ph-gear text-xl"></i> Configurações
+            </a>
+        </nav>
+        <div class="p-4 border-t border-white/10 flex-shrink-0">
+            <button class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-semibold transition-all">
+                <i class="ph-fill ph-warning-circle text-xl animate-pulse"></i> Emergência 192
+            </button>
+        </div>
+    </aside>
+
+    <header class="fixed top-0 w-full z-40 glass px-4 md:px-6 py-4 flex justify-between items-center gap-4">
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <button onclick="openSidebar()" class="text-slate-300 hover:text-white transition-colors" aria-label="Menu">
+                <i class="ph-bold ph-list text-2xl"></i>
+            </button>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i class="ph-bold ph-activity text-white"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight">Saúde<span class="text-blue-500">Pira</span></span>
+            </div>
         </div>
 
-        <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all">
+        <div class="flex bg-slate-800/50 rounded-full px-4 py-2 border border-white/10 items-center gap-3 flex-1 max-w-md">
+            <i class="ph ph-magnifying-glass text-slate-400"></i>
+            <input id="search-input" type="text" placeholder="Buscar unidades ou especialidades..." class="bg-transparent border-none outline-none text-sm w-full" oninput="aplicarFiltros()">
+        </div>
+
+        <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0">
             Entrar
         </button>
     </header>
 
-    <main class="pt-28 px-6 max-w-7xl mx-auto pb-20">
+    <main class="pt-36 px-6 max-w-7xl mx-auto pb-24">
         <section class="mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 py-1 bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">
                 Encontre atendimento agora.
             </h1>
             <p class="text-slate-400 text-lg">Selecione uma especialidade para ver as unidades mais próximas de você.</p>
         </section>
 
-        <section class="flex gap-4 overflow-x-auto pb-6 no-scrollbar mb-10">
-            <div class="category-card min-w-[120px] glass p-6 rounded-2xl flex flex-col items-center gap-3 cursor-pointer transition-all border border-transparent">
-                <i class="ph ph-stethoscope text-3xl text-blue-400"></i>
-                <span class="text-sm font-medium">Clínico Geral</span>
-            </div>
-            <div class="category-card min-w-[120px] glass p-6 rounded-2xl flex flex-col items-center gap-3 cursor-pointer transition-all border border-transparent border-blue-500/50 bg-blue-500/10">
-                <i class="ph ph-baby text-3xl text-cyan-400"></i>
-                <span class="text-sm font-medium">Pediatria</span>
-            </div>
-            <div class="category-card min-w-[120px] glass p-6 rounded-2xl flex flex-col items-center gap-3 cursor-pointer transition-all border border-transparent">
-                <i class="ph ph-tooth text-3xl text-emerald-400"></i>
-                <span class="text-sm font-medium">Dentista</span>
-            </div>
-            <div class="category-card min-w-[120px] glass p-6 rounded-2xl flex flex-col items-center gap-3 cursor-pointer transition-all border border-transparent">
-                <i class="ph ph-first-aid text-3xl text-red-400"></i>
-                <span class="text-sm font-medium">Urgência</span>
-            </div>
-            <div class="category-card min-w-[120px] glass p-6 rounded-2xl flex flex-col items-center gap-3 cursor-pointer transition-all border border-transparent">
-                <i class="ph ph-brain text-3xl text-purple-400"></i>
-                <span class="text-sm font-medium">Psicologia</span>
-            </div>
-        </section>
+        <!-- Filtros renderizados por JS -->
+        <section id="filtros-container" class="flex gap-3 overflow-x-auto pt-2 pb-6 no-scrollbar mb-10"></section>
 
         <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
-            <i class="ph ph-map-pin-area text-blue-500"></i> Unidades com Pediatria disponíveis
+            <i class="ph ph-map-pin-area text-blue-500"></i>
+            <span id="section-title-text">Todas as unidades disponíveis</span>
         </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="unit-card group relative glass rounded-3xl overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-blue-500/50">
-                <div class="h-48 bg-slate-800 relative">
-                    <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=500" class="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700">
-                    <div class="absolute top-4 left-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg">ABERTO AGORA</div>
-                </div>
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-xl">UBS Cidade Alta</h3>
-                        <span class="flex items-center gap-1 text-sm"><i class="ph-fill ph-star text-amber-400"></i> 4.9</span>
-                    </div>
-                    <p class="text-slate-400 text-sm mb-4">Rua Benedito Passuti, 301 • 1.2km de você</p>
-                    <div class="flex gap-2">
-                        <span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300">Pediatria</span>
-                        <span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300">Vacinação</span>
-                    </div>
-                    <button onclick="toggleMap(-22.7350, -47.6500, 'UBS Cidade Alta')" class="mt-6 w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
-                        <i class="ph ph-map-trifold"></i> Ver no Mapa
-                    </button>
-                </div>
-            </div>
 
-            <div class="unit-card group relative glass rounded-3xl overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-blue-500/50">
-                <div class="h-48 bg-slate-800 relative">
-                    <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=500" class="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700">
-                </div>
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold text-xl">CRAB Vila Sônia</h3>
-                        <span class="flex items-center gap-1 text-sm"><i class="ph-fill ph-star text-amber-400"></i> 4.7</span>
-                    </div>
-                    <p class="text-slate-400 text-sm mb-4">Rua João Zem, 450 • 3.5km de você</p>
-                    <div class="flex gap-2">
-                        <span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300">Pediatria</span>
-                        <span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300">Odonto</span>
-                    </div>
-                    <button onclick="toggleMap(-22.7050, -47.6600, 'CRAB Vila Sônia')" class="mt-6 w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
-                        <i class="ph ph-map-trifold"></i> Ver no Mapa
-                    </button>
-                </div>
-            </div>
+        <!-- Cards renderizados por JS -->
+        <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+        <div id="no-results" class="hidden text-center py-20 text-slate-500">
+            <i class="ph ph-magnifying-glass text-5xl mb-4 block opacity-40"></i>
+            <p class="text-lg font-medium">Nenhuma unidade encontrada.</p>
+            <p class="text-sm mt-1">Tente outro termo ou especialidade.</p>
         </div>
     </main>
 
-    <div id="map-overlay" class="fixed inset-0 z-50 pointer-events-none flex flex-col">
-        <div class="flex-1"></div> <div class="h-[85vh] glass rounded-t-[40px] pointer-events-auto flex flex-col shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
-            <div class="p-4 flex justify-between items-center border-b border-white/10">
-                <div class="h-1.5 w-12 bg-slate-700 rounded-full mx-auto absolute top-3 left-1/2 -translate-x-1/2"></div>
-                <h3 id="map-title" class="font-bold text-lg ml-4">Localização da Unidade</h3>
-                <button onclick="closeMap()" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-slate-700 transition-all">
-                    <i class="ph-bold ph-x text-white"></i>
-                </button>
-            </div>
-            <div id="map" class="flex-1"></div>
-        </div>
-    </div>
-
-    <button onclick="toggleMap(-22.7338, -47.6476, 'Visão Geral Piracicaba')" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 bg-slate-900 border border-white/20 px-6 py-3 rounded-full flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all">
-        <a href="ver_mapa.html"><span class="text-sm font-bold">Exibir Mapa</span></a>
+    <a href="mapa.html" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 bg-slate-900 border border-white/20 px-6 py-3 rounded-full flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all text-white no-underline">
+        <span class="text-sm font-bold">Exibir Mapa</span>
         <i class="ph-fill ph-map-trifold text-blue-400"></i>
-    </button>
+    </a>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const mapOverlay = document.getElementById('map-overlay');
-        const mapTitle = document.getElementById('map-title');
-        let leafletMap;
+    // ===== DADOS =====
+    const especialidades = [
+        { key: 'todos',         label: 'Ver Todos',     icon: 'ph-squares-four',        color: 'text-white' },
+        { key: 'clinico-geral', label: 'Clínico Geral', icon: 'ph-stethoscope',         color: 'text-blue-400' },
+        { key: 'pediatria',     label: 'Pediatria',     icon: 'ph-baby',                color: 'text-cyan-400' },
+        { key: 'dentista',      label: 'Dentista',      icon: 'ph-tooth',               color: 'text-emerald-400' },
+        { key: 'urgencia',      label: 'Urgência',      icon: 'ph-first-aid',           color: 'text-red-400' },
+        { key: 'psicologia',    label: 'Psicologia',    icon: 'ph-brain',               color: 'text-purple-400' },
+        { key: 'fisioterapia',  label: 'Fisioterapia',  icon: 'ph-person-simple-run',   color: 'text-orange-400' },
+        { key: 'vacinacao',     label: 'Vacinação',     icon: 'ph-syringe',             color: 'text-teal-400' },
+        { key: 'ginecologia',   label: 'Ginecologia',   icon: 'ph-gender-female',       color: 'text-pink-400' },
+        { key: 'cardiologia',   label: 'Cardiologia',   icon: 'ph-heartbeat',           color: 'text-rose-400' },
+        { key: 'ortopedia',     label: 'Ortopedia',     icon: 'ph-bone',                color: 'text-yellow-400' },
+        { key: 'nutricao',      label: 'Nutrição',      icon: 'ph-fork-knife',          color: 'text-lime-400' },
+    ];
 
-        function initMap() {
-            if (!leafletMap) {
-                leafletMap = L.map('map', { zoomControl: false }).setView([-22.7338, -47.6476], 14);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(leafletMap);
+    const unidades = [
+        { nome:'UBS Cidade Alta',                 endereco:'Rua Benedito Passuti, 301 · 1.2km',      nota:4.9, aberto:true,  tags:['Clínico Geral','Pediatria','Vacinação'],       esp:['clinico-geral','pediatria','vacinacao'],      img:'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=500' },
+        { nome:'CRAB Vila Sônia',                 endereco:'Rua João Zem, 450 · 3.5km',              nota:4.7, aberto:true,  tags:['Pediatria','Dentista','Ginecologia'],          esp:['pediatria','dentista','ginecologia'],         img:'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=500' },
+        { nome:'UPA Piracicamirim',               endereco:'Rua Rio Grande do Norte, 135 · 3.8km',   nota:4.5, aberto:true,  tags:['Urgência','Ortopedia','Raio-X'],               esp:['urgencia','ortopedia'], badge:'24h',           img:'https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Santa Casa de Piracicaba',        endereco:'Rua Moraes Barros, 33 · 2.0km',          nota:4.6, aberto:true,  tags:['Urgência','Cardiologia','UTI'],                esp:['urgencia','cardiologia'], badge:'24h',          img:'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&q=80&w=500' },
+        { nome:'CEO Piracicaba',                  endereco:'Rua Boa Morte, 2020 · 2.8km',            nota:4.8, aberto:true,  tags:['Dentista','Ortodontia'],                      esp:['dentista'],                                  img:'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=500' },
+        { nome:'CAPS Centro',                     endereco:'Rua do Rosário, 900 · 1.8km',            nota:4.8, aberto:true,  tags:['Psicologia','Psiquiatria'],                   esp:['psicologia'],                                img:'https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&q=80&w=500' },
+        { nome:'CAPS Infantil',                   endereco:'Rua Antônio Correa Barbosa, 200 · 3.2km',nota:4.7, aberto:true,  tags:['Psicologia','Psicopedagogia'],                esp:['psicologia'],                                img:'https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&q=80&w=500' },
+        { nome:'UBS Santa Terezinha',             endereco:'Av. Armando Sales de Oliveira, 150 · 4.7km',nota:4.4, aberto:false, tags:['Clínico Geral','Ginecologia','Fisioterapia'], esp:['clinico-geral','ginecologia','fisioterapia'], img:'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=500' },
+        { nome:'UBS Centro',                      endereco:'Rua Moraes Barros, 480 · 2.1km',         nota:4.6, aberto:true,  tags:['Clínico Geral','Vacinação'],                  esp:['clinico-geral','vacinacao'],                 img:'https://images.unsplash.com/photo-1632833239869-a37e3a5806d2?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Clínica de Fisioterapia Municipal',endereco:'Av. Independência, 780 · 5.1km',        nota:4.7, aberto:true,  tags:['Fisioterapia','Reabilitação'],                esp:['fisioterapia'],                              img:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Centro de Cardiologia Pira',      endereco:'Rua Tiradentes, 300 · 2.4km',            nota:4.9, aberto:true,  tags:['Cardiologia','Ecocardiograma'],               esp:['cardiologia'],                               img:'https://images.unsplash.com/photo-1628348070889-cb656235b4eb?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Núcleo de Nutrição Municipal',    endereco:'Rua Campos Salles, 600 · 3.0km',         nota:4.5, aberto:true,  tags:['Nutrição','Dietética'],                       esp:['nutricao'],                                  img:'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=500' },
+        { nome:'UPA Vila Rezende',                endereco:'Av. Luís de Queirós, 1500 · 5.2km',      nota:4.4, aberto:true,  tags:['Urgência','Pediatria'],                       esp:['urgencia','pediatria'], badge:'24h',           img:'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?auto=format&fit=crop&q=80&w=500' },
+        { nome:'UBS Nova América',                endereco:'Av. Independência, 580 · 5.3km',          nota:4.5, aberto:true,  tags:['Pediatria','Clínico Geral'],                  esp:['pediatria','clinico-geral'],                 img:'https://images.unsplash.com/photo-1512678080530-7760d81faba6?auto=format&fit=crop&q=80&w=500' },
+        { nome:'CAPS AD',                         endereco:'Rua Visconde do Rio Branco, 1300 · 4.0km',nota:4.5, aberto:false, tags:['Psicologia','Assistência Social'],            esp:['psicologia'],                                img:'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Posto de Vacinação Central',      endereco:'Rua do Rosário, 430 · 1.5km',            nota:4.8, aberto:true,  tags:['Vacinação','Saúde Infantil'],                 esp:['vacinacao'],                                 img:'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Clínica de Ginecologia Municipal',endereco:'Rua Benjamin Constant, 900 · 2.6km',     nota:4.6, aberto:true,  tags:['Ginecologia','Obstetrícia','Pré-natal'],      esp:['ginecologia'],                               img:'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Centro de Ortopedia Pira',        endereco:'Av. Independência, 1200 · 4.0km',        nota:4.7, aberto:true,  tags:['Ortopedia','Fisioterapia','Raio-X'],          esp:['ortopedia','fisioterapia'],                  img:'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&q=80&w=500' },
+    ];
+
+    let filtroAtivo = 'todos';
+
+    // ===== SIDEBAR =====
+    function openSidebar() {
+        document.getElementById('sidebar-overlay').classList.remove('opacity-0','pointer-events-none');
+        document.getElementById('sidebar-overlay').classList.add('opacity-100');
+        document.getElementById('sidebar-drawer').classList.remove('-translate-x-full');
+        document.getElementById('sidebar-drawer').classList.add('translate-x-0');
+    }
+    function closeSidebar() {
+        document.getElementById('sidebar-overlay').classList.add('opacity-0','pointer-events-none');
+        document.getElementById('sidebar-overlay').classList.remove('opacity-100');
+        document.getElementById('sidebar-drawer').classList.add('-translate-x-full');
+        document.getElementById('sidebar-drawer').classList.remove('translate-x-0');
+    }
+
+    // ===== FILTROS =====
+    function renderFiltros() {
+        const c = document.getElementById('filtros-container');
+        c.innerHTML = '';
+        especialidades.forEach(e => {
+            const ativo = filtroAtivo === e.key;
+            const btn = document.createElement('button');
+            btn.className = `category-card min-w-[110px] glass p-5 rounded-2xl flex flex-col items-center gap-3 cursor-pointer transition-all border focus:outline-none ${ativo ? 'active border-blue-500/50 bg-blue-500/10' : 'border-transparent'}`;
+            btn.innerHTML = `<i class="ph ${e.icon} text-3xl ${e.color}"></i><span class="text-sm font-medium">${e.label}</span>`;
+            btn.onclick = () => { filtroAtivo = e.key; renderFiltros(); aplicarFiltros(); };
+            c.appendChild(btn);
+        });
+    }
+
+    // ===== APLICAR FILTROS + BUSCA =====
+    function aplicarFiltros() {
+        const termo = (document.getElementById('search-input').value || '').toLowerCase().trim();
+        const titleEl = document.getElementById('section-title-text');
+        const resultado = unidades.filter(u => {
+            const matchEsp = filtroAtivo === 'todos' || u.esp.includes(filtroAtivo);
+            const matchSearch = !termo || u.nome.toLowerCase().includes(termo) || u.tags.some(t => t.toLowerCase().includes(termo)) || u.endereco.toLowerCase().includes(termo);
+            return matchEsp && matchSearch;
+        });
+        if (filtroAtivo === 'todos') {
+            titleEl.textContent = termo ? `Resultados para "${termo}"` : 'Todas as unidades disponíveis';
+        } else {
+            const esp = especialidades.find(e => e.key === filtroAtivo);
+            titleEl.textContent = `Unidades com ${esp ? esp.label : ''} disponíveis`;
+        }
+        renderCards(resultado);
+    }
+
+    // ===== RENDERIZAR CARDS =====
+    function renderCards(lista) {
+        const c = document.getElementById('cards-container');
+        const nr = document.getElementById('no-results');
+        c.innerHTML = '';
+        if (!lista.length) { nr.classList.remove('hidden'); return; }
+        nr.classList.add('hidden');
+        lista.forEach(u => {
+            let badgeHtml = '';
+            if (u.badge) {
+                badgeHtml = `<div class="absolute top-4 left-4 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg">${u.badge.toUpperCase()}</div>`;
+            } else if (u.aberto) {
+                badgeHtml = `<div class="absolute top-4 left-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg">ABERTO AGORA</div>`;
             }
-        }
+            const tagsHtml = u.tags.map(t => `<span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300">${t}</span>`).join('');
+            const div = document.createElement('div');
+            div.className = 'unit-card group relative glass rounded-3xl overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-blue-500/50';
+            div.innerHTML = `
+                <div class="h-48 bg-slate-800 relative">
+                    <img src="${u.img}" class="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" alt="${u.nome}" loading="lazy">
+                    ${badgeHtml}
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-xl">${u.nome}</h3>
+                        <span class="flex items-center gap-1 text-sm"><i class="ph-fill ph-star text-amber-400"></i> ${u.nota}</span>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-4">${u.endereco}</p>
+                    <div class="flex flex-wrap gap-2">${tagsHtml}</div>
+                    <a href="mapa.html" class="mt-6 w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 text-white no-underline">
+                        <i class="ph ph-map-trifold"></i> Ver no Mapa
+                    </a>
+                </div>`;
+            c.appendChild(div);
+        });
+    }
 
-        function toggleMap(lat, lng, name) {
-            mapOverlay.classList.add('active');
-            mapTitle.innerText = name;
-            
-            initMap();
-            
-            setTimeout(() => {
-                leafletMap.invalidateSize();
-                leafletMap.flyTo([lat, lng], 16, { duration: 1.5 });
-                
-                // Limpar marcadores anteriores e adicionar o novo
-                leafletMap.eachLayer((layer) => {
-                    if (layer instanceof L.Marker) leafletMap.removeLayer(layer);
-                });
-
-                L.marker([lat, lng]).addTo(leafletMap)
-                    .bindPopup(`<b style="color:#333">${name}</b>`).openPopup();
-            }, 600);
-        }
-
-        function closeMap() {
-            mapOverlay.classList.remove('active');
-        }
+    // ===== INIT =====
+    renderFiltros();
+    aplicarFiltros();
     </script>
 </body>
 </html>
