@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anotar Medicamentos - Saúde Piracicaba</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, rgba(56,189,248,0.15), transparent 28%), radial-gradient(circle at bottom right, rgba(129,140,248,0.14), transparent 22%), #020617; color: #f8fafc; }
+        .glass { background: rgba(15,23,42,0.75); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.08); }
+        .note-block { min-height: 350px; resize: vertical; }
+        .accent { color: #38bdf8; }
+        .shadow-soft { box-shadow: 0 35px 80px -40px rgba(15, 23, 42, 0.8); }
+        .dot-grid { background-image: radial-gradient(circle, rgba(148,163,184,0.18) 1px, transparent 1px); background-size: 20px 20px; }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen px-4 py-6 md:px-10 lg:px-16">
+        <header class="glass rounded-[32px] border-white/10 p-6 shadow-soft mb-8">
+            <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                <div class="space-y-3">
+                    <div class="inline-flex items-center gap-3 rounded-3xl bg-slate-900/70 px-4 py-3 border border-white/10">
+                        <a href="index3.html" class="inline-flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
+                            <i class="ph-bold ph-arrow-left text-xl"></i>
+                            Voltar
+                        </a>
+                    </div>
+                    <div>
+                        <h1 class="text-4xl font-bold tracking-tight text-white">Anotar Medicamentos</h1>
+                        <p class="mt-3 max-w-2xl text-slate-400">Use este espaço como um bloco de notas médico. Registre doses, horários e duração da prescrição com estilo, e mantenha tudo salvo automaticamente.</p>
+                    </div>
+                </div>
+                <div class="rounded-3xl bg-slate-900/80 border border-white/10 p-4 shadow-soft w-full md:w-auto">
+                    <p class="text-xs uppercase tracking-[0.25em] text-slate-500">Dica rápida</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-300">Anote o medicamento, horário e por quanto tempo tomar. Seus dados ficam guardados no navegador para você consultar sempre que precisar.</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="grid gap-6 xl:grid-cols-[1.55fr_1fr]">
+            <section class="glass rounded-[32px] border-white/10 p-6 shadow-soft">
+                <div class="flex items-center justify-between mb-6 gap-4">
+                    <div>
+                        <span class="text-sm uppercase tracking-[0.35em] text-slate-500">Bloco de notas</span>
+                        <h2 class="mt-2 text-3xl font-bold text-white">Seu diário de medicamentos</h2>
+                    </div>
+                    <button id="clear-notes" class="rounded-2xl bg-blue-500/15 border border-blue-500/30 px-4 py-2 text-sm font-semibold text-blue-300 hover:bg-blue-500/20 transition-all">Limpar notas</button>
+                </div>
+
+                <div class="relative rounded-[28px] border border-white/10 bg-slate-950/80 p-5 dot-grid">
+                    <div class="absolute inset-x-0 top-[2rem] h-[1px] bg-white/10"></div>
+                    <textarea id="quick-notes" class="note-block w-full rounded-[28px] border border-white/10 bg-slate-900/90 p-6 text-slate-100 placeholder:text-slate-500 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 text-sm leading-7" placeholder="Escreva seus medicamentos, horários ou lembretes clínicos aqui..." spellcheck="false"></textarea>
+                    <div class="mt-4 flex flex-wrap gap-3 text-sm text-slate-400">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-slate-800/80 px-3 py-2"> <i class="ph-fill ph-check-circle text-blue-400"></i> Texto salvo localmente</span>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-slate-800/80 px-3 py-2"> <i class="ph-fill ph-clock text-cyan-400"></i> Histórico disponível a qualquer momento</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass rounded-[32px] border-white/10 p-6 shadow-soft flex flex-col">
+                <div class="mb-6">
+                    <span class="text-sm uppercase tracking-[0.35em] text-slate-500">Agenda de medicamentos</span>
+                    <h2 class="mt-2 text-3xl font-bold text-white">Organize sua prescrição</h2>
+                </div>
+
+                <form id="medicine-form" class="space-y-5">
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <label class="space-y-2 text-sm text-slate-300">
+                            <span>Medicamento</span>
+                            <input id="medicine-name" type="text" placeholder="Ex: Paracetamol 500mg" class="w-full rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20" required>
+                        </label>
+                        <label class="space-y-2 text-sm text-slate-300">
+                            <span>Horário / Dias</span>
+                            <input id="medicine-schedule" type="text" placeholder="Ex: 08h, 14h e 20h / 7 dias" class="w-full rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20" required>
+                        </label>
+                    </div>
+
+                    <label class="space-y-2 text-sm text-slate-300">
+                        <span>Duração</span>
+                        <input id="medicine-duration" type="text" placeholder="Ex: 10 dias" class="w-full rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20">
+                    </label>
+
+                    <label class="space-y-2 text-sm text-slate-300">
+                        <span>Observações</span>
+                        <textarea id="medicine-notes" rows="4" placeholder="Ex: tomar após refeição ou evitar dirigir" class="w-full rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"></textarea>
+                    </label>
+
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <p class="text-sm text-slate-400">As prescrições ficam salvas automaticamente no seu navegador.</p>
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-3xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-400 transition-all">
+                            <i class="ph-bold ph-plus-circle"></i> Adicionar prescrição
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-8 flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Prescrições salvas</p>
+                        <p id="entry-count" class="mt-2 text-sm text-slate-300">Nenhuma prescrição ainda.</p>
+                    </div>
+                    <button id="clear-entries" class="rounded-3xl bg-white/5 border border-white/10 px-4 py-2 text-sm font-semibold text-slate-300 hover:bg-white/10 transition-colors">Limpar agenda</button>
+                </div>
+
+                <div id="entries-list" class="mt-6 flex-1 space-y-4 overflow-y-auto pr-1">
+                    <!-- cards preenchidos por JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const quickNotes = document.getElementById('quick-notes');
+        const form = document.getElementById('medicine-form');
+        const entriesList = document.getElementById('entries-list');
+        const entryCount = document.getElementById('entry-count');
+        const clearNotesBtn = document.getElementById('clear-notes');
+        const clearEntriesBtn = document.getElementById('clear-entries');
+
+        const NOTES_KEY = 'saude-pira-med-notes';
+        const ENTRIES_KEY = 'saude-pira-med-entries';
+
+        function loadState() {
+            const savedNotes = localStorage.getItem(NOTES_KEY);
+            const savedEntries = localStorage.getItem(ENTRIES_KEY);
+            if (savedNotes !== null) quickNotes.value = savedNotes;
+            const entries = savedEntries ? JSON.parse(savedEntries) : [];
+            renderEntries(entries);
+        }
+
+        function saveNotes() {
+            localStorage.setItem(NOTES_KEY, quickNotes.value);
+        }
+
+        function saveEntries(entries) {
+            localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries));
+        }
+
+        function renderEntries(entries) {
+            entriesList.innerHTML = entries.length ? '' : '<p class="text-slate-500 text-sm">Nenhuma prescrição salva ainda. Preencha o formulário para começar.</p>';
+            entryCount.textContent = entries.length ? `${entries.length} ${entries.length === 1 ? 'prescrição' : 'prescrições'} salvas` : 'Nenhuma prescrição ainda.';
+            entries.forEach(entry => {
+                const card = document.createElement('div');
+                card.className = 'glass rounded-3xl border border-white/10 p-5 text-slate-200';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.3em] text-slate-500">${entry.duration || 'Sem duração definida'}</p>
+                            <h3 class="mt-2 text-xl font-semibold text-white">${entry.name}</h3>
+                            <p class="mt-2 text-sm text-slate-400">${entry.schedule}</p>
+                        </div>
+                        <button data-id="${entry.id}" class="delete-entry rounded-full bg-red-500/15 p-3 text-red-300 hover:bg-red-500/20 transition-colors" aria-label="Excluir prescrição">
+                            <i class="ph-bold ph-trash"></i>
+                        </button>
+                    </div>
+                    <p class="mt-4 text-sm leading-6 text-slate-300">${entry.notes || '<span class="text-slate-500">Sem observações adicionais.</span>'}</p>
+                `;
+                entriesList.appendChild(card);
+            });
+            document.querySelectorAll('.delete-entry').forEach(button => {
+                button.addEventListener('click', () => {
+                    const id = button.dataset.id;
+                    const updated = (JSON.parse(localStorage.getItem(ENTRIES_KEY)) || []).filter(item => item.id !== id);
+                    saveEntries(updated);
+                    renderEntries(updated);
+                });
+            });
+        }
+
+        quickNotes.addEventListener('input', saveNotes);
+
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+            const name = document.getElementById('medicine-name').value.trim();
+            const schedule = document.getElementById('medicine-schedule').value.trim();
+            const duration = document.getElementById('medicine-duration').value.trim();
+            const notes = document.getElementById('medicine-notes').value.trim();
+
+            if (!name || !schedule) return;
+
+            const entries = JSON.parse(localStorage.getItem(ENTRIES_KEY)) || [];
+            entries.unshift({ id: crypto.randomUUID(), name, schedule, duration, notes, createdAt: new Date().toISOString() });
+            saveEntries(entries);
+            renderEntries(entries);
+
+            form.reset();
+            document.getElementById('medicine-name').focus();
+        });
+
+        clearNotesBtn.addEventListener('click', () => {
+            quickNotes.value = '';
+            saveNotes();
+        });
+
+        clearEntriesBtn.addEventListener('click', () => {
+            if (!confirm('Deseja mesmo apagar todas as prescrições salvas?')) return;
+            saveEntries([]);
+            renderEntries([]);
+        });
+
+        loadState();
+    </script>
+</body>
+</html>

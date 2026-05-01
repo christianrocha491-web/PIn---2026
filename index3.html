@@ -48,30 +48,12 @@
             <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
                 <i class="ph-bold ph-calendar-plus text-xl"></i> Agendamentos
             </a>
-            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
-                <i class="ph-bold ph-pill text-xl"></i> Medicamentos
+            <a href="medicamentos.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+                <i class="ph-bold ph-pill text-xl"></i> Anotar Medicamentos
             </a>
             <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
                 <i class="ph-bold ph-file-text text-xl"></i> Meus Laudos
             </a>
-            <div class="h-px bg-white/10 my-2"></div>
-            <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1">Especialidades</span>
-            <a href="clinico-geral.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-white/5 transition-colors text-sm">
-                <i class="ph ph-stethoscope text-blue-400 text-lg"></i> Clínico Geral
-            </a>
-            <a href="pediatria.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-white/5 transition-colors text-sm">
-                <i class="ph ph-baby text-cyan-400 text-lg"></i> Pediatria
-            </a>
-            <a href="dentista.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-white/5 transition-colors text-sm">
-                <i class="ph ph-tooth text-emerald-400 text-lg"></i> Dentista
-            </a>
-            <a href="urgencia.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-white/5 transition-colors text-sm">
-                <i class="ph ph-first-aid text-red-400 text-lg"></i> Urgência
-            </a>
-            <a href="psicologia.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-white/5 transition-colors text-sm">
-                <i class="ph ph-brain text-purple-400 text-lg"></i> Psicologia
-            </a>
-            <div class="h-px bg-white/10 my-2"></div>
             <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1">Conta</span>
             <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
                 <i class="ph-bold ph-user text-xl"></i> Meu Perfil
@@ -156,6 +138,7 @@
         { key: 'cardiologia',   label: 'Cardiologia',   icon: 'ph-heartbeat',           color: 'text-rose-400' },
         { key: 'ortopedia',     label: 'Ortopedia',     icon: 'ph-bone',                color: 'text-yellow-400' },
         { key: 'nutricao',      label: 'Nutrição',      icon: 'ph-fork-knife',          color: 'text-lime-400' },
+        { key: 'farmacia',      label: 'Farmácia',      icon: 'ph-pill',                color: 'text-green-400' },
     ];
 
     const unidades = [
@@ -177,6 +160,10 @@
         { nome:'Posto de Vacinação Central',      endereco:'Rua do Rosário, 430 · 1.5km',            nota:4.8, aberto:true,  tags:['Vacinação','Saúde Infantil'],                 esp:['vacinacao'],                                 img:'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=500' },
         { nome:'Clínica de Ginecologia Municipal',endereco:'Rua Benjamin Constant, 900 · 2.6km',     nota:4.6, aberto:true,  tags:['Ginecologia','Obstetrícia','Pré-natal'],      esp:['ginecologia'],                               img:'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80&w=500' },
         { nome:'Centro de Ortopedia Pira',        endereco:'Av. Independência, 1200 · 4.0km',        nota:4.7, aberto:true,  tags:['Ortopedia','Fisioterapia','Raio-X'],          esp:['ortopedia','fisioterapia'],                  img:'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Farmácia Drogasil Centro',         endereco:'Rua do Rosário, 600 · 0.8km',            nota:4.3, aberto:true,  tags:['Medicamentos','Farmácia','Cosméticos'],       esp:['farmacia'],                                   img:'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Farmácia São Paulo',               endereco:'Av. Independência, 500 · 1.2km',          nota:4.5, aberto:true,  tags:['Medicamentos','Farmácia'],                   esp:['farmacia'],                                   img:'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Farmácia Pague Menos',             endereco:'Rua Moraes Barros, 200 · 0.6km',           nota:4.2, aberto:true,  tags:['Medicamentos','Farmácia','Produtos Naturais'],esp:['farmacia'],                                   img:'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=500' },
+        { nome:'Farmácia Popular Municipal',       endereco:'Av. Dr. Paulo de Moraes, 300 · 2.0km',     nota:4.4, aberto:true,  tags:['Medicamentos','Farmácia','Genéricos'],        esp:['farmacia'],                                   img:'https://images.unsplash.com/photo-1632833239869-a37e3a5806d2?auto=format&fit=crop&q=80&w=500' },
     ];
 
     let filtroAtivo = 'todos';

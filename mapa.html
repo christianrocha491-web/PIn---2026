@@ -165,6 +165,7 @@
                         <button onclick="setMapFilter('UBS')" id="mf-ubs" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-blue-400 hover:border-blue-500/30 font-medium transition-all">UBS</button>
                         <button onclick="setMapFilter('Saúde Mental')" id="mf-caps" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-purple-400 hover:border-purple-500/30 font-medium transition-all">CAPS</button>
                         <button onclick="setMapFilter('SAMU')" id="mf-samu" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-yellow-400 hover:border-yellow-500/30 font-medium transition-all">SAMU</button>
+                        <button onclick="setMapFilter('Farmácia')" id="mf-farmacia" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-green-400 hover:border-green-500/30 font-medium transition-all">Farmácia</button>
                     </div>
                 </div>
                 <!-- Lista de unidades -->
@@ -277,6 +278,10 @@
             { id:13, name:"CAPS Infantil",                      address:"Rua Antônio Correa Barbosa, 200",    lat:-22.7320, lng:-47.6450, rating:4.7, reviews:65,  status:"Aberto",    time:"08h - 17h",   tags:["Psicologia","Psicopedagogia"],             type:"Saúde Mental" },
             { id:14, name:"CAPS AD",                            address:"Rua Visconde do Rio Branco, 1300",   lat:-22.7200, lng:-47.6600, rating:4.5, reviews:55,  status:"Aberto",    time:"08h - 17h",   tags:["Psicologia","Assistência Social"],         type:"Saúde Mental" },
             { id:15, name:"SAMU Piracicaba",                    address:"Rua Duque de Caxias, 1310",          lat:-22.7290, lng:-47.6380, rating:4.8, reviews:400, status:"24 Horas", time:"Aberto 24h",  tags:["Emergência","Ambulância"],                 type:"SAMU" },
+            { id:16, name:"Farmácia Drogasil Centro",          address:"Rua do Rosário, 600",                lat:-22.7280, lng:-47.6470, rating:4.3, reviews:150, status:"Aberto",  time:"08h - 22h", tags:["Medicamentos","Farmácia"],                type:"Farmácia" },
+            { id:17, name:"Farmácia São Paulo",                address:"Av. Independência, 500",             lat:-22.7350, lng:-47.6500, rating:4.5, reviews:200, status:"Aberto",  time:"08h - 20h", tags:["Medicamentos","Farmácia"],                type:"Farmácia" },
+            { id:18, name:"Farmácia Pague Menos",              address:"Rua Moraes Barros, 200",             lat:-22.7260, lng:-47.6490, rating:4.2, reviews:120, status:"Aberto",  time:"08h - 21h", tags:["Medicamentos","Farmácia"],                type:"Farmácia" },
+            { id:19, name:"Farmácia Popular Municipal",        address:"Av. Dr. Paulo de Moraes, 300",       lat:-22.7400, lng:-47.6550, rating:4.4, reviews:180, status:"Aberto",  time:"08h - 18h", tags:["Medicamentos","Farmácia"],                type:"Farmácia" },
         ];
 
         // ===== ESTADO =====
@@ -286,7 +291,7 @@
         let currentMarker = null;
 
         // ===== CORES POR TIPO =====
-        const typeColors = { 'Hospital':'#ef4444', 'UPA':'#f97316', 'UBS':'#3b82f6', 'Saúde Mental':'#a855f7', 'SAMU':'#eab308' };
+        const typeColors = { 'Hospital':'#ef4444', 'UPA':'#f97316', 'UBS':'#3b82f6', 'Saúde Mental':'#a855f7', 'SAMU':'#eab308', 'Farmácia':'#10b981' };
 
         function createIcon(type, active = false) {
             const color = typeColors[type] || '#3b82f6';
@@ -319,7 +324,7 @@
                 b.classList.remove('border-blue-500/40','bg-blue-500/15','text-blue-400');
                 b.classList.add('border-white/10','bg-white/5','text-slate-300');
             });
-            const idMap = { 'todos':'mf-todos','Hospital':'mf-hospital','UPA':'mf-upa','UBS':'mf-ubs','Saúde Mental':'mf-caps','SAMU':'mf-samu' };
+            const idMap = { 'todos':'mf-todos','Hospital':'mf-hospital','UPA':'mf-upa','UBS':'mf-ubs','Saúde Mental':'mf-caps','SAMU':'mf-samu','Farmácia':'mf-farmacia' };
             const btn = document.getElementById(idMap[type]);
             if (btn) { btn.classList.add('border-blue-500/40','bg-blue-500/15','text-blue-400'); btn.classList.remove('border-white/10','bg-white/5','text-slate-300'); }
             aplicarFiltrosMapa();
