@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saúde Piracicaba - Login e Cadastro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; }
+        .glass { background: rgba(15,23,42,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .input-focus:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+       .tab-active {border-bottom: 2px solid #3b82f6; color: #3b82f6;}
+       .tab-inactive {border-bottom: 2px solid transparent;color: #94a3b8;}
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-4">
+
+    <!-- Background gradient -->
+    <div class="fixed inset-0 -z-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="w-full max-w-md">
+        <!-- Logo -->
+        <div class="flex items-center justify-center gap-3 mb-12">
+            <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                <i class="ph-bold ph-activity text-white text-2xl"></i>
+            </div>
+            <span class="font-bold text-2xl">Saúde<span class="text-blue-500">Pira</span></span>
+        </div>
+
+        <!-- Card Principal -->
+        <div class="glass rounded-3xl p-8 backdrop-blur-xl">
+            
+            <!-- Abas -->
+            <div class="flex gap-6 mb-8 border-b border-white/10">
+                <button id="tab-login" class="pb-3 font-semibold transition-all tab-active" onclick="switchTab('login')">
+                    <i class="ph ph-sign-in mr-2"></i>Entrar
+                </button>
+                <button id="tab-signup" class="pb-3 font-semibold transition-all tab-inactive" onclick="switchTab('signup')">
+                    <i class="ph ph-user-plus mr-2"></i>Cadastrar
+                </button>
+            </div>
+
+            <!-- Formulário de Login -->
+            <div id="login-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                    <input id="login-email" type="email" placeholder="seu@email.com" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Senha</label>
+                    <input id="login-password" type="password" placeholder="••••••••" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
+                </div>
+                <div id="login-error" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm"></div>
+                <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold transition-all text-white mt-6">
+                    Entrar
+                </button>
+                <p class="text-center text-slate-400 text-sm">
+                    Não tem conta? <button onclick="switchTab('signup')" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Cadastre-se</button>
+                </p>
+            </div>
+
+            <!-- Formulário de Cadastro -->
+            <div id="signup-form" class="hidden space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Nome Completo</label>
+                    <input id="signup-name" type="text" placeholder="João Silva" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                    <input id="signup-email" type="email" placeholder="seu@email.com" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Senha</label>
+                    <input id="signup-password" type="password" placeholder="••••••••" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Confirmar Senha</label>
+                    <input id="signup-password-confirm" type="password" placeholder="••••••••" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
+                </div>
+                <div id="signup-error" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm"></div>
+                <div id="signup-success" class="hidden bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                    <i class="ph ph-check-circle"></i>
+                    <span></span>
+                </div>
+                <button onclick="handleSignup()" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold transition-all text-white mt-6">
+                    Criar Conta
+                </button>
+                <p class="text-center text-slate-400 text-sm">
+                    Já tem conta? <button onclick="switchTab('login')" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Entre aqui</button>
+                </p>
+            </div>
+
+            <!-- Benefícios -->
+            <div class="mt-10 pt-8 border-t border-white/10 space-y-3">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Benefícios de se registrar:</p>
+                <div class="space-y-2 text-sm text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-check text-blue-400"></i>
+                        <span>Salve seus medicamentos prescitos</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-check text-blue-400"></i>
+                        <span>Favoritize unidades de saúde</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-check text-blue-400"></i>
+                        <span>Acesso rápido aos seus dados</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Link para voltar -->
+        <div class="text-center mt-6">
+            <a href="index3.html" class="text-slate-400 hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2">
+                <i class="ph ph-arrow-left"></i>
+                Voltar para Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+    // ===== GERENCIAR ABAS =====
+    function switchTab(tab) {
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const tabLogin = document.getElementById('tab-login');
+        const tabSignup = document.getElementById('tab-signup');
+
+        if (tab === 'login') {
+            loginForm.classList.remove('hidden');
+            signupForm.classList.add('hidden');
+            tabLogin.classList.remove('tab-inactive');
+            tabLogin.classList.add('tab-active');
+            tabSignup.classList.remove('tab-active');
+            tabSignup.classList.add('tab-inactive');
+            document.getElementById('login-error').classList.add('hidden');
+        } else {
+            loginForm.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+            tabLogin.classList.remove('tab-active');
+            tabLogin.classList.add('tab-inactive');
+            tabSignup.classList.remove('tab-inactive');
+            tabSignup.classList.add('tab-active');
+            document.getElementById('signup-error').classList.add('hidden');
+            document.getElementById('signup-success').classList.add('hidden');
+        }
+    }
+
+    // ===== GERENCIAR USUARIOS =====
+    function getAllUsers() {
+        return JSON.parse(localStorage.getItem('saude-pira-users')) || [];
+    }
+
+    function saveUsers(users) {
+        localStorage.setItem('saude-pira-users', JSON.stringify(users));
+    }
+
+    function getUserByEmail(email) {
+        const users = getAllUsers();
+        return users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    }
+
+    function createUser(name, email, password) {
+        const users = getAllUsers();
+        const id = Date.now().toString();
+        const newUser = { id, name, email, password };
+        users.push(newUser);
+        saveUsers(users);
+        return newUser;
+    }
+
+    // ===== LOGIN =====
+    function handleLogin() {
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const errorDiv = document.getElementById('login-error');
+
+        errorDiv.classList.add('hidden');
+
+        if (!email || !password) {
+            errorDiv.textContent = 'Por favor, preencha todos os campos.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        if (!email.includes('@')) {
+            errorDiv.textContent = 'Email inválido.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        const user = getUserByEmail(email);
+        if (!user) {
+            errorDiv.textContent = 'Email não encontrado.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        if (user.password !== password) {
+            errorDiv.textContent = 'Senha incorreta.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        // Login bem-sucedido
+        sessionStorage.setItem('currentUser', JSON.stringify({ id: user.id, name: user.name, email: user.email }));
+        window.location.href = 'index3.html';
+    }
+
+    // ===== SIGNUP =====
+    function handleSignup() {
+        const name = document.getElementById('signup-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+        const passwordConfirm = document.getElementById('signup-password-confirm').value;
+        const errorDiv = document.getElementById('signup-error');
+        const successDiv = document.getElementById('signup-success');
+
+        errorDiv.classList.add('hidden');
+        successDiv.classList.add('hidden');
+
+        if (!name || !email || !password || !passwordConfirm) {
+            errorDiv.textContent = 'Por favor, preencha todos os campos.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        if (!email.includes('@')) {
+            errorDiv.textContent = 'Email inválido.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        if (password.length < 6) {
+            errorDiv.textContent = 'Senha deve ter pelo menos 6 caracteres.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        if (password !== passwordConfirm) {
+            errorDiv.textContent = 'As senhas não coincidem.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        if (getUserByEmail(email)) {
+            errorDiv.textContent = 'Email já cadastrado.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        // Cadastro bem-sucedido
+        const newUser = createUser(name, email, password);
+        successDiv.querySelector('span').textContent = `Conta criada! Bem-vindo, ${name}!`;
+        successDiv.classList.remove('hidden');
+
+        // Limpar formulário
+        document.getElementById('signup-name').value = '';
+        document.getElementById('signup-email').value = '';
+        document.getElementById('signup-password').value = '';
+        document.getElementById('signup-password-confirm').value = '';
+
+        // Fazer login automático
+        setTimeout(() => {
+            sessionStorage.setItem('currentUser', JSON.stringify({ id: newUser.id, name: newUser.name, email: newUser.email }));
+            window.location.href = 'index3.html';
+        }, 2000);
+    }
+
+    // ===== VERIFICAR SE JÁ ESTÁ LOGADO =====
+    function checkAlreadyLoggedIn() {
+        const user = sessionStorage.getItem('currentUser');
+        if (user) {
+            window.location.href = 'index3.html';
+        }
+    }
+
+    checkAlreadyLoggedIn();
+    </script>
+</body>
+</html>

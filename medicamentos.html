@@ -3,203 +3,491 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anotar Medicamentos - Saúde Piracicaba</title>
+    <title>Saúde Piracicaba - Anotar Medicamentos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top, rgba(56,189,248,0.15), transparent 28%), radial-gradient(circle at bottom right, rgba(129,140,248,0.14), transparent 22%), #020617; color: #f8fafc; }
-        .glass { background: rgba(15,23,42,0.75); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.08); }
-        .note-block { min-height: 350px; resize: vertical; }
-        .accent { color: #38bdf8; }
-        .shadow-soft { box-shadow: 0 35px 80px -40px rgba(15, 23, 42, 0.8); }
-        .dot-grid { background-image: radial-gradient(circle, rgba(148,163,184,0.18) 1px, transparent 1px); background-size: 20px 20px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; }
+        .glass { background: rgba(15,23,42,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .input-focus:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .prescription-card { transition: all 0.3s ease; }
+        .prescription-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
     </style>
 </head>
-<body>
-    <div class="min-h-screen px-4 py-6 md:px-10 lg:px-16">
-        <header class="glass rounded-[32px] border-white/10 p-6 shadow-soft mb-8">
-            <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                <div class="space-y-3">
-                    <div class="inline-flex items-center gap-3 rounded-3xl bg-slate-900/70 px-4 py-3 border border-white/10">
-                        <a href="index3.html" class="inline-flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
-                            <i class="ph-bold ph-arrow-left text-xl"></i>
-                            Voltar
-                        </a>
-                    </div>
-                    <div>
-                        <h1 class="text-4xl font-bold tracking-tight text-white">Anotar Medicamentos</h1>
-                        <p class="mt-3 max-w-2xl text-slate-400">Use este espaço como um bloco de notas médico. Registre doses, horários e duração da prescrição com estilo, e mantenha tudo salvo automaticamente.</p>
-                    </div>
+<body class="min-h-screen">
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-40 glass px-4 md:px-6 py-4 flex justify-between items-center gap-4">
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <a href="index3.html" class="text-slate-300 hover:text-white transition-colors">
+                <i class="ph-bold ph-arrow-left text-2xl"></i>
+            </a>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i class="ph-bold ph-activity text-white"></i>
                 </div>
-                <div class="rounded-3xl bg-slate-900/80 border border-white/10 p-4 shadow-soft w-full md:w-auto">
-                    <p class="text-xs uppercase tracking-[0.25em] text-slate-500">Dica rápida</p>
-                    <p class="mt-2 text-sm leading-6 text-slate-300">Anote o medicamento, horário e por quanto tempo tomar. Seus dados ficam guardados no navegador para você consultar sempre que precisar.</p>
+                <span class="font-bold text-lg tracking-tight">Saúde<span class="text-blue-500">Pira</span></span>
+            </div>
+        </div>
+        <div class="flex bg-slate-800/50 rounded-full px-4 py-2 border border-white/10 items-center gap-3 flex-1 max-w-md">
+            <i class="ph ph-magnifying-glass text-slate-400"></i>
+            <input id="search-input" type="text" placeholder="Buscar prescrições..." class="bg-transparent border-none outline-none text-sm w-full" oninput="filterPrescriptions()">
+        </div>
+        <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0" id="auth-button">
+            <a href="login.html" class="no-underline text-white">Entrar</a>
+        </button>
+        <div id="user-greeting" class="hidden flex items-center gap-3 flex-shrink-0">
+            <div class="flex flex-col items-end">
+                <span class="text-sm font-semibold text-white">Olá, <span id="user-name"></span></span>
+                <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-red-400 transition-colors">Sair</button>
+            </div>
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold text-white">
+                <span id="user-initial"></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24 px-6 max-w-7xl mx-auto pb-24">
+        <section class="mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 py-1 bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">
+                Anote suas prescrições médicas.
+            </h1>
+            <p class="text-slate-400 text-lg">Mantenha um registro organizado dos seus medicamentos e horários.</p>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Prescrições Salvas (Lado Esquerdo) -->
+            <div class="lg:col-span-2">
+                <div class="glass rounded-3xl p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold flex items-center gap-3">
+                            <i class="ph ph-clipboard-list text-blue-400"></i>
+                            Suas Prescrições
+                        </h2>
+                    </div>
+
+                    <div id="prescriptions-list" class="space-y-4">
+                        <!-- Prescrições serão renderizadas aqui -->
+                    </div>
+
+                    <div id="no-prescriptions" class="text-center py-12 text-slate-500 hidden">
+                        <i class="ph ph-clipboard-list text-5xl mb-4 block opacity-40"></i>
+                        <p class="text-lg font-medium">Nenhuma prescrição salva ainda.</p>
+                        <p class="text-sm mt-1">Clique em "Nova Prescrição" para começar.</p>
+                    </div>
                 </div>
             </div>
-        </header>
 
-        <main class="grid gap-6 xl:grid-cols-[1.55fr_1fr]">
-            <section class="glass rounded-[32px] border-white/10 p-6 shadow-soft">
-                <div class="flex items-center justify-between mb-6 gap-4">
-                    <div>
-                        <span class="text-sm uppercase tracking-[0.35em] text-slate-500">Bloco de notas</span>
-                        <h2 class="mt-2 text-3xl font-bold text-white">Seu diário de medicamentos</h2>
-                    </div>
-                    <button id="clear-notes" class="rounded-2xl bg-blue-500/15 border border-blue-500/30 px-4 py-2 text-sm font-semibold text-blue-300 hover:bg-blue-500/20 transition-all">Limpar notas</button>
-                </div>
+            <!-- Formulário de Adição (Lado Direito) -->
+            <div class="lg:col-span-1">
+                <div class="glass rounded-3xl p-8 sticky top-32">
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-3">
+                        <i class="ph ph-plus-circle text-blue-400"></i>
+                        Adicionar Prescrição
+                    </h3>
 
-                <div class="relative rounded-[28px] border border-white/10 bg-slate-950/80 p-5 dot-grid">
-                    <div class="absolute inset-x-0 top-[2rem] h-[1px] bg-white/10"></div>
-                    <textarea id="quick-notes" class="note-block w-full rounded-[28px] border border-white/10 bg-slate-900/90 p-6 text-slate-100 placeholder:text-slate-500 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 text-sm leading-7" placeholder="Escreva seus medicamentos, horários ou lembretes clínicos aqui..." spellcheck="false"></textarea>
-                    <div class="mt-4 flex flex-wrap gap-3 text-sm text-slate-400">
-                        <span class="inline-flex items-center gap-2 rounded-full bg-slate-800/80 px-3 py-2"> <i class="ph-fill ph-check-circle text-blue-400"></i> Texto salvo localmente</span>
-                        <span class="inline-flex items-center gap-2 rounded-full bg-slate-800/80 px-3 py-2"> <i class="ph-fill ph-clock text-cyan-400"></i> Histórico disponível a qualquer momento</span>
-                    </div>
-                </div>
-            </section>
+                    <form id="prescription-form" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Nome do Medicamento</label>
+                            <input id="med-name" type="text" placeholder="Ex: Paracetamol" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus" required>
+                        </div>
 
-            <section class="glass rounded-[32px] border-white/10 p-6 shadow-soft flex flex-col">
-                <div class="mb-6">
-                    <span class="text-sm uppercase tracking-[0.35em] text-slate-500">Agenda de medicamentos</span>
-                    <h2 class="mt-2 text-3xl font-bold text-white">Organize sua prescrição</h2>
-                </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Dosagem</label>
+                            <input id="med-dosage" type="text" placeholder="Ex: 500mg" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus" required>
+                        </div>
 
-                <form id="medicine-form" class="space-y-5">
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <label class="space-y-2 text-sm text-slate-300">
-                            <span>Medicamento</span>
-                            <input id="medicine-name" type="text" placeholder="Ex: Paracetamol 500mg" class="w-full rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20" required>
-                        </label>
-                        <label class="space-y-2 text-sm text-slate-300">
-                            <span>Horário / Dias</span>
-                            <input id="medicine-schedule" type="text" placeholder="Ex: 08h, 14h e 20h / 7 dias" class="w-full rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20" required>
-                        </label>
-                    </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Frequência</label>
+                            <select id="med-frequency" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white transition-all input-focus" required>
+                                <option value="">Selecione...</option>
+                                <option value="1x ao dia">1x ao dia</option>
+                                <option value="2x ao dia">2x ao dia</option>
+                                <option value="3x ao dia">3x ao dia</option>
+                                <option value="4x ao dia">4x ao dia</option>
+                                <option value="A cada 8 horas">A cada 8 horas</option>
+                                <option value="A cada 12 horas">A cada 12 horas</option>
+                                <option value="Quando necessário">Quando necessário</option>
+                            </select>
+                        </div>
 
-                    <label class="space-y-2 text-sm text-slate-300">
-                        <span>Duração</span>
-                        <input id="medicine-duration" type="text" placeholder="Ex: 10 dias" class="w-full rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20">
-                    </label>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Horários</label>
+                            <input id="med-times" type="text" placeholder="Ex: 8:00, 14:00, 20:00" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
+                        </div>
 
-                    <label class="space-y-2 text-sm text-slate-300">
-                        <span>Observações</span>
-                        <textarea id="medicine-notes" rows="4" placeholder="Ex: tomar após refeição ou evitar dirigir" class="w-full rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"></textarea>
-                    </label>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Observações</label>
+                            <textarea id="med-notes" placeholder="Instruções especiais, efeitos colaterais..." rows="3" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus resize-none"></textarea>
+                        </div>
 
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <p class="text-sm text-slate-400">As prescrições ficam salvas automaticamente no seu navegador.</p>
-                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-3xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-400 transition-all">
-                            <i class="ph-bold ph-plus-circle"></i> Adicionar prescrição
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold transition-all text-white">
+                            Salvar Prescrição
                         </button>
-                    </div>
-                </form>
-
-                <div class="mt-8 flex items-center justify-between gap-3">
-                    <div>
-                        <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Prescrições salvas</p>
-                        <p id="entry-count" class="mt-2 text-sm text-slate-300">Nenhuma prescrição ainda.</p>
-                    </div>
-                    <button id="clear-entries" class="rounded-3xl bg-white/5 border border-white/10 px-4 py-2 text-sm font-semibold text-slate-300 hover:bg-white/10 transition-colors">Limpar agenda</button>
+                    </form>
                 </div>
+            </div>
+        </div>
+    </main>
 
-                <div id="entries-list" class="mt-6 flex-1 space-y-4 overflow-y-auto pr-1">
-                    <!-- cards preenchidos por JS -->
-                </div>
-            </section>
-        </main>
+    <!-- Modal de Sugestão de Login -->
+    <div id="login-suggestion-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity">
+        <div class="glass rounded-3xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <i class="ph ph-warning-circle text-5xl text-amber-400 mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Faça login para salvar</h3>
+                <p class="text-slate-400">Para manter suas prescrições salvas permanentemente, crie uma conta ou entre com sua conta existente.</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeLoginModal()" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-semibold transition-all">Depois</button>
+                <a href="login.html" class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-semibold transition-all text-center text-white no-underline">Entrar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Adição/Edição -->
+    <div id="add-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity">
+        <div class="glass rounded-3xl p-8 max-w-md w-full mx-4">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">Nova Prescrição</h3>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-white">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+            <!-- Formulário será inserido aqui pelo JS -->
+        </div>
     </div>
 
     <script>
-        const quickNotes = document.getElementById('quick-notes');
-        const form = document.getElementById('medicine-form');
-        const entriesList = document.getElementById('entries-list');
-        const entryCount = document.getElementById('entry-count');
-        const clearNotesBtn = document.getElementById('clear-notes');
-        const clearEntriesBtn = document.getElementById('clear-entries');
+    let currentUser = null;
+    let prescriptions = [];
+    let editingId = null;
 
-        const NOTES_KEY = 'saude-pira-med-notes';
-        const ENTRIES_KEY = 'saude-pira-med-entries';
-
-        function loadState() {
-            const savedNotes = localStorage.getItem(NOTES_KEY);
-            const savedEntries = localStorage.getItem(ENTRIES_KEY);
-            if (savedNotes !== null) quickNotes.value = savedNotes;
-            const entries = savedEntries ? JSON.parse(savedEntries) : [];
-            renderEntries(entries);
+    function checkLogin() {
+        const user = sessionStorage.getItem('currentUser');
+        if (user) {
+            currentUser = JSON.parse(user);
+            updateAuthUI();
         }
+    }
 
-        function saveNotes() {
-            localStorage.setItem(NOTES_KEY, quickNotes.value);
+    function updateAuthUI() {
+        const authButton = document.getElementById('auth-button');
+        const userGreeting = document.getElementById('user-greeting');
+        
+        if (currentUser) {
+            authButton.classList.add('hidden');
+            userGreeting.classList.remove('hidden');
+            document.getElementById('user-name').textContent = currentUser.name.split(' ')[0];
+            document.getElementById('user-initial').textContent = currentUser.name.charAt(0).toUpperCase();
+        } else {
+            authButton.classList.remove('hidden');
+            userGreeting.classList.add('hidden');
         }
+    }
 
-        function saveEntries(entries) {
-            localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries));
+    function handleLogout() {
+        if (confirm('Deseja realmente sair?')) {
+            sessionStorage.removeItem('currentUser');
+            currentUser = null;
+            updateAuthUI();
+            loadPrescriptions();
         }
+    }
 
-        function renderEntries(entries) {
-            entriesList.innerHTML = entries.length ? '' : '<p class="text-slate-500 text-sm">Nenhuma prescrição salva ainda. Preencha o formulário para começar.</p>';
-            entryCount.textContent = entries.length ? `${entries.length} ${entries.length === 1 ? 'prescrição' : 'prescrições'} salvas` : 'Nenhuma prescrição ainda.';
-            entries.forEach(entry => {
-                const card = document.createElement('div');
-                card.className = 'glass rounded-3xl border border-white/10 p-5 text-slate-200';
-                card.innerHTML = `
-                    <div class="flex items-start justify-between gap-4">
-                        <div>
-                            <p class="text-xs uppercase tracking-[0.3em] text-slate-500">${entry.duration || 'Sem duração definida'}</p>
-                            <h3 class="mt-2 text-xl font-semibold text-white">${entry.name}</h3>
-                            <p class="mt-2 text-sm text-slate-400">${entry.schedule}</p>
-                        </div>
-                        <button data-id="${entry.id}" class="delete-entry rounded-full bg-red-500/15 p-3 text-red-300 hover:bg-red-500/20 transition-colors" aria-label="Excluir prescrição">
-                            <i class="ph-bold ph-trash"></i>
+    function loadPrescriptions() {
+        const key = currentUser ? `saude-pira-med-entries-${currentUser.id}` : 'saude-pira-med-entries';
+        prescriptions = JSON.parse(localStorage.getItem(key)) || [];
+        renderPrescriptions();
+    }
+
+    function savePrescriptions() {
+        const key = currentUser ? `saude-pira-med-entries-${currentUser.id}` : 'saude-pira-med-entries';
+        localStorage.setItem(key, JSON.stringify(prescriptions));
+    }
+
+    function renderPrescriptions() {
+        const container = document.getElementById('prescriptions-list');
+        const noPrescriptions = document.getElementById('no-prescriptions');
+        
+        container.innerHTML = '';
+        
+        if (prescriptions.length === 0) {
+            noPrescriptions.classList.remove('hidden');
+            return;
+        }
+        
+        noPrescriptions.classList.add('hidden');
+        
+        prescriptions.forEach((prescription, index) => {
+            const card = document.createElement('div');
+            card.className = 'prescription-card glass rounded-2xl p-6';
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h4 class="font-bold text-lg text-white">${prescription.name}</h4>
+                        <p class="text-slate-400 text-sm">${prescription.dosage} • ${prescription.frequency}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editPrescription(${index})" class="text-slate-400 hover:text-blue-400 transition-colors">
+                            <i class="ph ph-pencil text-lg"></i>
+                        </button>
+                        <button onclick="deletePrescription(${index})" class="text-slate-400 hover:text-red-400 transition-colors">
+                            <i class="ph ph-trash text-lg"></i>
                         </button>
                     </div>
-                    <p class="mt-4 text-sm leading-6 text-slate-300">${entry.notes || '<span class="text-slate-500">Sem observações adicionais.</span>'}</p>
-                `;
-                entriesList.appendChild(card);
-            });
-            document.querySelectorAll('.delete-entry').forEach(button => {
-                button.addEventListener('click', () => {
-                    const id = button.dataset.id;
-                    const updated = (JSON.parse(localStorage.getItem(ENTRIES_KEY)) || []).filter(item => item.id !== id);
-                    saveEntries(updated);
-                    renderEntries(updated);
-                });
-            });
+                </div>
+                ${prescription.times ? `<p class="text-slate-300 text-sm mb-2"><strong>Horários:</strong> ${prescription.times}</p>` : ''}
+                ${prescription.notes ? `<p class="text-slate-300 text-sm"><strong>Observações:</strong> ${prescription.notes}</p>` : ''}
+                <div class="mt-4 pt-4 border-t border-white/10">
+                    <small class="text-slate-500">Adicionado em ${new Date(prescription.date).toLocaleDateString('pt-BR')}</small>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function filterPrescriptions() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const filtered = prescriptions.filter(p => 
+            p.name.toLowerCase().includes(searchTerm) || 
+            p.dosage.toLowerCase().includes(searchTerm) ||
+            p.notes.toLowerCase().includes(searchTerm)
+        );
+        
+        const container = document.getElementById('prescriptions-list');
+        const noPrescriptions = document.getElementById('no-prescriptions');
+        
+        container.innerHTML = '';
+        
+        if (filtered.length === 0 && prescriptions.length > 0) {
+            container.innerHTML = '<p class="text-center text-slate-500 py-8">Nenhuma prescrição encontrada para o termo buscado.</p>';
+            return;
         }
-
-        quickNotes.addEventListener('input', saveNotes);
-
-        form.addEventListener('submit', event => {
-            event.preventDefault();
-            const name = document.getElementById('medicine-name').value.trim();
-            const schedule = document.getElementById('medicine-schedule').value.trim();
-            const duration = document.getElementById('medicine-duration').value.trim();
-            const notes = document.getElementById('medicine-notes').value.trim();
-
-            if (!name || !schedule) return;
-
-            const entries = JSON.parse(localStorage.getItem(ENTRIES_KEY)) || [];
-            entries.unshift({ id: crypto.randomUUID(), name, schedule, duration, notes, createdAt: new Date().toISOString() });
-            saveEntries(entries);
-            renderEntries(entries);
-
-            form.reset();
-            document.getElementById('medicine-name').focus();
+        
+        if (filtered.length === 0) {
+            noPrescriptions.classList.remove('hidden');
+            return;
+        }
+        
+        noPrescriptions.classList.add('hidden');
+        
+        filtered.forEach((prescription, index) => {
+            const card = document.createElement('div');
+            card.className = 'prescription-card glass rounded-2xl p-6';
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h4 class="font-bold text-lg text-white">${prescription.name}</h4>
+                        <p class="text-slate-400 text-sm">${prescription.dosage} • ${prescription.frequency}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editPrescription(${prescriptions.indexOf(prescription)})" class="text-slate-400 hover:text-blue-400 transition-colors">
+                            <i class="ph ph-pencil text-lg"></i>
+                        </button>
+                        <button onclick="deletePrescription(${prescriptions.indexOf(prescription)})" class="text-slate-400 hover:text-red-400 transition-colors">
+                            <i class="ph ph-trash text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                ${prescription.times ? `<p class="text-slate-300 text-sm mb-2"><strong>Horários:</strong> ${prescription.times}</p>` : ''}
+                ${prescription.notes ? `<p class="text-slate-300 text-sm"><strong>Observações:</strong> ${prescription.notes}</p>` : ''}
+                <div class="mt-4 pt-4 border-t border-white/10">
+                    <small class="text-slate-500">Adicionado em ${new Date(prescription.date).toLocaleDateString('pt-BR')}</small>
+                </div>
+            `;
+            container.appendChild(card);
         });
+    }
 
-        clearNotesBtn.addEventListener('click', () => {
-            quickNotes.value = '';
-            saveNotes();
-        });
+    function openAddModal() {
+        const modal = document.getElementById('add-modal');
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100');
+        
+        const formContainer = modal.querySelector('.glass > div:last-child');
+        formContainer.innerHTML = `
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">Nova Prescrição</h3>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-white">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+            <form id="modal-prescription-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Nome do Medicamento</label>
+                    <input id="modal-med-name" type="text" placeholder="Ex: Paracetamol" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Dosagem</label>
+                    <input id="modal-med-dosage" type="text" placeholder="Ex: 500mg" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Frequência</label>
+                    <select id="modal-med-frequency" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white transition-all input-focus" required>
+                        <option value="">Selecione...</option>
+                        <option value="1x ao dia">1x ao dia</option>
+                        <option value="2x ao dia">2x ao dia</option>
+                        <option value="3x ao dia">3x ao dia</option>
+                        <option value="4x ao dia">4x ao dia</option>
+                        <option value="A cada 8 horas">A cada 8 horas</option>
+                        <option value="A cada 12 horas">A cada 12 horas</option>
+                        <option value="Quando necessário">Quando necessário</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Horários</label>
+                    <input id="modal-med-times" type="text" placeholder="Ex: 8:00, 14:00, 20:00" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Observações</label>
+                    <textarea id="modal-med-notes" placeholder="Instruções especiais, efeitos colaterais..." rows="3" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus resize-none"></textarea>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeAddModal()" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-semibold transition-all">Cancelar</button>
+                    <button type="submit" class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-semibold transition-all text-white">Salvar</button>
+                </div>
+            </form>
+        `;
+        
+        document.getElementById('modal-prescription-form').addEventListener('submit', handleModalSubmit);
+    }
 
-        clearEntriesBtn.addEventListener('click', () => {
-            if (!confirm('Deseja mesmo apagar todas as prescrições salvas?')) return;
-            saveEntries([]);
-            renderEntries([]);
-        });
+    function closeAddModal() {
+        const modal = document.getElementById('add-modal');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        modal.classList.remove('opacity-100');
+    }
 
-        loadState();
+    function handleModalSubmit(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('modal-med-name').value.trim();
+        const dosage = document.getElementById('modal-med-dosage').value.trim();
+        const frequency = document.getElementById('modal-med-frequency').value;
+        const times = document.getElementById('modal-med-times').value.trim();
+        const notes = document.getElementById('modal-med-notes').value.trim();
+        
+        if (!name || !dosage || !frequency) {
+            alert('Por favor, preencha os campos obrigatórios.');
+            return;
+        }
+        
+        if (!currentUser) {
+            openLoginModal();
+            return;
+        }
+        
+        const prescription = {
+            id: editingId || Date.now(),
+            name,
+            dosage,
+            frequency,
+            times,
+            notes,
+            date: new Date().toISOString()
+        };
+        
+        if (editingId !== null) {
+            const index = prescriptions.findIndex(p => p.id === editingId);
+            prescriptions[index] = prescription;
+            editingId = null;
+        } else {
+            prescriptions.push(prescription);
+        }
+        
+        savePrescriptions();
+        renderPrescriptions();
+        closeAddModal();
+        
+        // Limpar formulário
+        document.getElementById('modal-med-name').value = '';
+        document.getElementById('modal-med-dosage').value = '';
+        document.getElementById('modal-med-frequency').value = '';
+        document.getElementById('modal-med-times').value = '';
+        document.getElementById('modal-med-notes').value = '';
+    }
+
+    function editPrescription(index) {
+        editingId = prescriptions[index].id;
+        openAddModal();
+        
+        // Preencher formulário
+        setTimeout(() => {
+            document.getElementById('modal-med-name').value = prescriptions[index].name;
+            document.getElementById('modal-med-dosage').value = prescriptions[index].dosage;
+            document.getElementById('modal-med-frequency').value = prescriptions[index].frequency;
+            document.getElementById('modal-med-times').value = prescriptions[index].times || '';
+            document.getElementById('modal-med-notes').value = prescriptions[index].notes || '';
+        }, 100);
+    }
+
+    function deletePrescription(index) {
+        if (confirm('Deseja realmente excluir esta prescrição?')) {
+            prescriptions.splice(index, 1);
+            savePrescriptions();
+            renderPrescriptions();
+        }
+    }
+
+    function openLoginModal() {
+        const modal = document.getElementById('login-suggestion-modal');
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100');
+    }
+
+    function closeLoginModal() {
+        const modal = document.getElementById('login-suggestion-modal');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        modal.classList.remove('opacity-100');
+    }
+
+    // Event listeners
+    document.getElementById('prescription-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById('med-name').value.trim();
+        const dosage = document.getElementById('med-dosage').value.trim();
+        const frequency = document.getElementById('med-frequency').value;
+        const times = document.getElementById('med-times').value.trim();
+        const notes = document.getElementById('med-notes').value.trim();
+        
+        if (!name || !dosage || !frequency) {
+            alert('Por favor, preencha os campos obrigatórios.');
+            return;
+        }
+        
+        if (!currentUser) {
+            openLoginModal();
+            return;
+        }
+        
+        const prescription = {
+            id: Date.now(),
+            name,
+            dosage,
+            frequency,
+            times,
+            notes,
+            date: new Date().toISOString()
+        };
+        
+        prescriptions.push(prescription);
+        savePrescriptions();
+        renderPrescriptions();
+        
+        // Limpar formulário
+        document.getElementById('med-name').value = '';
+        document.getElementById('med-dosage').value = '';
+        document.getElementById('med-frequency').value = '';
+        document.getElementById('med-times').value = '';
+        document.getElementById('med-notes').value = '';
+    });
+
+    // Init
+    checkLogin();
+    loadPrescriptions();
     </script>
 </body>
 </html>

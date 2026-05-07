@@ -51,9 +51,6 @@
             <a href="medicamentos.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
                 <i class="ph-bold ph-pill text-xl"></i> Anotar Medicamentos
             </a>
-            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
-                <i class="ph-bold ph-file-text text-xl"></i> Meus Laudos
-            </a>
             <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1">Conta</span>
             <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
                 <i class="ph-bold ph-user text-xl"></i> Meu Perfil
@@ -87,9 +84,18 @@
             <input id="search-input" type="text" placeholder="Buscar unidades ou especialidades..." class="bg-transparent border-none outline-none text-sm w-full" oninput="aplicarFiltros()">
         </div>
 
-        <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0">
-            Entrar
+        <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0" id="auth-button">
+            <a href="login.html" class="no-underline text-white">Entrar</a>
         </button>
+        <div id="user-greeting" class="hidden flex items-center gap-3 flex-shrink-0">
+            <div class="flex flex-col items-end">
+                <span class="text-sm font-semibold text-white">Olá, <span id="user-name"></span></span>
+                <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-red-400 transition-colors">Sair</button>
+            </div>
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold text-white">
+                <span id="user-initial"></span>
+            </div>
+        </div>
     </header>
 
     <main class="pt-36 px-6 max-w-7xl mx-auto pb-24">
@@ -167,6 +173,66 @@
     ];
 
     let filtroAtivo = 'todos';
+    let currentUser = null;
+
+    function checkLogin() {
+        const user = sessionStorage.getItem('currentUser');
+        if (user) {
+            currentUser = JSON.parse(user);
+            updateAuthUI();
+        }
+    }
+
+    function updateAuthUI() {
+        const authButton = document.getElementById('auth-button');
+        const userGreeting = document.getElementById('user-greeting');
+        
+        if (currentUser) {
+            authButton.classList.add('hidden');
+            userGreeting.classList.remove('hidden');
+            document.getElementById('user-name').textContent = currentUser.name.split(' ')[0];
+            document.getElementById('user-initial').textContent = currentUser.name.charAt(0).toUpperCase();
+        } else {
+            authButton.classList.remove('hidden');
+            userGreeting.classList.add('hidden');
+        }
+    }
+
+    function handleLogout() {
+        if (confirm('Deseja realmente sair?')) {
+            sessionStorage.removeItem('currentUser');
+            currentUser = null;
+            updateAuthUI();
+            window.location.href = 'index3.html';
+        }
+    }
+
+    function getFavorites() {
+        if (!currentUser) return [];
+        const key = `saude-pira-favorites-${currentUser.id}`;
+        return JSON.parse(localStorage.getItem(key)) || [];
+    }
+
+    function saveFavorites(favs) {
+        if (!currentUser) return;
+        const key = `saude-pira-favorites-${currentUser.id}`;
+        localStorage.setItem(key, JSON.stringify(favs));
+    }
+
+    function toggleFavorite(nome) {
+        if (!currentUser) {
+            window.location.href = 'login.html';
+            return;
+        }
+        let favs = getFavorites();
+        if (favs.includes(nome)) {
+            favs = favs.filter(f => f !== nome);
+        } else {
+            favs.push(nome);
+        }
+        saveFavorites(favs);
+        aplicarFiltros();
+    }
 
     // ===== SIDEBAR =====
     function openSidebar() {
@@ -205,17 +271,18 @@
             const matchSearch = !termo || u.nome.toLowerCase().includes(termo) || u.tags.some(t => t.toLowerCase().includes(termo)) || u.endereco.toLowerCase().includes(termo);
             return matchEsp && matchSearch;
         });
+        const favs = getFavorites();
         if (filtroAtivo === 'todos') {
             titleEl.textContent = termo ? `Resultados para "${termo}"` : 'Todas as unidades disponíveis';
         } else {
             const esp = especialidades.find(e => e.key === filtroAtivo);
             titleEl.textContent = `Unidades com ${esp ? esp.label : ''} disponíveis`;
         }
-        renderCards(resultado);
+        renderCards(resultado, favs);
     }
 
     // ===== RENDERIZAR CARDS =====
-    function renderCards(lista) {
+    function renderCards(lista, favs = []) {
         const c = document.getElementById('cards-container');
         const nr = document.getElementById('no-results');
         c.innerHTML = '';
@@ -229,12 +296,18 @@
                 badgeHtml = `<div class="absolute top-4 left-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg">ABERTO AGORA</div>`;
             }
             const tagsHtml = u.tags.map(t => `<span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300">${t}</span>`).join('');
+            const isFav = favs.includes(u.nome);
             const div = document.createElement('div');
             div.className = 'unit-card group relative glass rounded-3xl overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-blue-500/50';
             div.innerHTML = `
                 <div class="h-48 bg-slate-800 relative">
                     <img src="${u.img}" class="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" alt="${u.nome}" loading="lazy">
                     ${badgeHtml}
+                    <div class="absolute top-4 right-4">
+                        <button onclick="toggleFavorite('${u.nome}')" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all">
+                            <i class="ph ${isFav ? 'ph-fill ph-heart text-red-500' : 'ph ph-heart text-white'} text-lg"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="p-6">
                     <div class="flex justify-between items-start mb-2">
@@ -252,6 +325,7 @@
     }
 
     // ===== INIT =====
+    checkLogin();
     renderFiltros();
     aplicarFiltros();
     </script>
