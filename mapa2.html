@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saúde Piracicaba - Nova UI</title>
+    
+    <!-- Tailwind CSS para Estilização Rápida -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <!-- Phosphor Icons para ícones modernos -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Evita rolagem da página inteira */
+            background-color: #0f172a;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            z-index: 0;
+        }
+
+        /* Camada de UI flutuante sobre o mapa */
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Deixa o clique passar para o mapa... */
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ...exceto nos elementos da interface */
+        .interactive-ui {
+            pointer-events: auto;
+        }
+
+        /* Painel escuro combinando com o mapa */
+        .glass-panel {
+            background: rgba(10, 15, 30, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Marcador animado no mapa */
+        .pulse-marker {
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.8);
+            border: 3px solid white;
+        }
+
+        .pulse-marker::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: rgba(37, 99, 235, 0.4);
+            border-radius: 50%;
+            animation: pulse 2s infinite ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        /* Animação do card inferior */
+        .slide-up-enter {
+            transform: translateY(150%);
+            opacity: 0;
+        }
+        .slide-up-active {
+            transform: translateY(0);
+            opacity: 1;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); /* Curva suave estilo Voka */
+        }
+        
+        .slide-out {
+            transform: translateY(150%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+    </style>
+</head>
+<body>
+
+    <!-- O Mapa Base -->
+    <div id="map"></div>
+
+    <!-- Camada de Interface do Usuário -->
+    <div class="ui-layer">
+        
+        <!-- Header / Navbar Topo -->
+        <header class="interactive-ui glass-panel m-4 rounded-2xl flex items-center justify-between px-6 py-4">
+            <div class="flex items-center gap-3">
+                <!-- Ícone de menu hamburguer - sempre visível -->
+                <button id="btn-menu" class="mr-2 text-slate-300 hover:text-white focus:outline-none" onclick="toggleSidebar()">
+                    <i class="ph-bold ph-list text-3xl"></i>
+                </button>
+                <div class="bg-gradient-to-tr from-blue-600 to-cyan-400 p-2 rounded-xl text-white shadow-lg">
+                    <i class="ph-bold ph-heartbeat text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white tracking-tight">Saúde Piracicaba</h1>
+                    <p class="text-xs text-slate-400 font-medium">Rede Integrada de Atendimento</p>
+                </div>
+            </div>
+
+            <!-- Busca Global -->
+            <div class="hidden md:flex flex-1 max-w-md mx-8 relative group">
+                <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-400 transition-colors"></i>
+                <input id="map-search" type="text" placeholder="Buscar unidades, serviços ou especialidades..." 
+                       class="w-full bg-slate-800/60 hover:bg-slate-800 border border-white/10 outline-none focus:ring-2 focus:ring-blue-500/40 rounded-full py-2.5 pl-11 pr-4 text-sm text-slate-200 placeholder-slate-500 transition-all"
+                       oninput="filtrarMapa()">
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="text-slate-400 hover:text-white transition-colors"><i class="ph-bold ph-bell text-xl"></i></button>
+                <button class="text-slate-400 hover:text-white transition-colors"><i class="ph-bold ph-user-circle text-2xl"></i></button>
+            </div>
+        </header>
+
+        <div class="flex flex-1 overflow-hidden relative">
+            
+            <!-- Menu Lateral Flutuante (Filtros) -->
+            <aside id="sidebar" class="interactive-ui glass-panel ml-4 mb-4 rounded-2xl w-64 max-w-xs flex flex-col p-3 transition-all duration-300 z-20 fixed md:static left-4 top-[80px] bottom-4 md:top-auto md:bottom-auto md:left-auto -translate-x-[280px] md:translate-x-0" style="pointer-events:auto;">
+                <!-- Filtros rápidos -->
+                <div class="px-1 pb-3 border-b border-white/10 flex-shrink-0">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2 mt-1">Filtrar</p>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="setMapFilter('todos')" id="mf-todos" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-blue-500/40 bg-blue-500/15 text-blue-400 font-medium transition-all">Todos</button>
+                        <button onclick="setMapFilter('Hospital')" id="mf-hospital" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-red-400 hover:border-red-500/30 font-medium transition-all">Hospital</button>
+                        <button onclick="setMapFilter('UPA')" id="mf-upa" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-orange-400 hover:border-orange-500/30 font-medium transition-all">UPA</button>
+                        <button onclick="setMapFilter('UBS')" id="mf-ubs" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-blue-400 hover:border-blue-500/30 font-medium transition-all">UBS</button>
+                        <button onclick="setMapFilter('Saúde Mental')" id="mf-caps" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-purple-400 hover:border-purple-500/30 font-medium transition-all">CAPS</button>
+                        <button onclick="setMapFilter('SAMU')" id="mf-samu" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-yellow-400 hover:border-yellow-500/30 font-medium transition-all">SAMU</button>
+                    </div>
+                </div>
+                <!-- Lista de unidades -->
+                <div id="sidebar-unit-list" class="flex-1 overflow-y-auto py-2">
+                    <!-- preenchido por JS -->
+                </div>
+
+                <!-- Rodapé do sidebar -->
+                <div class="border-t border-white/10 pt-2 flex flex-col gap-1 flex-shrink-0 mt-auto">
+                    <a href="#" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-medium transition-all text-sm">
+                        <i class="ph-bold ph-calendar-plus text-base"></i> Agendamentos
+                    </a>
+                    <a href="#" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-medium transition-all text-sm">
+                        <i class="ph-bold ph-pill text-base"></i> Medicamentos
+                    </a>
+                    <a href="index3.html" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-medium transition-all text-sm">
+                        <i class="ph-bold ph-arrow-left text-base"></i> Voltar ao Início
+                    </a>
+                    <button class="w-full flex items-center justify-center gap-2 p-2.5 mt-1 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-semibold transition-all text-sm">
+                        <i class="ph-fill ph-warning-circle animate-pulse"></i> Emergência 192
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Card de Detalhes da Unidade (Aparece ao clicar no mapa) -->
+            <!-- Escondido inicialmente via CSS -->
+            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 interactive-ui z-30 pointer-events-none" id="details-container">
+                <div id="unit-card" class="glass-panel rounded-3xl p-6 slide-up-enter shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] pointer-events-auto">
+                    
+                    <!-- Botão Fechar -->
+                    <button id="close-card" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-700/60 hover:bg-slate-700 rounded-full p-1.5 transition-colors">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+
+                    <div class="flex gap-5">
+                        <!-- Imagem/Ícone da Unidade -->
+                        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-900/80 to-indigo-900/80 flex items-center justify-center flex-shrink-0 border border-white/10">
+                            <i class="ph-fill ph-hospital text-4xl text-blue-400"></i>
+                        </div>
+
+                        <!-- Info Principal -->
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span id="unit-status-badge" class="bg-emerald-900/50 text-emerald-400 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Aberto
+                                </span>
+                                <span id="unit-time-badge" class="text-xs text-slate-400 font-medium"><i class="ph-fill ph-clock"></i> 08h - 17h</span>
+                            </div>
+                            
+                            <h2 id="unit-name" class="text-2xl font-bold text-white leading-tight mb-1">UBS Cidade Alta</h2>
+                            
+                            <div class="flex items-center gap-1 text-sm text-slate-400 mb-3">
+                                <div class="flex text-amber-400 text-xs">
+                                    <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star-half"></i>
+                                </div>
+                                <span id="unit-rating" class="font-semibold text-slate-200 ml-1">4.9</span>
+                                <span id="unit-reviews">(120 avaliações)</span>
+                            </div>
+
+                            <!-- Tags de Especialidades -->
+                            <div id="unit-tags" class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-slate-700/60 text-slate-300 text-xs px-2.5 py-1 rounded-md font-medium border border-white/10">Clínica Geral</span>
+                            </div>
+
+                            <!-- Endereço e Ações -->
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
+                                <p class="text-sm text-slate-400 flex items-center gap-1.5 line-clamp-1">
+                                    <i class="ph-bold ph-map-pin-line text-blue-400"></i>
+                                    <span id="unit-address">Rua Benedito Passuti, 301</span>
+                                </p>
+                                
+                                <div class="flex items-center gap-3 w-full sm:w-auto">
+                                    <button class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-blue-400 font-semibold hover:bg-blue-500/20 transition-colors border border-blue-500/30 bg-blue-500/10">
+                                        <i class="ph-bold ph-phone"></i> Ligar
+                                    </button>
+                                    <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5">
+                                        <i class="ph-bold ph-calendar-check"></i> Agendar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        // ===== MAPA =====
+        const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-22.7338, -47.6476], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // ===== DADOS =====
+        const healthUnits = [
+            { id:1,  name:"Santa Casa de Piracicaba",           address:"Rua Moraes Barros, 33",              lat:-22.7260, lng:-47.6490, rating:4.6, reviews:280, status:"24 Horas", time:"Aberto 24h",  tags:["Urgência","Cardiologia","UTI"],           type:"Hospital" },
+            { id:2,  name:"Hospital dos Fornecedores de Cana",  address:"Av. Dr. Tibirica, 770",              lat:-22.7180, lng:-47.6550, rating:4.4, reviews:195, status:"24 Horas", time:"Aberto 24h",  tags:["Pronto Socorro","Cirurgia"],              type:"Hospital" },
+            { id:3,  name:"Hospital Regional Zilda Arms",       address:"Rua José Pinheiro Borba, s/n",       lat:-22.7310, lng:-47.6300, rating:4.3, reviews:310, status:"24 Horas", time:"Aberto 24h",  tags:["Urgência","Internação"],                  type:"Hospital" },
+            { id:4,  name:"Pronto Socorro Vila Cristina",       address:"Rua Narciso Pieroni, s/n",           lat:-22.7400, lng:-47.6530, rating:4.5, reviews:150, status:"24 Horas", time:"Aberto 24h",  tags:["Pronto Socorro"],                         type:"Hospital" },
+            { id:5,  name:"UPA Vila Rezende",                   address:"Av. Luís de Queirós, 1500",          lat:-22.7500, lng:-47.6400, rating:4.4, reviews:200, status:"24 Horas", time:"Aberto 24h",  tags:["Urgência","Pediatria"],                   type:"UPA" },
+            { id:6,  name:"UPA Piracicamirim",                  address:"Rua Rio Grande do Norte, 135",       lat:-22.7420, lng:-47.6200, rating:4.5, reviews:345, status:"24 Horas", time:"Aberto 24h",  tags:["Pronto Socorro","Raio-X","Ortopedia"],    type:"UPA" },
+            { id:7,  name:"UPA Vila Sônia – Neshor Longatto",   address:"Rua João Zem, 650",                  lat:-22.7100, lng:-47.6580, rating:4.3, reviews:175, status:"24 Horas", time:"Aberto 24h",  tags:["Urgência","Clínico Geral"],               type:"UPA" },
+            { id:8,  name:"UBS Centro",                         address:"Rua Moraes Barros, 480",             lat:-22.7280, lng:-47.6470, rating:4.6, reviews:130, status:"Aberto",    time:"08h - 17h",   tags:["Clínico Geral","Vacinação"],              type:"UBS" },
+            { id:9,  name:"UBS Cidade Alta",                    address:"Rua Benedito Passuti, 301",          lat:-22.7350, lng:-47.6500, rating:4.9, reviews:120, status:"Aberto",    time:"08h - 17h",   tags:["Clínico Geral","Pediatria","Fisioterapia"], type:"UBS" },
+            { id:10, name:"UBS Santa Terezinha",                address:"Av. Dr. Armando Sales, 150",         lat:-22.7450, lng:-47.6600, rating:4.4, reviews:98,  status:"Aberto",    time:"08h - 17h",   tags:["Clínico Geral","Ginecologia"],             type:"UBS" },
+            { id:11, name:"CRAB Vila Sônia",                    address:"Rua João Zem, 450",                  lat:-22.7050, lng:-47.6600, rating:4.7, reviews:89,  status:"Aberto",    time:"07h - 16h",   tags:["Odontologia","Ginecologia","Vacinação"],   type:"UBS" },
+            { id:12, name:"CAPS Centro",                        address:"Rua do Rosário, 900",                lat:-22.7240, lng:-47.6510, rating:4.8, reviews:80,  status:"Aberto",    time:"08h - 17h",   tags:["Psicologia","Psiquiatria"],               type:"Saúde Mental" },
+            { id:13, name:"CAPS Infantil",                      address:"Rua Antônio Correa Barbosa, 200",    lat:-22.7320, lng:-47.6450, rating:4.7, reviews:65,  status:"Aberto",    time:"08h - 17h",   tags:["Psicologia","Psicopedagogia"],             type:"Saúde Mental" },
+            { id:14, name:"CAPS AD",                            address:"Rua Visconde do Rio Branco, 1300",   lat:-22.7200, lng:-47.6600, rating:4.5, reviews:55,  status:"Aberto",    time:"08h - 17h",   tags:["Psicologia","Assistência Social"],         type:"Saúde Mental" },
+            { id:15, name:"SAMU Piracicaba",                    address:"Rua Duque de Caxias, 1310",          lat:-22.7290, lng:-47.6380, rating:4.8, reviews:400, status:"24 Horas", time:"Aberto 24h",  tags:["Emergência","Ambulância"],                 type:"SAMU" },
+        ];
+
+        // ===== ESTADO =====
+        let mapFilter = 'todos';
+        let searchTerm = '';
+        let allMarkers = [];
+        let currentMarker = null;
+
+        // ===== CORES POR TIPO =====
+        const typeColors = { 'Hospital':'#ef4444', 'UPA':'#f97316', 'UBS':'#3b82f6', 'Saúde Mental':'#a855f7', 'SAMU':'#eab308' };
+
+        function createIcon(type, active = false) {
+            const color = typeColors[type] || '#3b82f6';
+            const size = active ? 26 : 18;
+            return L.divIcon({
+                className: '',
+                html: `<div style="width:${size}px;height:${size}px;background:${color};border-radius:50%;border:3px solid rgba(255,255,255,0.7);box-shadow:0 0 10px ${color}99;transition:all .2s"></div>`,
+                iconSize: [size, size],
+                iconAnchor: [size/2, size/2]
+            });
+        }
+
+        // ===== SIDEBAR TOGGLE =====
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const isHidden = sidebar.classList.contains('-translate-x-[280px]');
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-[280px]');
+                sidebar.classList.add('translate-x-0');
+            } else {
+                sidebar.classList.add('-translate-x-[280px]');
+                sidebar.classList.remove('translate-x-0');
+            }
+        }
+
+        // ===== FILTROS POR TIPO =====
+        function setMapFilter(type) {
+            mapFilter = type;
+            document.querySelectorAll('.mf-btn').forEach(b => {
+                b.classList.remove('border-blue-500/40','bg-blue-500/15','text-blue-400');
+                b.classList.add('border-white/10','bg-white/5','text-slate-300');
+            });
+            const idMap = { 'todos':'mf-todos','Hospital':'mf-hospital','UPA':'mf-upa','UBS':'mf-ubs','Saúde Mental':'mf-caps','SAMU':'mf-samu' };
+            const btn = document.getElementById(idMap[type]);
+            if (btn) { btn.classList.add('border-blue-500/40','bg-blue-500/15','text-blue-400'); btn.classList.remove('border-white/10','bg-white/5','text-slate-300'); }
+            aplicarFiltrosMapa();
+        }
+
+        // ===== BUSCA FUNCIONAL =====
+        function filtrarMapa() {
+            searchTerm = (document.getElementById('map-search').value || '').toLowerCase().trim();
+            aplicarFiltrosMapa();
+        }
+
+        function aplicarFiltrosMapa() {
+            const filtered = healthUnits.filter(u => {
+                const matchType = mapFilter === 'todos' || u.type === mapFilter;
+                const matchSearch = !searchTerm || u.name.toLowerCase().includes(searchTerm) || u.tags.some(t => t.toLowerCase().includes(searchTerm)) || u.address.toLowerCase().includes(searchTerm);
+                return matchType && matchSearch;
+            });
+            const filteredIds = new Set(filtered.map(u => u.id));
+            allMarkers.forEach(({ unit, marker }) => {
+                if (filteredIds.has(unit.id)) marker.addTo(map); else map.removeLayer(marker);
+            });
+            renderSidebarList(filtered);
+        }
+
+        // ===== LISTA NA SIDEBAR =====
+        function renderSidebarList(lista) {
+            const container = document.getElementById('sidebar-unit-list');
+            container.innerHTML = '';
+            if (!lista.length) { container.innerHTML = '<p class="text-slate-500 text-xs text-center py-4">Nenhuma unidade encontrada.</p>'; return; }
+            lista.forEach(unit => {
+                const color = typeColors[unit.type] || '#3b82f6';
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 transition-all border border-transparent hover:border-white/10';
+                div.innerHTML = `<div class="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5" style="background:${color};box-shadow:0 0 6px ${color}88"></div><div class="min-w-0"><p class="text-sm font-semibold text-slate-100 leading-tight truncate">${unit.name}</p><p class="text-xs text-slate-500 mt-0.5">${unit.type} · ${unit.status}</p></div>`;
+                div.onclick = () => openUnitCard(unit);
+                container.appendChild(div);
+            });
+        }
+
+        // ===== INICIALIZAR MARCADORES =====
+        function initMarkers() {
+            healthUnits.forEach(unit => {
+                const marker = L.marker([unit.lat, unit.lng], { icon: createIcon(unit.type) });
+                marker.on('click', () => openUnitCard(unit));
+                allMarkers.push({ unit, marker });
+            });
+            aplicarFiltrosMapa();
+        }
+
+        // ===== CARD DE DETALHES =====
+        const card = document.getElementById('unit-card');
+        const closeBtn = document.getElementById('close-card');
+
+        function openUnitCard(unit) {
+            if (currentMarker) {
+                const prev = allMarkers.find(m => m.marker === currentMarker);
+                if (prev) prev.marker.setIcon(createIcon(prev.unit.type));
+            }
+            const found = allMarkers.find(m => m.unit.id === unit.id);
+            if (found) { found.marker.setIcon(createIcon(unit.type, true)); currentMarker = found.marker; }
+
+            map.flyTo([unit.lat - 0.003, unit.lng], 15, { duration: 1.2, easeLinearity: 0.25 });
+
+            document.getElementById('unit-name').textContent = unit.name;
+            document.getElementById('unit-address').textContent = unit.address;
+            document.getElementById('unit-rating').textContent = unit.rating;
+            document.getElementById('unit-reviews').textContent = `(${unit.reviews} avaliações)`;
+            document.getElementById('unit-time-badge').innerHTML = `<i class="ph-fill ph-clock"></i> ${unit.time}`;
+
+            const badge = document.getElementById('unit-status-badge');
+            if (unit.status === '24 Horas') {
+                badge.className = 'bg-blue-900/50 text-blue-400 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1';
+                badge.innerHTML = '<span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span> 24 HORAS';
+            } else {
+                badge.className = 'bg-emerald-900/50 text-emerald-400 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1';
+                badge.innerHTML = '<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> ABERTO';
+            }
+
+            const tagsContainer = document.getElementById('unit-tags');
+            tagsContainer.innerHTML = unit.tags.map(t => `<span class="bg-slate-700/60 text-slate-300 text-xs px-2.5 py-1 rounded-md font-medium border border-white/10">${t}</span>`).join('');
+
+            card.classList.remove('slide-up-enter','slide-out');
+            card.classList.add('slide-up-active');
+        }
+
+        function hideCard() {
+            card.classList.remove('slide-up-active');
+            card.classList.add('slide-out');
+            if (currentMarker) {
+                const prev = allMarkers.find(m => m.marker === currentMarker);
+                if (prev) prev.marker.setIcon(createIcon(prev.unit.type));
+                currentMarker = null;
+            }
+        }
+
+        closeBtn.addEventListener('click', hideCard);
+        map.on('click', hideCard);
+
+        // ===== INIT =====
+        initMarkers();
+    </script>
+</body>
+</html>
