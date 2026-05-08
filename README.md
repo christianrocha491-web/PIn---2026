@@ -17,7 +17,7 @@ Instruções importantíssimas para o bom andamento do projeto:
 
 6) Todos deverão ter uma árvore de diretórios no seu localhost ( C:/xampp/htdocs/PIn---2026/ <arquivo_de_interesse> );
 
-7) Haverá um arquivo no projeto que armazenará os scripts do banco para que sejam evitados conflitos e/ou confusões logísticas ( será um arquivo html e o script ficará comentado);
+7) Haverá um arquivo no projeto que armazenará os scripts do banco para que sejam evitados conflitos e/ou confusões logísticas;
 
 8) O procedimento para modificações no banco será sempre:
    
