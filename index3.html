@@ -42,7 +42,7 @@
             <a href="index3.html" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-500/10 text-blue-400 font-medium">
                 <i class="ph-bold ph-house text-xl"></i> Início
             </a>
-            <a href="mapa.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+            <a href="mapa_definitivo.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
                 <i class="ph-bold ph-map-trifold text-xl"></i> Ver Mapa
             </a>
             <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
@@ -124,7 +124,7 @@
         </div>
     </main>
 
-    <a href="mapa.html" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 bg-slate-900 border border-white/20 px-6 py-3 rounded-full flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all text-white no-underline">
+    <a href="mapa_definitivo.html" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 bg-slate-900 border border-white/20 px-6 py-3 rounded-full flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all text-white no-underline">
         <span class="text-sm font-bold">Exibir Mapa</span>
         <i class="ph-fill ph-map-trifold text-blue-400"></i>
     </a>
@@ -291,7 +291,7 @@
                     <h3 class="font-bold text-xl">${u.nome}</h3>
                     <p class="text-slate-400 text-sm mb-4">${u.endereco}</p>
                     <div class="flex flex-wrap gap-2">${u.tags.map(t => `<span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300">${t}</span>`).join('')}</div>
-                    <a href="mapa.html?lat=${u.lat}&lng=${u.lng}" class="mt-6 w-full py-3 bg-white/5 border border-white/10 rounded-xl font-semibold flex items-center justify-center gap-2 text-white no-underline">
+                    <a href="mapa_definitivo.html?lat=${u.lat}&lng=${u.lng}" class="mt-6 w-full py-3 bg-white/5 border border-white/10 rounded-xl font-semibold flex items-center justify-center gap-2 text-white no-underline">
                         <i class="ph ph-map-trifold"></i> Ver no Mapa
                     </a>
                 </div>`;
