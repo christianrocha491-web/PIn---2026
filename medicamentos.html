@@ -100,16 +100,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-slate-300 mb-2">Frequência</label>
-                            <select id="med-frequency" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white transition-all input-focus" required>
-                                <option value="">Selecione...</option>
-                                <option value="1x ao dia">1x ao dia</option>
-                                <option value="2x ao dia">2x ao dia</option>
-                                <option value="3x ao dia">3x ao dia</option>
-                                <option value="4x ao dia">4x ao dia</option>
-                                <option value="A cada 8 horas">A cada 8 horas</option>
-                                <option value="A cada 12 horas">A cada 12 horas</option>
-                                <option value="Quando necessário">Quando necessário</option>
-                            </select>
+                            <input id="med-frequency" type="text" placeholder="Ex: 2x ao dia" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus" required>
                         </div>
 
                         <div>
@@ -120,6 +111,11 @@
                         <div>
                             <label class="block text-sm font-medium text-slate-300 mb-2">Observações</label>
                             <textarea id="med-notes" placeholder="Instruções especiais, efeitos colaterais..." rows="3" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus resize-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Período de Uso</label>
+                            <input id="med-duration" type="text" placeholder="Ex: 5 dias" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
                         </div>
 
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold transition-all text-white">
@@ -163,6 +159,18 @@
     let currentUser = null;
     let prescriptions = [];
     let editingId = null;
+
+    function parseDuration(str) {
+        if (!str) return null;
+        const match = str.match(/(\d+)\s*(dias?|semanas?|meses?)/i);
+        if (!match) return null;
+        const num = parseInt(match[1]);
+        const unit = match[2].toLowerCase();
+        if (unit.startsWith('dia')) return num;
+        if (unit.startsWith('semana')) return num * 7;
+        if (unit.startsWith('mes')) return num * 30; // aproximado
+        return null;
+    }
 
     function checkLogin() {
         const user = sessionStorage.getItem('currentUser');
@@ -241,7 +249,13 @@
                 ${prescription.times ? `<p class="text-slate-300 text-sm mb-2"><strong>Horários:</strong> ${prescription.times}</p>` : ''}
                 ${prescription.notes ? `<p class="text-slate-300 text-sm"><strong>Observações:</strong> ${prescription.notes}</p>` : ''}
                 <div class="mt-4 pt-4 border-t border-white/10">
-                    <small class="text-slate-500">Adicionado em ${new Date(prescription.date).toLocaleDateString('pt-BR')}</small>
+                    <small class="text-slate-500">Adicionado em ${new Date(prescription.date).toLocaleDateString('pt-BR')}${prescription.duration ? (() => {
+                        const start = new Date(prescription.startDate);
+                        const end = new Date(start.getTime() + prescription.durationDays * 24 * 60 * 60 * 1000);
+                        const now = new Date();
+                        const remainingDays = Math.ceil((end - now) / (24 * 60 * 60 * 1000));
+                        return remainingDays > 0 ? ` • Faltam ${remainingDays} dias para encerrar o uso no prazo estipulado` : ` • Período de uso encerrado`;
+                    })() : ''}</small>
                 </div>
             `;
             container.appendChild(card);
@@ -294,7 +308,13 @@
                 ${prescription.times ? `<p class="text-slate-300 text-sm mb-2"><strong>Horários:</strong> ${prescription.times}</p>` : ''}
                 ${prescription.notes ? `<p class="text-slate-300 text-sm"><strong>Observações:</strong> ${prescription.notes}</p>` : ''}
                 <div class="mt-4 pt-4 border-t border-white/10">
-                    <small class="text-slate-500">Adicionado em ${new Date(prescription.date).toLocaleDateString('pt-BR')}</small>
+                    <small class="text-slate-500">Adicionado em ${new Date(prescription.date).toLocaleDateString('pt-BR')}${prescription.duration ? (() => {
+                        const start = new Date(prescription.startDate);
+                        const end = new Date(start.getTime() + prescription.durationDays * 24 * 60 * 60 * 1000);
+                        const now = new Date();
+                        const remainingDays = Math.ceil((end - now) / (24 * 60 * 60 * 1000));
+                        return remainingDays > 0 ? ` • Faltam ${remainingDays} dias para encerrar o uso no prazo estipulado` : ` • Período de uso encerrado`;
+                    })() : ''}</small>
                 </div>
             `;
             container.appendChild(card);
@@ -325,16 +345,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-2">Frequência</label>
-                    <select id="modal-med-frequency" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white transition-all input-focus" required>
-                        <option value="">Selecione...</option>
-                        <option value="1x ao dia">1x ao dia</option>
-                        <option value="2x ao dia">2x ao dia</option>
-                        <option value="3x ao dia">3x ao dia</option>
-                        <option value="4x ao dia">4x ao dia</option>
-                        <option value="A cada 8 horas">A cada 8 horas</option>
-                        <option value="A cada 12 horas">A cada 12 horas</option>
-                        <option value="Quando necessário">Quando necessário</option>
-                    </select>
+                    <input id="modal-med-frequency" type="text" placeholder="Ex: 2x ao dia" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-2">Horários</label>
@@ -343,6 +354,10 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-2">Observações</label>
                     <textarea id="modal-med-notes" placeholder="Instruções especiais, efeitos colaterais..." rows="3" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Período de Uso</label>
+                    <input id="modal-med-duration" type="text" placeholder="Ex: 5 dias" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
                 </div>
                 <div class="flex gap-3">
                     <button type="button" onclick="closeAddModal()" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-semibold transition-all">Cancelar</button>
@@ -368,6 +383,8 @@
         const frequency = document.getElementById('modal-med-frequency').value;
         const times = document.getElementById('modal-med-times').value.trim();
         const notes = document.getElementById('modal-med-notes').value.trim();
+        const durationStr = document.getElementById('modal-med-duration').value.trim();
+        const durationDays = parseDuration(durationStr);
         
         if (!name || !dosage || !frequency) {
             alert('Por favor, preencha os campos obrigatórios.');
@@ -386,6 +403,9 @@
             frequency,
             times,
             notes,
+            duration: durationStr,
+            durationDays,
+            startDate: new Date().toISOString(),
             date: new Date().toISOString()
         };
         
@@ -407,6 +427,7 @@
         document.getElementById('modal-med-frequency').value = '';
         document.getElementById('modal-med-times').value = '';
         document.getElementById('modal-med-notes').value = '';
+        document.getElementById('modal-med-duration').value = '';
     }
 
     function editPrescription(index) {
@@ -420,6 +441,7 @@
             document.getElementById('modal-med-frequency').value = prescriptions[index].frequency;
             document.getElementById('modal-med-times').value = prescriptions[index].times || '';
             document.getElementById('modal-med-notes').value = prescriptions[index].notes || '';
+            document.getElementById('modal-med-duration').value = prescriptions[index].duration || '';
         }, 100);
     }
 
@@ -452,6 +474,8 @@
         const frequency = document.getElementById('med-frequency').value;
         const times = document.getElementById('med-times').value.trim();
         const notes = document.getElementById('med-notes').value.trim();
+        const durationStr = document.getElementById('med-duration').value.trim();
+        const durationDays = parseDuration(durationStr);
         
         if (!name || !dosage || !frequency) {
             alert('Por favor, preencha os campos obrigatórios.');
@@ -470,6 +494,9 @@
             frequency,
             times,
             notes,
+            duration: durationStr,
+            durationDays,
+            startDate: new Date().toISOString(),
             date: new Date().toISOString()
         };
         
@@ -483,6 +510,7 @@
         document.getElementById('med-frequency').value = '';
         document.getElementById('med-times').value = '';
         document.getElementById('med-notes').value = '';
+        document.getElementById('med-duration').value = '';
     });
 
     // Init
