@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Senha - Saúde Pira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-900 text-white flex items-center justify-center">
+    <div class="max-w-md w-full p-8 glass rounded-3xl">
+        <h2 class="text-2xl font-bold mb-4">Esqueceu sua senha?</h2>
+        <p class="text-slate-400 mb-6">Informe o e-mail usado no cadastro. Enviaremos um link para redefinir sua senha.</p>
+
+        <div id="msg" class="hidden mb-4 text-sm"></div>
+
+        <form id="reset-form" class="space-y-4">
+            <div>
+                <label class="block text-sm text-slate-300 mb-2">E-mail</label>
+                <input id="email" type="email" required placeholder="seu@email.com" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold">Enviar link</button>
+        </form>
+
+        <p class="text-sm text-slate-400 mt-4">Lembrou a senha? <a href="login.html" class="text-blue-400">Entrar</a></p>
+    </div>
+
+    <script>
+        document.getElementById('reset-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const msg = document.getElementById('msg');
+            msg.classList.add('hidden');
+
+            const formData = new FormData();
+            formData.append('acao', 'request_reset');
+            formData.append('email', email);
+
+            try {
+                const res = await fetch('processar_login.php', { method: 'POST', body: formData });
+                const json = await res.json();
+                msg.classList.remove('hidden');
+                if (json.success) {
+                    msg.classList.remove('text-red-400');
+                    msg.classList.add('text-emerald-400');
+                    msg.textContent = 'Se o e-mail estiver cadastrado, você receberá um link para redefinir a senha.';
+                } else {
+                    msg.classList.remove('text-emerald-400');
+                    msg.classList.add('text-red-400');
+                    msg.textContent = json.message || 'Erro ao processar.';
+                }
+            } catch (err) {
+                msg.classList.remove('hidden');
+                msg.classList.add('text-red-400');
+                msg.textContent = 'Erro ao conectar com o servidor.';
+            }
+        });
+    </script>
+</body>
+</html>

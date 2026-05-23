@@ -59,7 +59,7 @@
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-2xl font-bold flex items-center gap-3">
                             <i class="ph ph-clipboard-list text-blue-400"></i>
-                            Suas Prescrições
+                            Suas Prescrições !!!!!
                         </h2>
                     </div>
 
@@ -101,18 +101,20 @@
 
                         <div>
                             <label class="block text-sm font-medium text-slate-300 mb-2">Horários</label>
-                            <input id="med-times" type="text" placeholder="Ex: 8:00, 14:00, 20:00" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
+                            <input id="med-times" type="text" placeholder="Ex: 8:00, 14:00, 20:00" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus" required>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-slate-300 mb-2">Observações</label>
-                            <textarea id="med-notes" placeholder="Instruções especiais, efeitos colaterais..." rows="3" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus resize-none"></textarea>
+                            <textarea id="med-notes" placeholder="Instruções especiais, efeitos colaterais..." rows="3" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus resize-none" required></textarea>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-slate-300 mb-2">Período de Uso</label>
-                            <input id="med-duration" type="text" placeholder="Ex: 5 dias" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
+                            <input id="med-duration" type="text" placeholder="Ex: 5 dias" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus" required>
                         </div>
+
+                        <div id="form-error" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm"></div>
 
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold transition-all text-white">
                             Salvar Prescrição
@@ -168,6 +170,31 @@
         return null;
     }
 
+    // Valida se a string contém horários no formato HH:MM separados por vírgula
+    function isValidTimesFormat(str) {
+        if (!str) return false;
+        const pattern = /^\s*([01]?\d|2[0-3]):[0-5]\d(\s*,\s*([01]?\d|2[0-3]):[0-5]\d)*\s*$/;
+        return pattern.test(str);
+    }
+
+    // Helpers para mensagens de erro inline
+    function showError(id, message) {
+        const el = document.getElementById(id);
+        if (!el) {
+            console.warn('Elemento de erro não encontrado:', id, message);
+            return;
+        }
+        el.textContent = message;
+        el.classList.remove('hidden');
+    }
+
+    function clearError(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = '';
+        el.classList.add('hidden');
+    }
+
     function checkLogin() {
         const user = sessionStorage.getItem('currentUser');
         if (user) {
@@ -183,8 +210,9 @@
         if (currentUser) {
             authButton.classList.add('hidden');
             userGreeting.classList.remove('hidden');
-            document.getElementById('user-name').textContent = currentUser.name.split(' ')[0];
-            document.getElementById('user-initial').textContent = currentUser.name.charAt(0).toUpperCase();
+            // processar_login.php retorna 'nome' e 'email'
+            document.getElementById('user-name').textContent = (currentUser.nome || currentUser.name || '').split(' ')[0];
+            document.getElementById('user-initial').textContent = ((currentUser.nome || currentUser.name || '').charAt(0) || '').toUpperCase();
         } else {
             authButton.classList.remove('hidden');
             userGreeting.classList.add('hidden');
@@ -201,13 +229,15 @@
     }
 
     function loadPrescriptions() {
-        const key = currentUser ? `saude-pira-med-entries-${currentUser.id}` : 'saude-pira-med-entries';
+        const identifier = currentUser ? (currentUser.email || currentUser.id || '') : '';
+        const key = identifier ? `saude-pira-med-entries-${identifier}` : 'saude-pira-med-entries';
         prescriptions = JSON.parse(localStorage.getItem(key)) || [];
         renderPrescriptions();
     }
 
     function savePrescriptions() {
-        const key = currentUser ? `saude-pira-med-entries-${currentUser.id}` : 'saude-pira-med-entries';
+        const identifier = currentUser ? (currentUser.email || currentUser.id || '') : '';
+        const key = identifier ? `saude-pira-med-entries-${identifier}` : 'saude-pira-med-entries';
         localStorage.setItem(key, JSON.stringify(prescriptions));
     }
 
@@ -355,6 +385,7 @@
                     <label class="block text-sm font-medium text-slate-300 mb-2">Período de Uso</label>
                     <input id="modal-med-duration" type="text" placeholder="Ex: 5 dias" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 transition-all input-focus">
                 </div>
+                <div id="modal-error" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm"></div>
                 <div class="flex gap-3">
                     <button type="button" onclick="closeAddModal()" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-semibold transition-all">Cancelar</button>
                     <button type="submit" class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-semibold transition-all text-white">Salvar</button>
@@ -363,6 +394,8 @@
         `;
         
         document.getElementById('modal-prescription-form').addEventListener('submit', handleModalSubmit);
+        // limpar qualquer erro anterior
+        clearError('modal-error');
     }
 
     function closeAddModal() {
@@ -376,14 +409,29 @@
         
         const name = document.getElementById('modal-med-name').value.trim();
         const dosage = document.getElementById('modal-med-dosage').value.trim();
-        const frequency = document.getElementById('modal-med-frequency').value;
+        const frequency = document.getElementById('modal-med-frequency').value.trim();
         const times = document.getElementById('modal-med-times').value.trim();
         const notes = document.getElementById('modal-med-notes').value.trim();
         const durationStr = document.getElementById('modal-med-duration').value.trim();
         const durationDays = parseDuration(durationStr);
         
-        if (!name || !dosage || !frequency) {
-            alert('Por favor, preencha os campos obrigatórios.');
+        // limpar erro anterior
+        clearError('modal-error');
+
+        if (!name || !dosage || !frequency || !times || !notes || !durationStr) {
+            showError('modal-error', 'Por favor, preencha todos os campos obrigatórios.');
+            return;
+        }
+
+        // Validação de formato de horários
+        if (!isValidTimesFormat(times)) {
+            showError('modal-error', 'Formato de horários inválido. Use HH:MM separados por vírgula (ex: 08:00, 14:00).');
+            return;
+        }
+
+        // Validação do período usando parseDuration
+        if (parseDuration(durationStr) === null) {
+            showError('modal-error', 'Formato do período inválido. Use por exemplo "5 dias", "2 semanas" ou "1 mês".');
             return;
         }
         
@@ -417,13 +465,14 @@
         renderPrescriptions();
         closeAddModal();
         
-        // Limpar formulário
+        // Limpar formulário e erros
         document.getElementById('modal-med-name').value = '';
         document.getElementById('modal-med-dosage').value = '';
         document.getElementById('modal-med-frequency').value = '';
         document.getElementById('modal-med-times').value = '';
         document.getElementById('modal-med-notes').value = '';
         document.getElementById('modal-med-duration').value = '';
+        clearError('modal-error');
     }
 
     function editPrescription(index) {
@@ -473,11 +522,27 @@
         const durationStr = document.getElementById('med-duration').value.trim();
         const durationDays = parseDuration(durationStr);
         
-        if (!name || !dosage || !frequency) {
-            alert('Por favor, preencha os campos obrigatórios.');
+        // limpar erro anterior
+        clearError('form-error');
+
+        // Exigir todos os campos antes de permitir salvar
+        if (!name || !dosage || !frequency || !times || !notes || !durationStr) {
+            showError('form-error', 'Por favor, preencha todos os campos antes de salvar a prescrição.');
             return;
         }
-        
+
+        // Validação de formato de horários
+        if (!isValidTimesFormat(times)) {
+            showError('form-error', 'Formato de horários inválido. Use HH:MM separados por vírgula (ex: 08:00, 14:00).');
+            return;
+        }
+
+        // Validação do período usando parseDuration
+        if (parseDuration(durationStr) === null) {
+            showError('form-error', 'Formato do período inválido. Use por exemplo "5 dias", "2 semanas" ou "1 mês".');
+            return;
+        }
+
         if (!currentUser) {
             openLoginModal();
             return;
@@ -500,13 +565,14 @@
         savePrescriptions();
         renderPrescriptions();
         
-        // Limpar formulário
+        // Limpar formulário e erros
         document.getElementById('med-name').value = '';
         document.getElementById('med-dosage').value = '';
         document.getElementById('med-frequency').value = '';
         document.getElementById('med-times').value = '';
         document.getElementById('med-notes').value = '';
         document.getElementById('med-duration').value = '';
+        clearError('form-error');
     });
 
     // Init
