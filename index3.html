@@ -17,9 +17,75 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         #sidebar-overlay { transition: opacity 0.3s; }
         #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); }
+        .settings-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: min(360px, calc(100vw - 2rem));
+            background: rgba(15,23,42,0.98);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 24px;
+            box-shadow: 0 28px 90px rgba(0,0,0,0.3);
+            z-index: 60;
+            transform-origin: top right;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+            transition: opacity .2s ease, transform .2s ease;
+        }
+        .settings-panel.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+        .settings-panel.hidden { display: block !important; }
+        .settings-color-btn,
+        .settings-action-btn,
+        .settings-toggle-btn {
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 999px;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.04);
+            color: #e2e8f0;
+            font-size: 0.85rem;
+            transition: all .15s ease;
+            cursor: pointer;
+        }
+        .settings-color-btn:hover,
+        .settings-action-btn:hover,
+        .settings-toggle-btn:hover {
+            background: rgba(255,255,255,0.12);
+        }
+        .settings-toggle-btn.active,
+        .settings-action-btn.active,
+        .settings-color-btn.active {
+            background: rgba(59,130,246,0.2);
+            border-color: rgba(59,130,246,0.45);
+            color: #fff;
+        }
+        .section-title { text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.68rem; color: #94a3b8; margin-bottom: 0.75rem; }
+        body.high-contrast { background-color: #050505; color: #f8fafc; }
+        body.high-contrast header { background: rgba(0,0,0,0.98); }
+        body.readable-fonts { font-family: 'Inter', Arial, Helvetica, sans-serif; }
+        body.hide-images img { opacity: 0.08; filter: blur(1px); }
+        body.text-magnifier { font-size: 1.03rem; }
+        body.align-left main { text-align: left; }
+        body.align-center main { text-align: center; }
+        body.align-right main { text-align: right; }
+        body.skip-links #skip-links { display: flex; }
+        body.theme-blue { background-color: #020f24; }
+        body.theme-green { background-color: #081e12; }
+        body.theme-purple { background-color: #140a23; }
+        body.theme-dark { background-color: #030610; }
     </style>
 </head>
 <body class="min-h-screen">
+    <div id="skip-links" class="skip-links hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-wrap gap-2 rounded-full bg-slate-900/95 border border-white/10 px-3 py-2 text-xs shadow-2xl">
+        <a href="#main-content" class="skip-link text-slate-100 bg-slate-700/80 px-3 py-2 rounded-full hover:bg-slate-600 transition-colors">Ir para conteúdo</a>
+        <a href="#sidebar-drawer" class="skip-link text-slate-100 bg-slate-700/80 px-3 py-2 rounded-full hover:bg-slate-600 transition-colors">Ir para menu</a>
+        <a href="#footer" class="skip-link text-slate-100 bg-slate-700/80 px-3 py-2 rounded-full hover:bg-slate-600 transition-colors">Ir para rodapé</a>
+    </div>
 
     <!-- Overlay do Sidebar -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeSidebar()"></div>
@@ -51,7 +117,7 @@
             
             <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1">Conta</span>
 
-            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+            <a href="configuracoes.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
                 <i class="ph-bold ph-gear text-xl"></i> Configurações
             </a>
         </nav>
@@ -80,6 +146,62 @@
             <input id="search-input" type="text" placeholder="Buscar unidades ou especialidades..." class="bg-transparent border-none outline-none text-sm w-full" oninput="aplicarFiltros()">
         </div>
 
+        <div class="relative flex items-center gap-2">
+            <button id="settings-toggle" onclick="toggleSettingsPanel()" class="bg-slate-800/80 hover:bg-slate-700 px-4 py-2 rounded-full text-slate-200 transition-colors flex items-center gap-2 flex-shrink-0" aria-expanded="false" aria-controls="settings-panel" aria-label="Abrir configurações">
+                <i class="ph ph-gear text-lg"></i>
+            </button>
+            <div id="settings-panel" class="settings-panel hidden glass">
+                <div class="flex items-start justify-between gap-3 p-4 border-b border-white/10">
+                    <div>
+                        <p class="text-slate-400 text-xs uppercase tracking-[0.25em] mb-1">Configurações</p>
+                        <h3 class="text-base font-bold">Preferências do site</h3>
+                    </div>
+                    <button onclick="toggleSettingsPanel()" class="text-slate-300 hover:text-white transition-colors" aria-label="Fechar configurações">
+                        <i class="ph-bold ph-x text-xl"></i>
+                    </button>
+                </div>
+                <div class="space-y-4 p-4">
+                    <div>
+                        <p class="section-title">Idioma</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button type="button" onclick="setLanguage('pt')" class="settings-action-btn" id="lang-pt">Português</button>
+                            <button type="button" onclick="setLanguage('en')" class="settings-action-btn" id="lang-en">English</button>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="section-title">Cor do tema</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button type="button" onclick="setTheme('default')" class="settings-color-btn">Padrão</button>
+                            <button type="button" onclick="setTheme('blue')" class="settings-color-btn bg-blue-500/15 text-blue-200">Azul</button>
+                            <button type="button" onclick="setTheme('green')" class="settings-color-btn bg-emerald-500/15 text-emerald-200">Verde</button>
+                            <button type="button" onclick="setTheme('purple')" class="settings-color-btn bg-violet-500/15 text-violet-200">Roxo</button>
+                            <button type="button" onclick="setTheme('dark')" class="settings-color-btn bg-slate-700/80 text-slate-100">Escuro</button>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="section-title">Acessibilidade</p>
+                        <div class="mt-3 grid gap-3">
+                            <button type="button" onclick="toggleAccessibility('highContrast')" class="settings-toggle-btn" id="btn-highContrast">Alto contraste</button>
+                            <button type="button" onclick="toggleAccessibility('readableFonts')" class="settings-toggle-btn" id="btn-readableFonts">Fonte legível</button>
+                            <button type="button" onclick="toggleAccessibility('hideImages')" class="settings-toggle-btn" id="btn-hideImages">Ocultar imagens</button>
+                            <button type="button" onclick="toggleAccessibility('textMagnifier')" class="settings-toggle-btn" id="btn-textMagnifier">Lupa de texto</button>
+                            <button type="button" onclick="toggleAccessibility('skipLinks')" class="settings-toggle-btn" id="btn-skipLinks">Ativar links de pulo</button>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="section-title">Alinhamento</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button type="button" onclick="setAlignment('left')" class="settings-action-btn">Esquerda</button>
+                            <button type="button" onclick="setAlignment('center')" class="settings-action-btn">Centro</button>
+                            <button type="button" onclick="setAlignment('right')" class="settings-action-btn">Direita</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 pt-2 border-t border-white/10">
+                        <button type="button" onclick="resetSettings()" class="w-full py-3 rounded-2xl border border-white/10 text-slate-200 hover:bg-white/5 transition-colors">Redefinir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0" id="auth-button">
             <a href="login.html" class="no-underline text-white">Entrar</a>
         </button>
@@ -94,7 +216,7 @@
         </div>
     </header>
 
-    <main class="pt-36 px-6 max-w-7xl mx-auto pb-24">
+    <main id="main-content" class="pt-36 px-6 max-w-7xl mx-auto pb-24">
         <section class="mb-12">
             <h1 class="text-4xl md:text-5xl font-bold mb-4 py-1 bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">
                 Encontre atendimento agora.
@@ -124,6 +246,7 @@
         <span class="text-sm font-bold">Exibir Mapa</span>
         <i class="ph-fill ph-map-trifold text-blue-400"></i>
     </a>
+    <footer id="footer" class="hidden"></footer>
 
     <script>
     // 1. CONSTANTES E VARIÁVEIS GLOBAIS (Sempre no topo absoluto)
@@ -213,6 +336,133 @@
         window.location.reload();
     }
 
+    const siteSettings = {
+        language: 'pt',
+        theme: 'default',
+        highContrast: false,
+        readableFonts: false,
+        hideImages: false,
+        textMagnifier: false,
+        alignText: 'left',
+        skipLinks: false
+    };
+
+    function toggleSettingsPanel() {
+        const panel = document.getElementById('settings-panel');
+        const button = document.getElementById('settings-toggle');
+        const isOpen = panel.classList.toggle('open');
+        panel.classList.toggle('hidden', !isOpen);
+        button.setAttribute('aria-expanded', isOpen);
+    }
+
+    function setTheme(theme) {
+        document.body.classList.remove('theme-blue', 'theme-green', 'theme-purple', 'theme-dark');
+        if (theme !== 'default') document.body.classList.add(`theme-${theme}`);
+        siteSettings.theme = theme;
+        updateSettingsButtons();
+    }
+
+    function setLanguage(lang) {
+        siteSettings.language = lang;
+        document.getElementById('search-input').placeholder = lang === 'en'
+            ? 'Search for units or specialties...'
+            : 'Buscar unidades ou especialidades...';
+        document.querySelector('h1').textContent = lang === 'en'
+            ? 'Find care now.'
+            : 'Encontre atendimento agora.';
+        document.querySelector('p.text-lg').textContent = lang === 'en'
+            ? 'Select a specialty to see the nearest units to you.'
+            : 'Selecione uma especialidade para ver as unidades mais próximas de você.';
+        document.getElementById('auth-button').querySelector('a').textContent = lang === 'en' ? 'Sign In' : 'Entrar';
+        document.querySelector('a[href="mapa_definitivo.html"]').querySelector('span').textContent = lang === 'en' ? 'Show Map' : 'Exibir Mapa';
+        document.getElementById('section-title-text').textContent = lang === 'en' ? 'All available units' : 'Todas as unidades disponíveis';
+        updateSettingsButtons();
+    }
+
+    function toggleAccessibility(flag) {
+        siteSettings[flag] = !siteSettings[flag];
+        document.body.classList.toggle(flag.replace(/([A-Z])/g, '-$1').toLowerCase(), siteSettings[flag]);
+        updateSettingsButtons();
+    }
+
+    function setAlignment(alignment) {
+        document.body.classList.remove('align-left', 'align-center', 'align-right');
+        document.body.classList.add(`align-${alignment}`);
+        siteSettings.alignText = alignment;
+        updateSettingsButtons();
+    }
+
+    function resetSettings() {
+        siteSettings.language = 'pt';
+        siteSettings.theme = 'default';
+        siteSettings.highContrast = false;
+        siteSettings.readableFonts = false;
+        siteSettings.hideImages = false;
+        siteSettings.textMagnifier = false;
+        siteSettings.alignText = 'left';
+        siteSettings.skipLinks = false;
+        document.body.className = document.body.className
+            .split(' ')
+            .filter(c => !c.startsWith('theme-') && !['high-contrast','readable-fonts','hide-images','text-magnifier','align-left','align-center','align-right','skip-links'].includes(c))
+            .join(' ');
+        document.body.classList.add('min-h-screen');
+        updateSettingsButtons();
+        setTheme('default');
+        setLanguage('pt');
+        updateSkipLinks();
+    }
+
+    function updateSkipLinks() {
+        document.body.classList.toggle('skip-links', siteSettings.skipLinks);
+    }
+
+    function updateSettingsButtons() {
+        const toggleIds = {
+            highContrast: 'btn-highContrast',
+            readableFonts: 'btn-readableFonts',
+            hideImages: 'btn-hideImages',
+            textMagnifier: 'btn-textMagnifier',
+            skipLinks: 'btn-skipLinks'
+        };
+        Object.keys(toggleIds).forEach(key => {
+            const btn = document.getElementById(toggleIds[key]);
+            if (!btn) return;
+            btn.classList.toggle('active', siteSettings[key]);
+            btn.textContent = `${siteSettings[key] ? 'Desativar' : 'Ativar'} ${btn.textContent.replace(/Ativar |Desativar /, '')}`;
+        });
+        document.getElementById('lang-pt').classList.toggle('active', siteSettings.language === 'pt');
+        document.getElementById('lang-en').classList.toggle('active', siteSettings.language === 'en');
+        const toggleMap = {
+            highContrast: { id: 'btn-highContrast', label: 'Alto contraste' },
+            readableFonts: { id: 'btn-readableFonts', label: 'Fonte legível' },
+            hideImages: { id: 'btn-hideImages', label: 'Ocultar imagens' },
+            textMagnifier: { id: 'btn-textMagnifier', label: 'Lupa de texto' },
+            skipLinks: { id: 'btn-skipLinks', label: 'Links de pulo' }
+        };
+
+        Object.values(toggleMap).forEach(({ id, label }) => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.textContent = `${siteSettings[id.replace('btn-', '')] ? 'Desativar' : 'Ativar'} ${label}`;
+        });
+
+        document.querySelectorAll('.settings-color-btn').forEach(button => {
+            button.classList.toggle('active', button.textContent.trim().toLowerCase() === siteSettings.theme || (siteSettings.theme === 'default' && button.textContent.trim().toLowerCase() === 'padrão'));
+        });
+        updateSkipLinks();
+    }
+
+    function initializeSettings() {
+        setLanguage(siteSettings.language);
+        setTheme(siteSettings.theme);
+        setAlignment(siteSettings.alignText);
+        if (siteSettings.highContrast) toggleAccessibility('highContrast');
+        if (siteSettings.readableFonts) toggleAccessibility('readableFonts');
+        if (siteSettings.hideImages) toggleAccessibility('hideImages');
+        if (siteSettings.textMagnifier) toggleAccessibility('textMagnifier');
+        if (siteSettings.skipLinks) toggleAccessibility('skipLinks');
+    }
+
     function getFavorites() {
         if (!currentUser) return [];
         return JSON.parse(localStorage.getItem(`fav-${currentUser.id}`)) || [];
@@ -300,6 +550,7 @@
         checkLogin();
         renderFiltros();
         carregarDadosDoBanco();
+        initializeSettings();
     });
 </script>
 </body>
