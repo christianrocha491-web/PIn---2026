@@ -1,0 +1,777 @@
+/**
+ * =====================================================
+ * CSS - Sistema de Navegação com Mapa Interativo
+ * Tema: Moderno, Responsivo, Semelhante ao Google Maps
+ * =====================================================
+ */
+
+:root {
+    --primary-color: #1f77d2;
+    --primary-hover: #1a5fa8;
+    --danger-color: #d32f2f;
+    --success-color: #388e3c;
+    --warning-color: #f57c00;
+    --light-gray: #f5f5f5;
+    --border-gray: #e0e0e0;
+    --text-primary: #202124;
+    --text-secondary: #5f6368;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    --radius: 8px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    background-color: #fff;
+}
+
+/* =====================================================
+   MAPA E CONTAINER PRINCIPAL
+   ===================================================== */
+
+.map-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+}
+
+#mapa {
+    width: 100%;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+/* =====================================================
+   HEADER / BARRA DE TOPO
+   ===================================================== */
+
+.navbar {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    flex-wrap: wrap;
+}
+
+.navbar-title {
+    background: white;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar-title::before {
+    content: "📍";
+    font-size: 20px;
+}
+
+/* =====================================================
+   BARRA DE BUSCA
+   ===================================================== */
+
+.search-bar {
+    flex: 1;
+    min-width: 250px;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-bar input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.search-bar input::placeholder {
+    color: var(--text-secondary);
+}
+
+.search-bar svg {
+    width: 20px;
+    height: 20px;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+/* =====================================================
+   PAINEL LATERAL - LISTA DE INSTITUIÇÕES
+   ===================================================== */
+
+.sidebar {
+    position: fixed;
+    left: -350px;
+    top: 0;
+    width: 350px;
+    height: 100vh;
+    background: white;
+    z-index: 999;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-gray);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h2 {
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.sidebar-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.sidebar-close:hover {
+    color: var(--text-primary);
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.instituicao-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-gray);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.instituicao-item:hover {
+    background-color: var(--light-gray);
+}
+
+.instituicao-item.active {
+    background-color: rgba(31, 119, 210, 0.1);
+    border-left: 4px solid var(--primary-color);
+}
+
+.instituicao-item-nome {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.instituicao-item-endereco {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* =====================================================
+   BOTÃO TOGGLE SIDEBAR
+   ===================================================== */
+
+.menu-toggle {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: white;
+    border: none;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    z-index: 1001;
+    transition: var(--transition);
+    display: none;
+}
+
+.menu-toggle:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.menu-toggle svg {
+    width: 24px;
+    height: 24px;
+    color: var(--text-primary);
+}
+
+/* =====================================================
+   POPUP DE INSTITUIÇÃO (MARKER)
+   ===================================================== */
+
+.leaflet-popup-content-wrapper {
+    border-radius: var(--radius);
+    background: white !important;
+    box-shadow: var(--shadow-lg) !important;
+    border: none !important;
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    width: 320px !important;
+    font-family: inherit !important;
+}
+
+.popup-content {
+    padding: 16px;
+}
+
+.popup-header {
+    margin-bottom: 12px;
+}
+
+.popup-nome {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.popup-endereco {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.popup-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 6px 0;
+}
+
+.popup-info strong {
+    color: var(--text-primary);
+}
+
+.popup-horario {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.popup-especialidades {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 8px 0;
+    padding: 8px;
+    background-color: var(--light-gray);
+    border-radius: 4px;
+    line-height: 1.4;
+}
+
+.popup-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-iniciar {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, var(--primary-color), #1565c0);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-iniciar:hover {
+    background: linear-gradient(135deg, var(--primary-hover), #0d47a1);
+    box-shadow: 0 4px 12px rgba(31, 119, 210, 0.4);
+}
+
+.btn-iniciar:active {
+    transform: scale(0.95);
+}
+
+.btn-google-maps {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 12px;
+    background: white;
+    color: var(--text-primary);
+    border: 1px solid var(--border-gray);
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-google-maps:hover {
+    background-color: var(--light-gray);
+    border-color: var(--text-secondary);
+}
+
+/* =====================================================
+   PAINEL DE ROTA (SIDEBAR DIREITO)
+   ===================================================== */
+
+.route-panel {
+    position: fixed;
+    right: -350px;
+    top: 0;
+    width: 350px;
+    height: 100vh;
+    background: white;
+    z-index: 999;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.route-panel.active {
+    right: 0;
+}
+
+.route-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-gray);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.route-header h2 {
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.route-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.route-close:hover {
+    color: var(--text-primary);
+}
+
+.route-info {
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(31, 119, 210, 0.1), rgba(21, 101, 192, 0.1));
+    border-bottom: 1px solid var(--border-gray);
+}
+
+.route-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.route-stat {
+    flex: 1;
+}
+
+.route-stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.route-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.route-destination {
+    padding: 12px;
+    background-color: var(--light-gray);
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.route-destination-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.route-destination-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.route-actions {
+    padding: 16px;
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+}
+
+.btn-stop-route {
+    width: 100%;
+    padding: 12px;
+    background: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-stop-route:hover {
+    background: #b71c1c;
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+}
+
+/* =====================================================
+   BOTÃO DE LOCALIZAÇÃO ATUAL
+   ===================================================== */
+
+.locate-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+.locate-button:hover {
+    box-shadow: var(--shadow-lg);
+    background-color: var(--light-gray);
+}
+
+.locate-button svg {
+    width: 24px;
+    height: 24px;
+    color: var(--primary-color);
+}
+
+/* =====================================================
+   INDICADORES DE CARREGAMENTO
+   ===================================================== */
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(31, 119, 210, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.spinner-text {
+    color: white;
+    font-weight: 600;
+}
+
+/* =====================================================
+   NOTIFICAÇÕES / TOAST
+   ===================================================== */
+
+.toast-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 2001;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toast {
+    background: white;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast.success {
+    border-left: 4px solid var(--success-color);
+}
+
+.toast.error {
+    border-left: 4px solid var(--danger-color);
+}
+
+.toast.info {
+    border-left: 4px solid var(--primary-color);
+}
+
+.toast-icon {
+    font-size: 20px;
+}
+
+.toast-message {
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* =====================================================
+   RESPONSIVO
+   ===================================================== */
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    .navbar {
+        flex-direction: column;
+        top: 10px;
+        left: 60px;
+        right: 10px;
+    }
+
+    .search-bar {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .sidebar {
+        width: 100%;
+        left: -100%;
+    }
+
+    .route-panel {
+        width: 100%;
+        right: -100%;
+    }
+
+    .locate-button {
+        bottom: 70px;
+        right: 10px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .popup-content {
+        width: 100% !important;
+    }
+
+    .toast-container {
+        right: 10px;
+        top: 70px;
+    }
+
+    .toast {
+        min-width: unset;
+        width: 90vw;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-title {
+        font-size: 14px;
+    }
+
+    .search-bar {
+        padding: 8px 12px;
+    }
+
+    .search-bar input {
+        font-size: 12px;
+    }
+
+    .popup-content {
+        width: 100% !important;
+    }
+
+    .popup-nome {
+        font-size: 14px;
+    }
+}
+
+/* =====================================================
+   ESTILO DO LEAFLET CUSTOMIZADO
+   ===================================================== */
+
+.leaflet-control-container .leaflet-routing-container-hide {
+    display: none;
+}
+
+.leaflet-routing-container {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+}
+
+.leaflet-routing-alternatives {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.leaflet-marker-icon {
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.leaflet-marker-icon:hover {
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+    transform: scale(1.2);
+}
+
+/* =====================================================
+   ANIMAÇÕES
+   ===================================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-down {
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =====================================================
+   ACESSIBILIDADE
+   ===================================================== */
+
+button:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+input:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

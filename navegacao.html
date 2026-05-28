@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Sistema de navegação interativa para localizar instituições de saúde em Piracicaba">
+    <meta name="theme-color" content="#1f77d2">
+    <title>Mapa Interativo - PIN 2026 | Sistema de Navegação</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' font-weight='bold' fill='%231f77d2'>📍</text></svg>">
+
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="css/navegacao.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+        integrity="sha512-h9FcoyWjrSciJTBLAMQsxars7DKHx6F/74YPtyndrP3946w3snzBeQkOlHMYOL+rUfQpmC9+XduMnV25synnFQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Leaflet Routing Machine CSS -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"
+        integrity="sha384-qGxSL1R6dv8u+7/b8+O6AibPh8NapRxILeJNvGpqHrk4LzGnWLJvzTuILVQjQHUjl"
+        crossorigin="anonymous" />
+
+    <!-- Estilos Responsivos -->
+    <style>
+        @media (max-width: 768px) {
+            .leaflet-routing-container-hide {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Container Principal do Mapa -->
+    <div class="map-container">
+        <!-- Mapa Leaflet -->
+        <div id="mapa"></div>
+
+        <!-- Navbar Topo -->
+        <nav class="navbar">
+            <div class="navbar-title">PIN 2026 - Navegação</div>
+            <div class="search-bar">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h8v14z" />
+                </svg>
+                <input type="text" placeholder="Buscar instituição..." aria-label="Buscar instituição">
+            </div>
+        </nav>
+
+        <!-- Menu Toggle (Mobile) -->
+        <button class="menu-toggle" title="Abrir menu">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+            </svg>
+        </button>
+
+        <!-- Botão de Localização -->
+        <button class="locate-button" title="Centralizar em minha localização">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94-3A9.04 9.04 0 1 0 1.06 9h2.01A7.003 7.003 0 0 1 11 2c3.9 0 7 3.1 7 7h2.01z" />
+            </svg>
+        </button>
+
+        <!-- Sidebar Esquerdo - Lista de Instituições -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Instituições</h2>
+                <button class="sidebar-close" title="Fechar menu">✕</button>
+            </div>
+            <div class="sidebar-content">
+                <!-- Preenchido dinamicamente pelo JavaScript -->
+                <div style="padding: 16px; text-align: center; color: #5f6368;">
+                    <p>Carregando instituições...</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Painel Direito - Informações da Rota -->
+        <aside class="route-panel">
+            <div class="route-header">
+                <h2>🛣️ Rota Ativa</h2>
+                <button class="route-close" title="Fechar rota">✕</button>
+            </div>
+            <div class="route-info">
+                <!-- Preenchido dinamicamente pelo JavaScript -->
+            </div>
+            <div class="route-actions">
+                <button class="btn-stop-route">⏹️ Parar Navegação</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Overlay de Carregamento -->
+    <div class="loading-overlay">
+        <div class="spinner-container">
+            <div class="loading-spinner"></div>
+            <div class="spinner-text">Carregando...</div>
+        </div>
+    </div>
+
+    <!-- Container de Notificações Toast -->
+    <div class="toast-container"></div>
+
+    <!-- ===================================
+         CDNs e Scripts Externos
+         ==================================== -->
+
+    <!-- Leaflet (Mapa) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+        integrity="sha512-WXoSL2lrKOSIDIcct9TC3DLHeTasCbF7fbDerby8Ehegrzl5ZxJia7nMqSwj+yNJZhL4usilence"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Leaflet Routing Machine (Cálculo de Rotas) -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.umd.js"
+        integrity="sha384-s/mTzWJnFLe7+mvXWRmqk5/b9RG8/qHXG4hKVIpW+K0Vbt/VMPT7WR1SyCxpdUqR"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Script Principal -->
+    <script src="js/navegacao.js"></script>
+
+    <!-- Script de Testes (Opcional - comentar em produção) -->
+    <script src="js/testes.js"></script>
+
+    <!-- Google Analytics (Opcional) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        if (typeof window !== 'undefined') {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            // gtag('config', 'G-XXXXXXXXXX');
+        }
+    </script>
+</body>
+
+</html>
