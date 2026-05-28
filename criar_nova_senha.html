@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redefinir Senha - Saúde Pira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-900 text-white flex items-center justify-center">
+    <div class="max-w-md w-full p-8 glass rounded-3xl">
+        <h2 class="text-2xl font-bold mb-4">Crie uma nova senha</h2>
+        <p class="text-slate-400 mb-6">Insira sua nova senha e confirme abaixo.</p>
+
+        <div id="msg" class="hidden mb-4 text-sm"></div>
+
+        <form id="newpass-form" class="space-y-4">
+            <div>
+                <label class="block text-sm text-slate-300 mb-2">Senha (mínimo 6 caracteres)</label>
+                <input id="senha" type="password" required placeholder="Senha" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white">
+            </div>
+            <div>
+                <label class="block text-sm text-slate-300 mb-2">Repita a senha</label>
+                <input id="senha2" type="password" required placeholder="Repita a senha" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold">Salvar</button>
+        </form>
+
+        <p class="text-sm text-slate-400 mt-4">Voltar para <a href="login.html" class="text-blue-400">Entrar</a></p>
+    </div>
+
+    <script>
+        function getParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
+
+        document.getElementById('newpass-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const senha = document.getElementById('senha').value.trim();
+            const senha2 = document.getElementById('senha2').value.trim();
+            const msg = document.getElementById('msg');
+            msg.classList.add('hidden');
+
+            const token = getParam('token');
+            if (!token) {
+                msg.classList.remove('hidden'); msg.classList.add('text-red-400'); msg.textContent = 'Token não fornecido.'; return;
+            }
+
+            if (senha.length < 6) {
+                msg.classList.remove('hidden'); msg.classList.add('text-red-400'); msg.textContent = 'A senha deve ter no mínimo 6 caracteres.'; return;
+            }
+            if (senha !== senha2) {
+                msg.classList.remove('hidden'); msg.classList.add('text-red-400'); msg.textContent = 'As senhas não coincidem.'; return;
+            }
+
+            const formData = new FormData();
+            formData.append('acao', 'reset_password');
+            formData.append('token', token);
+            formData.append('senha', senha);
+
+            try {
+                const res = await fetch('processar_login.php', { method: 'POST', body: formData });
+                const json = await res.json();
+                msg.classList.remove('hidden');
+                if (json.success) {
+                    msg.classList.remove('text-red-400'); msg.classList.add('text-emerald-400');
+                    msg.textContent = 'Senha redefinida com sucesso. Redirecionando para login...';
+                    setTimeout(() => window.location.href = 'login.html', 2500);
+                } else {
+                    msg.classList.remove('text-emerald-400'); msg.classList.add('text-red-400');
+                    msg.textContent = json.message || 'Erro ao redefinir senha.';
+                }
+            } catch (err) {
+                msg.classList.remove('hidden'); msg.classList.add('text-red-400'); msg.textContent = 'Erro ao conectar com o servidor.';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saúde Piracicaba Definitivo - Buscar Especialidade</title>
+    <title>Saúde Piracicaba Definitivo. - Buscar Especialidade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -326,8 +326,8 @@
         if (currentUser && userGreeting) {
             authButton.classList.add('hidden');
             userGreeting.classList.remove('hidden');
-            document.getElementById('user-name').textContent = currentUser.name.split(' ')[0];
-            document.getElementById('user-initial').textContent = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('user-name').textContent = currentUser.nome.split(' ')[0];
+            document.getElementById('user-initial').textContent = currentUser.nome.charAt(0).toUpperCase();
         }
     }
 
@@ -465,14 +465,14 @@
 
     function getFavorites() {
         if (!currentUser) return [];
-        return JSON.parse(localStorage.getItem(`fav-${currentUser.id}`)) || [];
+        return JSON.parse(localStorage.getItem(`fav-${currentUser.email}`)) || [];
     }
 
     function toggleFavorite(nome) {
         if (!currentUser) { window.location.href = 'login.html'; return; }
         let favs = getFavorites();
         favs = favs.includes(nome) ? favs.filter(f => f !== nome) : [...favs, nome];
-        localStorage.setItem(`fav-${currentUser.id}`, JSON.stringify(favs));
+        localStorage.setItem(`fav-${currentUser.email}`, JSON.stringify(favs));
         aplicarFiltros();
     }
 
