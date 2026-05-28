@@ -18,27 +18,38 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
     header('Content-Type: application/json');
     
-    // Lógica de Cadastro
+    // ==========================================
+    // LÓGICA DE CADASTRO (Modificada)
+    // ==========================================
     if ($_POST['acao'] === 'cadastrar') {
+        // Gerando o hash seguro usando o algoritmo criptográfico padrão (atualmente Bcrypt)
+        $senhaHash = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+
         $sql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
         $stmt = $pdo->prepare($sql);
         try {
-            $stmt->execute([$_POST['nome'], $_POST['email'], $_POST['senha']]);
+            // Salvamos a variável $senhaHash em vez da senha pura
+            $stmt->execute([$_POST['nome'], $_POST['email'], $senhaHash]);
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Email já cadastrado!']);
         }
     }
 
-    // Lógica de Login
+    // ==========================================
+    // LÓGICA DE LOGIN (Modificada)
+    // ==========================================
     if ($_POST['acao'] === 'logar') {
-        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ? AND senha = ?");
-        $stmt->execute([$_POST['email'], $_POST['senha']]);
+        // Buscamos o usuário APENAS pelo e-mail, pois a senha agora é um hash dinâmico
+        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
+        $stmt->execute([$_POST['email']]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user) {
+        // Se o usuário existir, usamos password_verify para validar a senha digitada contra o hash do banco
+        if ($user && password_verify($_POST['senha'], $user['senha'])) {
             echo json_encode(['success' => true, 'user' => ['nome' => $user['nome'], 'email' => $user['email']]]);
         } else {
+            // Mensagem genérica por segurança (não diz se o erro foi no e-mail ou na senha)
             echo json_encode(['success' => false, 'message' => 'E-mail ou senha incorretos!']);
         }
     }
@@ -103,7 +114,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
         exit;
     }
 
-    // Resetar a senha usando token
+
+    // ==========================================
+    // RECUPERAÇÃO DE SENHA / RESET (Modificada)
+    // ==========================================
     if ($_POST['acao'] === 'reset_password') {
         $token = $_POST['token'] ?? '';
         $newSenha = $_POST['senha'] ?? '';
@@ -121,9 +135,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
             exit;
         }
 
-        // Atualizar senha do usuário
+        // Criando o hash também para a nova senha redefinida
+        $novaSenhaHash = password_hash($newSenha, PASSWORD_DEFAULT);
+
+        // Atualizar senha do usuário utilizando o hash gerado
         $stmt = $pdo->prepare("UPDATE usuarios SET senha = ? WHERE email = ?");
-        $stmt->execute([$newSenha, $row['email']]);
+        $stmt->execute([$novaSenhaHash, $row['email']]);
 
         // Remover tokens pendentes para esse email
         $stmt = $pdo->prepare("DELETE FROM password_resets WHERE email = ?");
