@@ -77,6 +77,9 @@ class SistemaNavegacao {
             // 6. Adicionar marcadores das instituições ao mapa
             this.plotar_marcadores_instituicoes();
 
+            // 7. Atualizar lista de instituições na sidebar
+            this.atualizar_sidebar_instituicoes();
+
             console.log('✅ Sistema inicializado com sucesso!');
         } catch (erro) {
             console.error('❌ Erro ao inicializar:', erro);
@@ -724,8 +727,8 @@ class SistemaNavegacao {
         let visivel_count = 0;
 
         items.forEach((item) => {
-            const nome = item.querySelector('.instituicao-item-nome').textContent.toLowerCase();
-            const endereco = item.querySelector('.instituicao-item-endereco').textContent.toLowerCase();
+            const nome = item.querySelector('.instituicao-item-nome')?.textContent?.toLowerCase() || '';
+            const endereco = item.querySelector('.instituicao-item-endereco')?.textContent?.toLowerCase() || '';
 
             const matches = nome.includes(termo) || endereco.includes(termo);
             item.style.display = matches ? '' : 'none';
@@ -754,28 +757,33 @@ class SistemaNavegacao {
         const sidebar_content = document.querySelector('.sidebar-content');
         if (!sidebar_content) return;
 
-        const html = this.estado.instituicoes
-            .map(
-                (inst) => `
-            <div class="instituicao-item" data-id="${inst.id}" onclick="sistemaNavegacao.selecionar_instituicao({
-                id: ${inst.id},
-                nome: '${this.escapar_html(inst.nome)}',
-                latitude: ${inst.latitude},
-                longitude: ${inst.longitude},
-                endereco: '${this.escapar_html(inst.endereco)}',
-                especialidades: '${this.escapar_html(inst.especialidades || '')}',
-                contato: '${this.escapar_html(inst.contato || '')}',
-                horario_atendimento: '${this.escapar_html(inst.horario_atendimento || '')}',
-                detalhes: '${this.escapar_html(inst.detalhes || '')}'
-            })">
+        if (this.estado.instituicoes.length === 0) {
+            sidebar_content.innerHTML = `
+                <div style="padding: 16px; text-align: center; color: #5f6368;">
+                    <p>Nenhuma instituição encontrada.</p>
+                </div>
+            `;
+            return;
+        }
+
+        sidebar_content.innerHTML = '';
+
+        this.estado.instituicoes.forEach((inst) => {
+            const item = document.createElement('div');
+            item.className = 'instituicao-item';
+            item.dataset.id = inst.id;
+
+            item.innerHTML = `
                 <div class="instituicao-item-nome">${this.escapar_html(inst.nome)}</div>
                 <div class="instituicao-item-endereco">${this.escapar_html(inst.endereco)}</div>
-            </div>
-        `
-            )
-            .join('');
+            `;
 
-        sidebar_content.innerHTML = html;
+            item.addEventListener('click', () => {
+                this.selecionar_instituicao(inst);
+            });
+
+            sidebar_content.appendChild(item);
+        });
     }
 
     /**
@@ -860,11 +868,6 @@ let sistemaNavegacao;
  */
 document.addEventListener('DOMContentLoaded', () => {
     sistemaNavegacao = new SistemaNavegacao();
-
-    // Após carregar instituições, atualizar sidebar
-    setTimeout(() => {
-        sistemaNavegacao.atualizar_sidebar_instituicoes();
-    }, 1000);
 });
 
 /**
