@@ -1,4 +1,12 @@
 <?php
+// Importação das classes do PHPMailer para o envio via SMTP
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'phpmailer/Exception.php';
+require 'phpmailer/PHPMailer.php';
+require 'phpmailer/SMTP.php';
+
 // Configurações do Banco de Dados
 $host = '127.0.0.1';
 $user = 'root';
@@ -19,16 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
     header('Content-Type: application/json');
     
     // ==========================================
-    // LÓGICA DE CADASTRO (Modificada)
+    // LÓGICA DE CADASTRO
     // ==========================================
     if ($_POST['acao'] === 'cadastrar') {
-        // Gerando o hash seguro usando o algoritmo criptográfico padrão (atualmente Bcrypt)
         $senhaHash = password_hash($_POST['senha'], PASSWORD_DEFAULT);
 
         $sql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
         $stmt = $pdo->prepare($sql);
         try {
-            // Salvamos a variável $senhaHash em vez da senha pura
             $stmt->execute([$_POST['nome'], $_POST['email'], $senhaHash]);
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
@@ -37,24 +43,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
     }
 
     // ==========================================
-    // LÓGICA DE LOGIN (Modificada)
+    // LÓGICA DE LOGIN
     // ==========================================
     if ($_POST['acao'] === 'logar') {
-        // Buscamos o usuário APENAS pelo e-mail, pois a senha agora é um hash dinâmico
         $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
         $stmt->execute([$_POST['email']]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Se o usuário existir, usamos password_verify para validar a senha digitada contra o hash do banco
         if ($user && password_verify($_POST['senha'], $user['senha'])) {
             echo json_encode(['success' => true, 'user' => ['nome' => $user['nome'], 'email' => $user['email']]]);
         } else {
-            // Mensagem genérica por segurança (não diz se o erro foi no e-mail ou na senha)
             echo json_encode(['success' => false, 'message' => 'E-mail ou senha incorretos!']);
         }
     }
 
-    // Solicitação de redefinição de senha
+    // ==========================================
+    // SOLICITAÇÃO DE REDEFINIÇÃO DE SENHA (SMTP)
+    // ==========================================
     if ($_POST['acao'] === 'request_reset') {
         $email = $_POST['email'] ?? '';
         $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
@@ -88,18 +93,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
         $path = dirname($_SERVER['PHP_SELF']);
         $link = "http://" . $host . $path . "/criar_nova_senha.html?token=" . $token;
 
-        $subject = '[Saúde Pira] Redefinição de senha';
-        $message = "Prezado(a),\n\nPara redefinir sua senha, acesse o link a seguir:\n\n" . $link . "\n\nSe você não solicitou essa alteração, ignore esta mensagem.\n\nAtenciosamente,\nSaúde Pira";
-        $headers = 'From: no-reply@' . $host . "\r\n" . 'Content-Type: text/plain; charset=UTF-8';
+        // Instanciando o PHPMailer para envio via SMTP seguro
+        $mail = new PHPMailer(true);
 
-        // Enviar e-mail (pode não funcionar sem SMTP configurado)
-        @mail($email, $subject, $message, $headers);
+        try {
+            // Configurações do Servidor SMTP (Substitua com os seus dados do Mailtrap ou outro provedor)
+            $mail->isSMTP();
+            $mail->Host      = 'sandbox.smtp.mailtrap.io'; 
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'INSIRA_SEU_USUARIO_SMTP'; 
+            $mail->Password   = 'INSIRA_SUA_SENHA_SMTP';     
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+            $mail->CharSet     = 'UTF-8';
 
-        echo json_encode(['success' => true, 'message' => 'Se o e-mail estiver cadastrado, você receberá um link para redefinir a senha.']);
+            // Remetente e Destinatário
+            $mail->setFrom('no-reply@saudepira.com', 'Saúde Pira');
+            $mail->addAddress($email);
+
+            // Conteúdo do E-mail em HTML
+            $mail->isHTML(true);
+            $mail->Subject = '[Saúde Pira] Redefinição de senha';
+            $mail->Body     = "Prezado(a),<br><br>Para redefinir sua senha, acesse o link a seguir:<br><br><a href='{$link}' style='color: #007bff; text-decoration: none; font-weight: bold;'>Clique aqui para redefinir sua senha</a><br><br>Ou copie e cole o link no seu navegador:<br>{$link}<br><br>Se você não solicitou essa alteração, ignore esta mensagem.<br><br>Atenciosamente,<br>Saúde Pira";
+            $mail->AltBody = "Prezado(a),\n\nPara redefinir sua senha, acesse o link a seguir:\n\n" . $link . "\n\nSe você não solicitou essa alteração, ignore esta mensagem.\n\nAtenciosamente,\nSaúde Pira";
+
+            $mail->send();
+            echo json_encode(['success' => true, 'message' => 'Se o e-mail estiver cadastrado, você receberá um link para redefinir a senha.']);
+        } catch (Exception $e) {
+            // Em caso de erro no SMTP, exibe o diagnóstico para você arrumar nas configurações
+            echo json_encode(['success' => false, 'message' => "Erro ao enviar e-mail: {$mail->ErrorInfo}"]);
+        }
         exit;
     }
 
-    // Validar token (opcional)
+    // ==========================================
+    // VALIDAR TOKEN
+    // ==========================================
     if ($_POST['acao'] === 'validate_token') {
         $token = $_POST['token'] ?? '';
         $token_hash = hash('sha256', $token);
@@ -114,9 +143,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
         exit;
     }
 
-
     // ==========================================
-    // RECUPERAÇÃO DE SENHA / RESET (Modificada)
+    // RECUPERAÇÃO DE SENHA / RESET
     // ==========================================
     if ($_POST['acao'] === 'reset_password') {
         $token = $_POST['token'] ?? '';
@@ -135,14 +163,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
             exit;
         }
 
-        // Criando o hash também para a nova senha redefinida
         $novaSenhaHash = password_hash($newSenha, PASSWORD_DEFAULT);
 
-        // Atualizar senha do usuário utilizando o hash gerado
         $stmt = $pdo->prepare("UPDATE usuarios SET senha = ? WHERE email = ?");
         $stmt->execute([$novaSenhaHash, $row['email']]);
 
-        // Remover tokens pendentes para esse email
         $stmt = $pdo->prepare("DELETE FROM password_resets WHERE email = ?");
         $stmt->execute([$row['email']]);
 

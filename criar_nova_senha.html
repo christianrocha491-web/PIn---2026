@@ -5,27 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redefinir Senha - Saúde Pira</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-slate-900 text-white flex items-center justify-center">
-    <div class="max-w-md w-full p-8 glass rounded-3xl">
-        <h2 class="text-2xl font-bold mb-4">Crie uma nova senha</h2>
-        <p class="text-slate-400 mb-6">Insira sua nova senha e confirme abaixo.</p>
+<body class="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full p-8 glass rounded-3xl shadow-2xl">
+        <h2 class="text-2xl font-bold mb-2">Crie uma nova senha</h2>
+        <p id="subtitulo" class="text-slate-400 mb-6 text-sm">Insira sua nova senha e confirme abaixo.</p>
 
-        <div id="msg" class="hidden mb-4 text-sm"></div>
+        <div id="msg" class="hidden mb-4 p-3 rounded-xl text-sm font-medium border"></div>
 
-        <form id="newpass-form" class="space-y-4">
+        <form id="newpass-form" class="hidden space-y-4">
             <div>
                 <label class="block text-sm text-slate-300 mb-2">Senha (mínimo 6 caracteres)</label>
-                <input id="senha" type="password" required placeholder="Senha" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white">
+                <input id="senha" type="password" required minlength="6" placeholder="Sua nova senha" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
             </div>
             <div>
                 <label class="block text-sm text-slate-300 mb-2">Repita a senha</label>
-                <input id="senha2" type="password" required placeholder="Repita a senha" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white">
+                <input id="senha2" type="password" required minlength="6" placeholder="Confirme a nova senha" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
             </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold">Salvar</button>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 py-3 rounded-xl font-semibold transition-colors mt-2 shadow-lg shadow-blue-600/20">Salvar</button>
         </form>
 
-        <p class="text-sm text-slate-400 mt-4">Voltar para <a href="login.html" class="text-blue-400">Entrar</a></p>
+        <p class="text-sm text-slate-400 mt-6">Voltar para <a href="login.html" class="text-blue-400 hover:underline">Entrar</a></p>
     </div>
 
     <script>
@@ -34,23 +42,76 @@
             return url.searchParams.get(name);
         }
 
-        document.getElementById('newpass-form').addEventListener('submit', async (e) => {
+        const msg = document.getElementById('msg');
+        const form = document.getElementById('newpass-form');
+        const subtitulo = document.getElementById('subtitulo');
+        const token = getParam('token');
+
+        // Função utilitária para exibir alertas estilizados
+        function exibirMensagem(texto, tipo) {
+            msg.classList.remove('hidden', 'text-red-400', 'bg-red-500/10', 'border-red-500/20', 'text-emerald-400', 'bg-emerald-500/10', 'border-emerald-500/20', 'text-blue-400', 'bg-blue-500/10', 'border-blue-500/20');
+            
+            if (tipo === 'erro') {
+                msg.classList.add('text-red-400', 'bg-red-500/10', 'border-red-500/20');
+            } else if (tipo === 'sucesso') {
+                msg.classList.add('text-emerald-400', 'bg-emerald-500/10', 'border-emerald-500/20');
+            } else {
+                msg.classList.add('text-blue-400', 'bg-blue-500/10', 'border-blue-500/20');
+            }
+            msg.textContent = texto;
+            msg.classList.remove('hidden');
+        }
+
+        // ==========================================
+        // PASSO 1: VALIDAR O TOKEN AO CARREGAR A PÁGINA
+        // ==========================================
+        async function validarTokenInicial() {
+            if (!token) {
+                exibirMensagem('Token de redefinição ausente. Solicite um novo link de recuperação.', 'erro');
+                return;
+            }
+
+            exibirMensagem('Verificando a validade do link...', 'info');
+
+            const formData = new FormData();
+            formData.append('acao', 'validate_token');
+            formData.append('token', token);
+
+            try {
+                const res = await fetch('processar_login.php', { method: 'POST', body: formData });
+                const json = await res.json();
+
+                if (json.success) {
+                    msg.classList.add('hidden'); // Limpa a mensagem de carregamento
+                    subtitulo.innerHTML = `Redefinindo a senha para a conta:<br><span class="text-blue-400 font-medium">${json.email}</span>`;
+                    form.classList.remove('hidden'); // Mostra o formulário seguro
+                } else {
+                    exibirMensagem(json.message || 'Este link é inválido ou já expirou.', 'erro');
+                }
+            } catch (err) {
+                exibirMensagem('Erro ao se comunicar com o servidor.', 'erro');
+            }
+        }
+
+        // Executa a validação assim que o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', validarTokenInicial);
+
+        // ==========================================
+        // PASSO 2: ENVIAR A NOVA SENHA
+        // ==========================================
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
             const senha = document.getElementById('senha').value.trim();
             const senha2 = document.getElementById('senha2').value.trim();
-            const msg = document.getElementById('msg');
-            msg.classList.add('hidden');
-
-            const token = getParam('token');
-            if (!token) {
-                msg.classList.remove('hidden'); msg.classList.add('text-red-400'); msg.textContent = 'Token não fornecido.'; return;
-            }
 
             if (senha.length < 6) {
-                msg.classList.remove('hidden'); msg.classList.add('text-red-400'); msg.textContent = 'A senha deve ter no mínimo 6 caracteres.'; return;
+                exibirMensagem('A senha deve ter no mínimo 6 caracteres.', 'erro');
+                return;
             }
             if (senha !== senha2) {
-                msg.classList.remove('hidden'); msg.classList.add('text-red-400'); msg.textContent = 'As senhas não coincidem.'; return;
+                exibirMensagem('As senhas digitadas não coincidem.', 'erro');
+                return;
             }
 
             const formData = new FormData();
@@ -59,19 +120,19 @@
             formData.append('senha', senha);
 
             try {
+                exibirMensagem('Salvando nova senha...', 'info');
                 const res = await fetch('processar_login.php', { method: 'POST', body: formData });
                 const json = await res.json();
-                msg.classList.remove('hidden');
+
                 if (json.success) {
-                    msg.classList.remove('text-red-400'); msg.classList.add('text-emerald-400');
-                    msg.textContent = 'Senha redefinida com sucesso. Redirecionando para login...';
-                    setTimeout(() => window.location.href = 'login.html', 2500);
+                    form.classList.add('hidden'); // Esconde o formulário para evitar múltiplos cliques
+                    exibirMensagem('Senha updated com sucesso! Redirecionando para a tela de login...', 'sucesso');
+                    setTimeout(() => window.location.href = 'login.html', 3000);
                 } else {
-                    msg.classList.remove('text-emerald-400'); msg.classList.add('text-red-400');
-                    msg.textContent = json.message || 'Erro ao redefinir senha.';
+                    exibirMensagem(json.message || 'Erro ao redefinir a senha.', 'erro');
                 }
             } catch (err) {
-                msg.classList.remove('hidden'); msg.classList.add('text-red-400'); msg.textContent = 'Erro ao conectar com o servidor.';
+                exibirMensagem('Erro técnico ao conectar com o servidor.', 'erro');
             }
         });
     </script>

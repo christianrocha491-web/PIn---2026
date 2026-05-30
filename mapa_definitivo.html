@@ -89,6 +89,16 @@
             100% { transform: scale(1.5); opacity: 0; }
         }
 
+        .animated-route path {
+            stroke-linecap: round;
+            stroke-dasharray: 10 12;
+            animation: dash 1.2s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -22; }
+        }
+
         /* Animação do card inferior */
         .slide-up-enter {
             transform: translateY(150%);
@@ -225,6 +235,22 @@
                                 <span class="bg-slate-700/60 text-slate-300 text-xs px-2.5 py-1 rounded-md font-medium border border-white/10">Clínica Geral</span>
                             </div>
 
+                            <!-- Modo de deslocamento -->
+                            <div class="flex items-center flex-wrap gap-2 mb-4" id="travel-mode-group">
+                                <button id="mode-car" class="flex items-center gap-2 px-4 py-2 rounded-2xl border border-slate-700 bg-slate-800/70 text-slate-200 hover:bg-slate-700 transition-all" onclick="setTravelMode('carro')">
+                                    <i class="ph-bold ph-car"></i>
+                                    Carro
+                                </button>
+                                <button id="mode-moto" class="flex items-center gap-2 px-4 py-2 rounded-2xl border border-slate-700 bg-slate-800/70 text-slate-200 hover:bg-slate-700 transition-all" onclick="setTravelMode('moto')">
+                                    <i class="ph-bold ph-motorcycle"></i>
+                                    Moto
+                                </button>
+                                <button id="mode-walk" class="flex items-center gap-2 px-4 py-2 rounded-2xl border border-slate-700 bg-slate-800/70 text-slate-200 hover:bg-slate-700 transition-all" onclick="setTravelMode('caminhada')">
+                                    <i class="ph-bold ph-walk"></i>
+                                    Caminhar
+                                </button>
+                            </div>
+
                             <!-- Endereço e Ações -->
                             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
                                 <p class="text-sm text-slate-400 flex items-center gap-1.5 line-clamp-1">
@@ -233,13 +259,21 @@
                                 </p>
                                 
                                 <div class="flex items-center gap-3 w-full sm:w-auto">
-                                    <button class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-blue-400 font-semibold hover:bg-blue-500/20 transition-colors border border-blue-500/30 bg-blue-500/10">
+                                    <button id="btn-call" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-blue-400 font-semibold hover:bg-blue-500/20 transition-colors border border-blue-500/30 bg-blue-500/10">
                                         <i class="ph-bold ph-phone"></i> Ligar
+                                    </button>
+                                    <button id="btn-start-route" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold bg-slate-700 border border-white/10 hover:bg-slate-600 transition-colors">
+                                        <i class="ph-bold ph-arrow-right"></i> Iniciar Rota
                                     </button>
                                     <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5">
                                         <i class="ph-bold ph-calendar-check"></i> Agendar
                                     </button>
                                 </div>
+                            </div>
+                            <div id="route-summary" class="mt-4 rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-slate-300 hidden">
+                                <p id="route-distance" class="font-semibold text-slate-100"></p>
+                                <p id="route-duration" class="mt-1"></p>
+                                <p id="route-mode" class="mt-1 text-slate-400"></p>
                             </div>
                         </div>
                     </div>
@@ -262,6 +296,13 @@
         let searchTerm = '';
         let allMarkers = [];
         let currentMarker = null;
+        let usuarioLocalizacao = null;
+        let userMarker = null;
+        let routeLayer = null;
+        let routeStartMarker = null;
+        let routeDestMarker = null;
+        let routeActiveUnit = null;
+        let travelMode = 'carro';
 
         // ===== CORES POR TIPO =====
         const typeColors = { 
@@ -318,6 +359,210 @@
                 iconSize: [size, size],
                 iconAnchor: [size/2, size/2]
             });
+        }
+
+        function mostrarToast(mensagem, tipo = 'info') {
+            const toast = document.createElement('div');
+            const colorMap = {
+                success: 'bg-emerald-500/90 text-white',
+                error: 'bg-red-500/90 text-white',
+                info: 'bg-slate-800/90 text-slate-100'
+            };
+            toast.className = `fixed bottom-6 right-6 z-50 rounded-2xl px-4 py-3 shadow-2xl shadow-slate-950/30 ${colorMap[tipo] || colorMap.info}`;
+            toast.textContent = mensagem;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3200);
+        }
+
+        function setTravelMode(mode) {
+            travelMode = mode;
+            const modeMap = {
+                carro: 'mode-car',
+                moto: 'mode-moto',
+                caminhada: 'mode-walk'
+            };
+            Object.values(modeMap).forEach(id => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                btn.classList.remove('bg-slate-700', 'text-white', 'border-white/20');
+                btn.classList.add('bg-slate-800/70', 'text-slate-200', 'border-slate-700');
+            });
+            const activeButton = document.getElementById(modeMap[mode]);
+            if (activeButton) {
+                activeButton.classList.remove('bg-slate-800/70', 'text-slate-200', 'border-slate-700');
+                activeButton.classList.add('bg-slate-700', 'text-white', 'border-white/20');
+            }
+            if (routeActiveUnit) {
+                iniciarRota(routeActiveUnit.id);
+            }
+        }
+
+        function getTravelProfile() {
+            if (travelMode === 'caminhada') return 'walking';
+            return 'driving';
+        }
+
+        async function obterLocalizacaoUsuario() {
+            if (!navigator.geolocation) {
+                mostrarToast('Geolocalização não suportada neste navegador', 'error');
+                return;
+            }
+
+            return new Promise((resolve) => {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const { latitude, longitude } = position.coords;
+                        usuarioLocalizacao = { lat: latitude, lng: longitude };
+                        if (userMarker) map.removeLayer(userMarker);
+                        userMarker = L.circleMarker([latitude, longitude], {
+                            radius: 9,
+                            fillColor: '#06b6d4',
+                            fillOpacity: 0.9,
+                            color: '#ffffff',
+                            weight: 2
+                        }).addTo(map).bindPopup('Sua localização');
+                        resolve();
+                    },
+                    error => {
+                        console.warn('Erro na geolocalização:', error);
+                        mostrarToast('Não foi possível obter sua localização. Verifique permissão do navegador.', 'error');
+                        resolve();
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            });
+        }
+
+        function formatarDistancia(metros) {
+            if (metros == null || isNaN(metros)) return 'N/A';
+            return `${(metros / 1000).toFixed(1)} km`;
+        }
+
+        function formatarDuracao(segundos) {
+            if (segundos == null || isNaN(segundos)) return 'N/A';
+            const minutos = Math.floor(segundos / 60);
+            const segs = Math.round(segundos % 60);
+            return minutos === 0 ? `${segs}s` : `${minutos}min ${segs}s`;
+        }
+
+        async function calcularRotaOSRM(origem, destino) {
+            const coordenadas = `${origem.lng},${origem.lat};${destino.lng},${destino.lat}`;
+            const perfil = getTravelProfile();
+            const url = `https://router.project-osrm.org/route/v1/${perfil}/${coordenadas}?overview=full&geometries=geojson&steps=true&annotations=duration,distance`;
+            try {
+                const response = await Promise.race([
+                    fetch(url),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout na requisição OSRM')), 10000))
+                ]);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const dados = await response.json();
+                if (dados.code !== 'Ok' || !dados.routes || !dados.routes[0]) {
+                    throw new Error(`OSRM: ${dados.message || dados.code || 'rota não encontrada'}`);
+                }
+                const rota = dados.routes[0];
+                if (!rota.geometry || !rota.geometry.coordinates) {
+                    throw new Error('Rota inválida: coordenadas não retornadas');
+                }
+                // Ajustar duração segundo o modo selecionado (moto pode ser mais rápido que carro)
+                let duracao = rota.duration; // em segundos, conforme retornado pelo OSRM
+                // Aplicar multiplicadores suaves quando usamos o perfil 'driving' para diferenciar moto/car
+                if (travelMode === 'moto') {
+                    duracao = Math.round(duracao * 0.90); // assumir ~10% mais rápido para motos
+                } else if (travelMode === 'carro') {
+                    duracao = Math.round(duracao * 1.00);
+                }
+
+                return {
+                    coordenadas: rota.geometry.coordinates,
+                    distancia: rota.distance,
+                    duracao: duracao,
+                    instrucoes: rota.legs
+                };
+            } catch (erro) {
+                throw new Error(`Falha ao calcular rota: ${erro.message}`);
+            }
+        }
+
+        function limparRota() {
+            if (routeLayer) {
+                map.removeLayer(routeLayer);
+                routeLayer = null;
+            }
+            if (routeStartMarker) {
+                map.removeLayer(routeStartMarker);
+                routeStartMarker = null;
+            }
+            if (routeDestMarker) {
+                map.removeLayer(routeDestMarker);
+                routeDestMarker = null;
+            }
+            routeActiveUnit = null;
+            document.getElementById('route-summary').classList.add('hidden');
+        }
+
+        function desenharRota(rota, unit) {
+            limparRota();
+            const pontos = rota.coordenadas.map(coord => [coord[1], coord[0]]);
+            routeLayer = L.polyline(pontos, {
+                className: 'animated-route',
+                color: '#38bdf8',
+                weight: 6,
+                opacity: 0.85,
+                lineCap: 'round',
+                dashArray: '10, 12'
+            }).addTo(map);
+
+            routeStartMarker = L.circleMarker([usuarioLocalizacao.lat, usuarioLocalizacao.lng], {
+                radius: 8,
+                fillColor: '#22c55e',
+                fillOpacity: 0.9,
+                color: '#ffffff',
+                weight: 2
+            }).addTo(map).bindPopup('Início');
+
+            routeDestMarker = L.circleMarker([unit.lat, unit.lng], {
+                radius: 8,
+                fillColor: '#f97316',
+                fillOpacity: 0.9,
+                color: '#ffffff',
+                weight: 2
+            }).addTo(map).bindPopup(unit.name);
+
+            const bounds = L.latLngBounds(pontos);
+            map.fitBounds(bounds.pad(0.12));
+
+            document.getElementById('route-distance').textContent = `Distância: ${formatarDistancia(rota.distancia)}`;
+            document.getElementById('route-duration').textContent = `Tempo estimado: ${formatarDuracao(rota.duracao)}`;
+            document.getElementById('route-mode').textContent = `Modo: ${travelMode === 'caminhada' ? 'Caminhada' : travelMode === 'moto' ? 'Moto' : 'Carro'}`;
+            document.getElementById('route-summary').classList.remove('hidden');
+        }
+
+        async function iniciarRota(unitId) {
+            if (!usuarioLocalizacao) {
+                mostrarToast('Tentando obter sua localização...', 'info');
+                await obterLocalizacaoUsuario();
+                if (!usuarioLocalizacao) {
+                    mostrarToast('Localização do usuário não disponível. Verifique permissão de geolocalização no navegador.', 'error');
+                    return;
+                }
+            }
+            const unit = healthUnits.find(u => String(u.id) === String(unitId));
+            if (!unit) {
+                mostrarToast('Unidade não encontrada', 'error');
+                return;
+            }
+            try {
+                mostrarToast('Calculando rota...', 'info');
+                const rota = await calcularRotaOSRM(usuarioLocalizacao, { lat: unit.lat, lng: unit.lng });
+                desenharRota(rota, unit);
+                routeActiveUnit = unit;
+                mostrarToast('Rota traçada com sucesso!', 'success');
+            } catch (erro) {
+                console.error(erro);
+                mostrarToast(erro.message, 'error');
+            }
         }
 
         // 2. INICIALIZAR MARCADORES (Limpando os antigos primeiro)
@@ -423,6 +668,11 @@
             const tagsContainer = document.getElementById('unit-tags');
             tagsContainer.innerHTML = unit.tags.map(t => `<span class="bg-slate-700/60 text-slate-300 text-xs px-2.5 py-1 rounded-md font-medium border border-white/10">${t}</span>`).join('');
 
+            const startButton = document.getElementById('btn-start-route');
+            if (startButton) {
+                startButton.onclick = () => iniciarRota(unit.id);
+            }
+
             card.classList.remove('slide-up-enter','slide-out');
             card.classList.add('slide-up-active');
         }
@@ -441,6 +691,8 @@
         map.on('click', hideCard);
 
         // ===== INICIAR TUDO =====
+        setTravelMode('carro');
+        obterLocalizacaoUsuario();
         carregarDadosDoBanco();
     </script> 
 </body>

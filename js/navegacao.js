@@ -130,6 +130,11 @@ class SistemaNavegacao {
             minZoom: 10,
         }).addTo(this.estado.mapa);
 
+        // Garantir que o mapa seja renderizado corretamente após o layout final estar pronto
+        this.estado.mapa.whenReady(() => {
+            setTimeout(() => this.estado.mapa.invalidateSize(), 50);
+        });
+
         // Customizar ícone padrão do Leaflet
         this.customizar_icones_padrao();
     }
@@ -177,6 +182,13 @@ class SistemaNavegacao {
         // Busca de instituições
         this.elementos.search_bar?.addEventListener('input', (e) => {
             this.filtrar_instituicoes(e.target.value);
+        });
+
+        // Redesenhar mapa quando a janela for redimensionada
+        window.addEventListener('resize', () => {
+            if (this.estado.mapa) {
+                this.estado.mapa.invalidateSize();
+            }
         });
 
         // Fechar sidebar ao clicar fora (mobile)
@@ -348,6 +360,16 @@ class SistemaNavegacao {
     adicionar_marcador_instituicao(instituicao) {
         const { id, nome, latitude, longitude, endereco, especialidades } = instituicao;
 
+        if (
+            latitude == null ||
+            longitude == null ||
+            Number.isNaN(Number(latitude)) ||
+            Number.isNaN(Number(longitude))
+        ) {
+            console.warn('⚠️ Instituto sem coordenadas válidas:', instituicao);
+            return;
+        }
+
         // Determinar cor do marcador baseado no tipo
         const cor_marcador = especialidades?.includes('Urgência') ? '#d32f2f' : '#388e3c';
 
@@ -385,7 +407,8 @@ class SistemaNavegacao {
             })
             .addTo(this.estado.mapa);
 
-        this.estado.marcadores_instituicoes.set(id, marcador);
+        // Usar string como chave para evitar mismatch entre number/string
+        this.estado.marcadores_instituicoes.set(String(id), marcador);
     }
 
     /**
@@ -400,6 +423,8 @@ class SistemaNavegacao {
             contato,
             horario_atendimento,
             detalhes,
+            latitude,
+            longitude,
         } = instituicao;
 
         return `
@@ -477,7 +502,7 @@ class SistemaNavegacao {
         );
 
         // Abrir popup do marcador
-        const marcador = this.estado.marcadores_instituicoes.get(instituicao.id);
+        const marcador = this.estado.marcadores_instituicoes.get(String(instituicao.id));
         if (marcador) {
             marcador.openPopup();
         }
@@ -494,7 +519,8 @@ class SistemaNavegacao {
             return;
         }
 
-        const instituicao = this.estado.instituicoes.find((i) => i.id === id_instituicao);
+        // Comparar IDs como string para aceitar tanto number quanto string
+        const instituicao = this.estado.instituicoes.find((i) => String(i.id) === String(id_instituicao));
         if (!instituicao) {
             this.mostrar_toast('Instituição não encontrada', 'error');
             return;
@@ -545,7 +571,7 @@ class SistemaNavegacao {
         // Formatar coordenadas: [lng, lat] para OSRM
         const coordenadas = `${origem[0]},${origem[1]};${destino[0]},${destino[1]}`;
 
-        const url = `${this.config.osrm_url}/${coordenadas}?overview=full&steps=true&annotations=duration,distance`;
+        const url = `${this.config.osrm_url}/${coordenadas}?overview=full&geometries=geojson&steps=true&annotations=duration,distance`;
 
         try {
             const response = await Promise.race([
@@ -573,6 +599,11 @@ class SistemaNavegacao {
             }
 
             const rota = dados.routes[0];
+
+            if (!rota.geometry || !rota.geometry.coordinates) {
+                throw new Error('Rota inválida: coordenadas não foram retornadas pelo OSRM');
+            }
+
             return {
                 coordenadas: rota.geometry.coordinates,
                 distancia: rota.distance, // metros
@@ -737,7 +768,7 @@ class SistemaNavegacao {
         });
 
         // Mostrar mensagem se nenhum resultado
-        if (visivel_count === 0) {
+        if (visivel_count == 0) {
             this.mostrar_toast(`Nenhuma instituição encontrada para "${termo_busca}"`, 'info');
         }
     }

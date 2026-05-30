@@ -46,13 +46,16 @@ html, body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
 #mapa {
     width: 100%;
     flex: 1;
+    min-height: 0;
     position: relative;
     z-index: 1;
+    height: 100%;
 }
 
 /* =====================================================
