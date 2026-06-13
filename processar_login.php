@@ -96,26 +96,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
         // Instanciando o PHPMailer para envio via SMTP seguro
         $mail = new PHPMailer(true);
 
+
+
+        
         try {
             // Configurações do Servidor SMTP (Substitua com os seus dados do Mailtrap ou outro provedor)
             $mail->isSMTP();
-            $mail->Host      = 'sandbox.smtp.mailtrap.io'; 
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'INSIRA_SEU_USUARIO_SMTP'; 
-            $mail->Password   = 'INSIRA_SUA_SENHA_SMTP';     
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-            $mail->CharSet     = 'UTF-8';
 
-            // Remetente e Destinatário
-            $mail->setFrom('no-reply@saudepira.com', 'Saúde Pira');
-            $mail->addAddress($email);
+$mail->Host = 'smtp.gmail.com';
+
+$mail->SMTPAuth = true;
+
+$mail->Username = 'christianrocha491@gmail.com';
+
+$mail->Password = 'mrrphaokpqbtxnda';
+
+$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+
+$mail->Port = 587;
+
+$mail->CharSet = 'UTF-8';
+
+$mail->setFrom('christianrocha491@gmail.com', 'SaudePira');
+
+$mail->addAddress($email);
+
+
+
+           
 
             // Conteúdo do E-mail em HTML
             $mail->isHTML(true);
             $mail->Subject = '[Saúde Pira] Redefinição de senha';
             $mail->Body     = "Prezado(a),<br><br>Para redefinir sua senha, acesse o link a seguir:<br><br><a href='{$link}' style='color: #007bff; text-decoration: none; font-weight: bold;'>Clique aqui para redefinir sua senha</a><br><br>Ou copie e cole o link no seu navegador:<br>{$link}<br><br>Se você não solicitou essa alteração, ignore esta mensagem.<br><br>Atenciosamente,<br>Saúde Pira";
             $mail->AltBody = "Prezado(a),\n\nPara redefinir sua senha, acesse o link a seguir:\n\n" . $link . "\n\nSe você não solicitou essa alteração, ignore esta mensagem.\n\nAtenciosamente,\nSaúde Pira";
+
+            
 
             $mail->send();
             echo json_encode(['success' => true, 'message' => 'Se o e-mail estiver cadastrado, você receberá um link para redefinir a senha.']);
