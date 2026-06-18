@@ -250,25 +250,91 @@
 
     <script>
     // 1. CONSTANTES E VARIÁVEIS GLOBAIS (Sempre no topo absoluto)
-    const especialidades = [
-        { key: 'todos',         label: 'Ver Todos',     icon: 'ph-squares-four',        color: 'text-white' },
-        { key: 'clinico-geral', label: 'Clínico Geral', icon: 'ph-stethoscope',         color: 'text-blue-400' },
-        { key: 'pediatria',     label: 'Pediatria',     icon: 'ph-baby',                color: 'text-cyan-400' },
-        { key: 'dentista',      label: 'Dentista',      icon: 'ph-tooth',               color: 'text-emerald-400' },
-        { key: 'urgencia',      label: 'Urgência',      icon: 'ph-first-aid',           color: 'text-red-400' },
-        { key: 'psicologia',    label: 'Psicologia',    icon: 'ph-brain',               color: 'text-purple-400' },
-        { key: 'fisioterapia',  label: 'Fisioterapia',  icon: 'ph-person-simple-run',   color: 'text-orange-400' },
-        { key: 'vacinacao',     label: 'Vacinação',     icon: 'ph-syringe',             color: 'text-teal-400' },
-        { key: 'ginecologia',   label: 'Ginecologia',   icon: 'ph-gender-female',       color: 'text-pink-400' },
-        { key: 'cardiologia',   label: 'Cardiologia',   icon: 'ph-heartbeat',           color: 'text-rose-400' },
-        { key: 'ortopedia',     label: 'Ortopedia',     icon: 'ph-bone',                color: 'text-yellow-400' },
-        { key: 'nutricao',      label: 'Nutrição',      icon: 'ph-fork-knife',          color: 'text-lime-400' },
-        { key: 'farmacia',      label: 'Farmácia',      icon: 'ph-pill',                color: 'text-green-400' },
-    ];
+    const iconesPorEspecialidade = {
+        'clinica': 'ph-stethoscope',
+        'pediatria': 'ph-baby',
+        'dentista': 'ph-tooth',
+        'urgencia': 'ph-first-aid',
+        'psicologia': 'ph-brain',
+        'fisioterapia': 'ph-person-simple-run',
+        'vacinacao': 'ph-syringe',
+        'ginecologia': 'ph-gender-female',
+        'cardiologia': 'ph-heartbeat',
+        'ortopedia': 'ph-bone',
+        'nutricao': 'ph-fork-knife',
+        'farmacia': 'ph-pill',
+        'odontologia': 'ph-tooth'
+    };
+
+    const coresPorEspecialidade = {
+        'clinica': 'text-blue-400',
+        'pediatria': 'text-cyan-400',
+        'dentista': 'text-emerald-400',
+        'urgencia': 'text-red-400',
+        'psicologia': 'text-purple-400',
+        'fisioterapia': 'text-orange-400',
+        'vacinacao': 'text-teal-400',
+        'ginecologia': 'text-pink-400',
+        'cardiologia': 'text-rose-400',
+        'ortopedia': 'text-yellow-400',
+        'nutricao': 'text-lime-400',
+        'farmacia': 'text-green-400',
+        'odontologia': 'text-emerald-400'
+    };
+
+    const labelsPorEspecialidade = {
+        'clinica': 'Clínica',
+        'pediatria': 'Pediatria',
+        'dentista': 'Dentista',
+        'urgencia': 'Urgência',
+        'psicologia': 'Psicologia',
+        'fisioterapia': 'Fisioterapia',
+        'vacinacao': 'Vacinação',
+        'ginecologia': 'Ginecologia',
+        'cardiologia': 'Cardiologia',
+        'ortopedia': 'Ortopedia',
+        'nutricao': 'Nutrição',
+        'farmacia': 'Farmácia',
+        'odontologia': 'Odontologia'
+    };
 
     let unidades = [];
+    let filtrosDisponiveis = [];
     let filtroAtivo = 'todos';
     let currentUser = null;
+
+    function normalizarTexto(texto) {
+        return String(texto || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9\s]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function extrairEspecialidades(texto) {
+        const textoNormalizado = normalizarTexto(texto);
+        const regras = [
+            { key: 'clinica', padroes: ['clinica', 'clinico', 'clinica medica', 'clinica medica'] },
+            { key: 'ginecologia', padroes: ['ginecologia'] },
+            { key: 'pediatria', padroes: ['pediatria'] },
+            { key: 'odontologia', padroes: ['odontologia', 'odontologica'] },
+            { key: 'urgencia', padroes: ['urgencia', 'emergencia'] },
+            { key: 'psicologia', padroes: ['psicologia'] },
+            { key: 'fisioterapia', padroes: ['fisioterapia'] },
+            { key: 'vacinacao', padroes: ['vacinacao', 'vacina'] },
+            { key: 'cardiologia', padroes: ['cardiologia'] },
+            { key: 'ortopedia', padroes: ['ortopedia'] },
+            { key: 'nutricao', padroes: ['nutricao'] },
+            { key: 'farmacia', padroes: ['farmacia'] },
+            { key: 'dentista', padroes: ['dentista', 'dentaria', 'dental'] }
+        ];
+
+        return regras
+            .filter(regra => regra.padroes.some(p => textoNormalizado.includes(p)))
+            .map(regra => regra.key);
+    }
 
     // 2. FUNÇÕES DE DADOS E LOGIN
     async function carregarDadosDoBanco() {
@@ -277,35 +343,46 @@
         if (!response.ok) throw new Error('Erro na requisição');
         const dadosDoBanco = await response.json();
 
-        // ATENÇÃO: Sem "const" ou "let" antes de unidades!
         unidades = dadosDoBanco.map(u => {
-            const espString = u.especialidades || "";
-            const listaTags = espString.split(',').map(s => s.trim()).filter(s => s !== "");
-            const listaEsp = listaTags.map(t => 
-                t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-')
-            );
+            const espRaw = u.especialidades || "";
+            const listaEsp = extrairEspecialidades(espRaw);
+            const tags = listaEsp.map(chave => labelsPorEspecialidade[chave] || chave);
 
             return {
                 nome: u.nome || "Unidade sem nome",
                 endereco: u.localizacao || "Endereço não informado",
-                nota: 4.8, 
+                nota: 4.8,
                 aberto: true,
                 badge: u.horario_atendimento || "",
-                tags: listaTags,
+                tags,
                 esp: listaEsp,
-                
-                // Pega a URL que você cadastrou no banco
-                img: (u.url_imagem && u.url_imagem.trim() !== "") 
-                    ? u.url_imagem 
+                img: (u.url_imagem && u.url_imagem.trim() !== "")
+                    ? u.url_imagem
                     : 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=500',
-                
                 lat: u.lat,
                 lng: u.lng
             };
         });
 
-        // Chama a função que você já tem para desenhar os cards na tela
-        aplicarFiltros(); 
+        const contagemEspecialidades = {};
+        unidades.forEach(u => {
+            u.esp.forEach(especialidade => {
+                contagemEspecialidades[especialidade] = (contagemEspecialidades[especialidade] || 0) + 1;
+            });
+        });
+
+        filtrosDisponiveis = Object.entries(contagemEspecialidades)
+            .filter(([, contador]) => contador >= 2)
+            .map(([key]) => ({
+                key,
+                label: labelsPorEspecialidade[key] || key,
+                icon: iconesPorEspecialidade[key] || 'ph-tag',
+                color: coresPorEspecialidade[key] || 'text-slate-300'
+            }))
+            .sort((a, b) => a.label.localeCompare(b.label));
+
+        renderFiltros();
+        aplicarFiltros();
 
     } catch (error) {
         console.error("Erro no fetch:", error);
@@ -493,7 +570,13 @@
         const c = document.getElementById('filtros-container');
         if(!c) return;
         c.innerHTML = '';
-        especialidades.forEach(e => {
+
+        const botoes = [
+            { key: 'todos', label: 'Ver Todos', icon: 'ph-squares-four', color: 'text-white' },
+            ...filtrosDisponiveis
+        ];
+
+        botoes.forEach(e => {
             const ativo = filtroAtivo === e.key;
             const btn = document.createElement('button');
             btn.className = `category-card min-w-[110px] glass p-5 rounded-2xl flex flex-col items-center gap-3 transition-all border ${ativo ? 'active border-blue-500/50 bg-blue-500/10' : 'border-transparent'}`;
