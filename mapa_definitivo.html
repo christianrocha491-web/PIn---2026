@@ -169,11 +169,11 @@
                     <p class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2 mt-1">Filtrar</p>
                     <div class="flex flex-wrap gap-1.5">
                         <button onclick="setMapFilter('todos')" id="mf-todos" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-blue-500/40 bg-blue-500/15 text-blue-400 font-medium transition-all">Todos</button>
-                        <button onclick="setMapFilter('Hospital')" id="mf-hospital" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-red-400 hover:border-red-500/30 font-medium transition-all">Hospital</button>
-                        <button onclick="setMapFilter('UPA')" id="mf-upa" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-orange-400 hover:border-orange-500/30 font-medium transition-all">UPA</button>
                         <button onclick="setMapFilter('UBS')" id="mf-ubs" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-blue-400 hover:border-blue-500/30 font-medium transition-all">UBS</button>
-                        <button onclick="setMapFilter('Saúde Mental')" id="mf-caps" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-purple-400 hover:border-purple-500/30 font-medium transition-all">CAPS</button>
-                        <button onclick="setMapFilter('SAMU')" id="mf-samu" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-yellow-400 hover:border-yellow-500/30 font-medium transition-all">SAMU</button>
+                        <button onclick="setMapFilter('USF')" id="mf-usf" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/30 font-medium transition-all">USF</button>
+                        <button onclick="setMapFilter('Urgência')" id="mf-urgencia" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-orange-400 hover:border-orange-500/30 font-medium transition-all">UPA / Urgência</button>
+                        <button onclick="setMapFilter('Farmácia')" id="mf-farmacia" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-green-400 hover:border-green-500/30 font-medium transition-all">Farmácias</button>
+                        <button onclick="setMapFilter('Psicologia')" id="mf-psicologia" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-purple-400 hover:border-purple-500/30 font-medium transition-all">Psicologia</button>
                     </div>
                 </div>
                 <!-- Lista de unidades -->
@@ -207,8 +207,8 @@
 
                     <div class="flex gap-5">
                         <!-- Imagem/Ícone da Unidade -->
-                        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-900/80 to-indigo-900/80 flex items-center justify-center flex-shrink-0 border border-white/10">
-                            <i class="ph-fill ph-hospital text-4xl text-blue-400"></i>
+                        <div id="unit-icon-container" class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-900/80 to-indigo-900/80 flex items-center justify-center flex-shrink-0 border border-white/10 overflow-hidden">
+                            <i id="unit-icon-default" class="ph-fill ph-hospital text-4xl text-blue-400"></i>
                         </div>
 
                         <!-- Info Principal -->
@@ -306,11 +306,11 @@
 
         // ===== CORES POR TIPO =====
         const typeColors = { 
-            'Hospital':'#ef4444', 
-            'UPA':'#f97316', 
-            'UBS':'#3b82f6', 
-            'Saúde Mental':'#a855f7', 
-            'SAMU':'#eab308' 
+            'UBS':'#3b82f6',
+            'USF':'#10b981',
+            'Urgência':'#f97316',
+            'Farmácia':'#22c55e',
+            'Psicologia':'#a855f7'
         };
 
         // 1. BUSCAR DADOS DO BANCO
@@ -331,7 +331,7 @@
                     status: (u.horario_atendimento && u.horario_atendimento.includes("24")) ? "24 Horas" : "Aberto",
                     time: u.horario_atendimento || "08h - 17h",
                     tags: u.especialidades ? u.especialidades.split(',').map(t => t.trim()) : [],
-                    type: determinarTipo(u.nome)
+                    type: determinarTipo(u.nome, u.especialidades)
                 }));
 
                 // Inicializa os marcadores SOMENTE após os dados chegarem
@@ -341,12 +341,34 @@
             }
         }
 
-        function determinarTipo(nome) {
-            const n = nome.toUpperCase();
-            if (n.includes('HOSPITAL') || n.includes('SANTA CASA')) return 'Hospital';
-            if (n.includes('UPA')) return 'UPA';
-            if (n.includes('CAPS')) return 'Saúde Mental';
-            if (n.includes('SAMU')) return 'SAMU';
+        function determinarTipo(nome, especialidades = '') {
+            const texto = `${nome} ${especialidades}`.toUpperCase();
+
+            if (texto.includes('UPA') ||
+                texto.includes('URGÊNCIA') ||
+                texto.includes('URGENCIA') ||
+                texto.includes('EMERGÊNCIA') ||
+                texto.includes('EMERGENCIA') ||
+                texto.includes('SAMU') ||
+                texto.includes('SUB') ||
+                texto.includes('COT') ||
+                texto.includes('PRONTO SOCORRO') ||
+                texto.includes('ATENDIMENTO PRÉ-HOSPITALAR') ||
+                texto.includes('ATENDIMENTO PRE-HOSPITALAR')) {
+                return 'Urgência';
+            }
+
+            if (texto.includes('USF')) return 'USF';
+            if (texto.includes('FARMÁCIA') || texto.includes('FARMACIA')) return 'Farmácia';
+            if (texto.includes('PSICO') ||
+                texto.includes('PSIQUI') ||
+                texto.includes('CAPS') ||
+                texto.includes('PSICOSSOCIAL') ||
+                texto.includes('PSICOLOG')) {
+                return 'Psicologia';
+            }
+
+            if (texto.includes('UBS')) return 'UBS';
             return 'UBS';
         }
 
@@ -594,7 +616,14 @@
                 b.classList.remove('border-blue-500/40','bg-blue-500/15','text-blue-400');
                 b.classList.add('border-white/10','bg-white/5','text-slate-300');
             });
-            const idMap = { 'todos':'mf-todos','Hospital':'mf-hospital','UPA':'mf-upa','UBS':'mf-ubs','Saúde Mental':'mf-caps','SAMU':'mf-samu' };
+            const idMap = {
+                'todos':'mf-todos',
+                'UBS':'mf-ubs',
+                'USF':'mf-usf',
+                'Urgência':'mf-urgencia',
+                'Farmácia':'mf-farmacia',
+                'Psicologia':'mf-psicologia'
+            };
             const btn = document.getElementById(idMap[type]);
             if (btn) btn.classList.add('border-blue-500/40','bg-blue-500/15','text-blue-400');
             aplicarFiltrosMapa();
@@ -663,6 +692,20 @@
             } else {
                 badge.className = 'bg-emerald-900/50 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1';
                 badge.innerHTML = '<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> ABERTO';
+            }
+
+            const iconContainer = document.getElementById('unit-icon-container');
+            const iconDefault = document.getElementById('unit-icon-default');
+            const isSamu = /samu/i.test(unit.name) || /serviço de atendimento móvel de urgência/i.test(unit.name);
+
+            if (isSamu) {
+                iconContainer.className = 'w-24 h-24 rounded-2xl bg-white/5 flex items-center justify-center flex-shrink-0 border border-white/10 overflow-hidden';
+                iconContainer.innerHTML = '<img src="img/Samu192.png" alt="SAMU" class="w-full h-full object-cover">';
+            } else {
+                iconContainer.className = 'w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-900/80 to-indigo-900/80 flex items-center justify-center flex-shrink-0 border border-white/10 overflow-hidden';
+                iconContainer.innerHTML = '';
+                iconContainer.appendChild(iconDefault);
+                iconDefault.className = 'ph-fill ph-hospital text-4xl text-blue-400';
             }
 
             const tagsContainer = document.getElementById('unit-tags');
