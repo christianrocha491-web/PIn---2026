@@ -9,8 +9,41 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; }
-        .glass { background: rgba(15,23,42,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        :root {
+            --page-bg: #020617;
+            --page-text: #f8fafc;
+            --page-muted: #94a3b8;
+            --surface: rgba(15,23,42,0.6);
+            --surface-strong: rgba(15,23,42,0.98);
+            --border: rgba(255,255,255,0.12);
+            --panel-border: rgba(255,255,255,0.12);
+            --shadow: 0 28px 90px rgba(0,0,0,0.3);
+            --button-bg: rgba(255,255,255,0.08);
+            --button-text: #e2e8f0;
+            --control-bg: rgba(255,255,255,0.04);
+            --accent: #3b82f6;
+            --accent-soft: rgba(59,130,246,0.2);
+            --acc-font-size: 100;
+            --acc-line-height: 100;
+            --acc-letter-spacing: 100;
+            --acc-scale: 100;
+        }
+        html {
+            font-size: calc(var(--acc-font-size, 100) * var(--acc-scale, 100) / 100 * 1%);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--page-bg);
+            color: var(--page-text);
+            line-height: calc(var(--acc-line-height, 100) / 100);
+            letter-spacing: calc((var(--acc-letter-spacing, 100) - 100) * 0.05px);
+            width: 100%;
+            transition: background-color .2s ease, color .2s ease, letter-spacing .2s ease, line-height .2s ease;
+        }
+        main, header, footer, .glass, .unit-card, .settings-panel, .category-card {
+            transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+        .glass { background: var(--surface); backdrop-filter: blur(12px); border: 1px solid var(--border); }
         .category-card:hover { border-color: #38bdf8; background: rgba(56,189,248,0.1); transform: translateY(-5px); position: relative; z-index: 10; }
         .category-card.active { border-color: rgba(59,130,246,0.5) !important; background: rgba(59,130,246,0.1) !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -39,8 +72,8 @@
             pointer-events: auto;
             transform: scale(1);
         }
-        .settings-panel.hidden { display: block !important; }
-        .settings-color-btn,
+        .settings-panel.hidden { display: none !important; }
+        .settings-theme-btn,
         .settings-action-btn,
         .settings-toggle-btn {
             border: 1px solid rgba(255,255,255,0.08);
@@ -52,40 +85,84 @@
             transition: all .15s ease;
             cursor: pointer;
         }
-        .settings-color-btn:hover,
+        .settings-theme-btn:hover,
         .settings-action-btn:hover,
         .settings-toggle-btn:hover {
             background: rgba(255,255,255,0.12);
         }
         .settings-toggle-btn.active,
         .settings-action-btn.active,
-        .settings-color-btn.active {
+        .settings-theme-btn.active {
             background: rgba(59,130,246,0.2);
             border-color: rgba(59,130,246,0.45);
             color: #fff;
         }
         .section-title { text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.68rem; color: #94a3b8; margin-bottom: 0.75rem; }
         body.high-contrast { background-color: #050505; color: #f8fafc; }
-        body.high-contrast header { background: rgba(0,0,0,0.98); }
+        body.high-contrast header,
+        body.high-contrast .glass,
+        body.high-contrast .unit-card,
+        body.high-contrast .settings-panel,
+        body.high-contrast .category-card {
+            background-color: #0b1120;
+            border-color: #ffffff;
+            color: #f8fafc;
+        }
+        body.high-contrast .text-slate-400,
+        body.high-contrast .settings-panel .text-slate-400,
+        body.high-contrast .unit-card p {
+            color: #dbeafe !important;
+        }
         body.readable-fonts { font-family: 'Inter', Arial, Helvetica, sans-serif; }
-        body.hide-images img { opacity: 0.08; filter: blur(1px); }
-        body.text-magnifier { font-size: 1.03rem; }
+        body.reading-mask main { filter: saturate(1.05) brightness(1.08); }
+        body.reading-mask .glass,
+        body.reading-mask .unit-card,
+        body.reading-mask .settings-panel,
+        body.reading-mask .category-card {
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+            background-color: rgba(255,255,255,0.92);
+        }
         body.align-left main { text-align: left; }
         body.align-center main { text-align: center; }
         body.align-right main { text-align: right; }
-        body.skip-links #skip-links { display: flex; }
-        body.theme-blue { background-color: #020f24; }
-        body.theme-green { background-color: #081e12; }
-        body.theme-purple { background-color: #140a23; }
-        body.theme-dark { background-color: #030610; }
+        body.theme-light {
+            background-color: #F3F5F8;
+            color: #1E293B;
+        }
+        body.theme-light .glass { background: #FFFFFF; border-color: #E2E8F0; color: #1E293B; box-shadow: 0 16px 30px rgba(15,23,42,0.06); }
+        body.theme-light header { background: #F8FAFC; }
+        body.theme-light .text-slate-400 { color: #64748B !important; }
+        body.theme-light .text-white { color: #1E293B !important; }
+        body.theme-light .bg-slate-800\/50 { background-color: rgba(226,232,240,0.35) !important; }
+        body.theme-light .border-white\/10 { border-color: rgba(226,232,240,0.35) !important; }
+        body.theme-light .category-card { background: #FFFFFF; color: #1E293B; box-shadow: 0 14px 28px rgba(15,23,42,0.04); }
+        body.theme-light .category-card:hover { background: #F8FAFC; }
+        body.theme-light .unit-card { background: #FFFFFF; border-color: #E2E8F0; }
+        body.theme-light .unit-card .h-48 { background: #F8FAFC !important; }
+        body.theme-light .unit-card h3 { color: #0F172A !important; }
+        body.theme-light .unit-card p { color: #475569 !important; }
+        body.theme-light .unit-card .text-slate-300 { color: #64748B !important; }
+        body.theme-light .unit-card a { background: #E2E8F0 !important; color: #0F172A !important; border-color: #CBD5E1 !important; }
+        body.theme-light .settings-panel { background: #FFFFFF; color: #1E293B; border-color: #E2E8F0; }
+        body.theme-light a { color: #1E293B !important; }
+        body.theme-light .settings-theme-btn,
+        body.theme-light .settings-action-btn,
+        body.theme-light .settings-toggle-btn {
+            border-color: #E2E8F0;
+            background: #F8FAFC;
+            color: #1E293B;
+        }
+        body.theme-light .settings-theme-btn.active,
+        body.theme-light .settings-action-btn.active,
+        body.theme-light .settings-toggle-btn.active {
+            background: rgba(59,130,246,0.14);
+            border-color: rgba(59,130,246,0.35);
+            color: #1E293B;
+        }
     </style>
 </head>
 <body class="min-h-screen">
-    <div id="skip-links" class="skip-links hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-wrap gap-2 rounded-full bg-slate-900/95 border border-white/10 px-3 py-2 text-xs shadow-2xl">
-        <a href="#main-content" class="skip-link text-slate-100 bg-slate-700/80 px-3 py-2 rounded-full hover:bg-slate-600 transition-colors">Ir para conteúdo</a>
-        <a href="#sidebar-drawer" class="skip-link text-slate-100 bg-slate-700/80 px-3 py-2 rounded-full hover:bg-slate-600 transition-colors">Ir para menu</a>
-        <a href="#footer" class="skip-link text-slate-100 bg-slate-700/80 px-3 py-2 rounded-full hover:bg-slate-600 transition-colors">Ir para rodapé</a>
-    </div>
+    <!-- O painel de configuração agora usa acesso autoral a recursos de acessibilidade -->
 
     <!-- Overlay do Sidebar -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeSidebar()"></div>
@@ -106,28 +183,22 @@
         <nav class="flex-1 p-4 flex flex-col gap-1">
             <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1 mt-2">Navegação</span>
             <a href="index3.html" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-500/10 text-blue-400 font-medium">
-                <i class="ph-bold ph-house text-xl"></i> Início
+                <i class="ph-bold ph-house text-xl"></i> <span>Início</span>
             </a>
             <a href="mapa_definitivo.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
-                <i class="ph-bold ph-map-trifold text-xl"></i> Ver Mapa
+                <i class="ph-bold ph-map-trifold text-xl"></i> <span>Ver Mapa</span>
             </a>
             <a href="catalogo_uni.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
-                <i class="ph-bold ph-list-bullets text-xl"></i> Catálogo de Unidades
+                <i class="ph-bold ph-list-bullets text-xl"></i> <span>Catálogo de Unidades</span>
             </a>
             <a href="medicamentos.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
-                <i class="ph-bold ph-pill text-xl"></i> Anotar Medicamentos
-            </a>
-            
-            <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-3 mb-1">Conta</span>
-
-            <a href="configuracoes.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
-                <i class="ph-bold ph-gear text-xl"></i> Configurações
+                <i class="ph-bold ph-pill text-xl"></i> <span>Anotar Medicamentos</span>
             </a>
         </nav>
         <div class="p-4 border-t border-white/10 flex-shrink-0">
-            <button class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-semibold transition-all">
+            <a href="tel:192" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-semibold transition-all no-underline" role="button">
                 <i class="ph-fill ph-warning-circle text-xl animate-pulse"></i> Emergência 192
-            </button>
+            </a>
         </div>
     </aside>
 
@@ -144,13 +215,13 @@
             </div>
         </div>
 
-        <div class="flex bg-slate-800/50 rounded-full px-4 py-2 border border-white/10 items-center gap-3 flex-1 max-w-md">
+            <div class="flex bg-slate-800/50 rounded-full px-4 py-2 border border-white/10 items-center gap-3 flex-1 max-w-md">
             <i class="ph ph-magnifying-glass text-slate-400"></i>
-            <input id="search-input" type="text" placeholder="Buscar unidades ou especialidades..." class="bg-transparent border-none outline-none text-sm w-full" oninput="aplicarFiltros()">
+            <input id="search-input" type="text" placeholder="Buscar unidades ou especialidades..." class="bg-transparent border-none outline-none text-sm w-full">
         </div>
 
         <div class="relative flex items-center gap-2">
-            <button id="settings-toggle" onclick="toggleSettingsPanel()" class="bg-slate-800/80 hover:bg-slate-700 px-4 py-2 rounded-full text-slate-200 transition-colors flex items-center gap-2 flex-shrink-0" aria-expanded="false" aria-controls="settings-panel" aria-label="Abrir configurações">
+            <button id="settings-toggle" class="bg-slate-800/80 hover:bg-slate-700 px-4 py-2 rounded-full text-slate-200 transition-colors flex items-center gap-2 flex-shrink-0" aria-expanded="false" aria-controls="settings-panel" aria-label="Abrir configurações">
                 <i class="ph ph-gear text-lg"></i>
             </button>
             <div id="settings-panel" class="settings-panel hidden glass">
@@ -165,42 +236,37 @@
                 </div>
                 <div class="space-y-4 p-4">
                     <div>
-                        <p class="section-title">Idioma</p>
+                        <p class="section-title">Tema</p>
                         <div class="mt-3 flex flex-wrap gap-2">
-                            <button type="button" onclick="setLanguage('pt')" class="settings-action-btn" id="lang-pt">Português</button>
-                            <button type="button" onclick="setLanguage('en')" class="settings-action-btn" id="lang-en">English</button>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="section-title">Cor do tema</p>
-                        <div class="mt-3 flex flex-wrap gap-2">
-                            <button type="button" onclick="setTheme('default')" class="settings-color-btn">Padrão</button>
-                            <button type="button" onclick="setTheme('blue')" class="settings-color-btn bg-blue-500/15 text-blue-200">Azul</button>
-                            <button type="button" onclick="setTheme('green')" class="settings-color-btn bg-emerald-500/15 text-emerald-200">Verde</button>
-                            <button type="button" onclick="setTheme('purple')" class="settings-color-btn bg-violet-500/15 text-violet-200">Roxo</button>
-                            <button type="button" onclick="setTheme('dark')" class="settings-color-btn bg-slate-700/80 text-slate-100">Escuro</button>
+                            <button type="button" data-theme="default" class="settings-theme-btn">Padrão</button>
+                            <button type="button" data-theme="light" class="settings-theme-btn">Claro</button>
                         </div>
                     </div>
                     <div>
                         <p class="section-title">Acessibilidade</p>
                         <div class="mt-3 grid gap-3">
-                            <button type="button" onclick="toggleAccessibility('highContrast')" class="settings-toggle-btn" id="btn-highContrast">Alto contraste</button>
-                            <button type="button" onclick="toggleAccessibility('readableFonts')" class="settings-toggle-btn" id="btn-readableFonts">Fonte legível</button>
-                            <button type="button" onclick="toggleAccessibility('hideImages')" class="settings-toggle-btn" id="btn-hideImages">Ocultar imagens</button>
-                            <button type="button" onclick="toggleAccessibility('textMagnifier')" class="settings-toggle-btn" id="btn-textMagnifier">Lupa de texto</button>
-                            <button type="button" onclick="toggleAccessibility('skipLinks')" class="settings-toggle-btn" id="btn-skipLinks">Ativar links de pulo</button>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="section-title">Alinhamento</p>
-                        <div class="mt-3 flex flex-wrap gap-2">
-                            <button type="button" onclick="setAlignment('left')" class="settings-action-btn">Esquerda</button>
-                            <button type="button" onclick="setAlignment('center')" class="settings-action-btn">Centro</button>
-                            <button type="button" onclick="setAlignment('right')" class="settings-action-btn">Direita</button>
+                            <button type="button" data-accessibility="readingMask" class="settings-toggle-btn">Máscara de leitura</button>
+                            <button type="button" data-accessibility="highContrast" class="settings-toggle-btn">Alto contraste</button>
+                            <button type="button" data-accessibility="readableFont" class="settings-toggle-btn">Fonte legível</button>
+                            <div class="grid gap-3">
+                                <label for="acc-fontSize" class="text-xs text-slate-400">Tamanho da fonte</label>
+                                <input id="acc-fontSize" type="range" min="80" max="160" value="100">
+                                <label for="acc-lineHeight" class="text-xs text-slate-400">Altura da linha</label>
+                                <input id="acc-lineHeight" type="range" min="80" max="200" value="100">
+                                <label for="acc-letterSpacing" class="text-xs text-slate-400">Espaçamento entre letras</label>
+                                <input id="acc-letterSpacing" type="range" min="80" max="200" value="100">
+                                <label for="acc-scale" class="text-xs text-slate-400">Dimensionamento do conteúdo</label>
+                                <input id="acc-scale" type="range" min="80" max="140" value="100">
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" data-align="left" class="settings-action-btn">Alinhar à esquerda</button>
+                                <button type="button" data-align="center" class="settings-action-btn">Centralizar</button>
+                                <button type="button" data-align="right" class="settings-action-btn">Alinhar à direita</button>
+                            </div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between gap-2 pt-2 border-t border-white/10">
-                        <button type="button" onclick="resetSettings()" class="w-full py-3 rounded-2xl border border-white/10 text-slate-200 hover:bg-white/5 transition-colors">Redefinir</button>
+                        <button type="button" id="reset-settings" class="w-full py-3 rounded-2xl border border-white/10 text-slate-200 hover:bg-white/5 transition-colors">Redefinir configurações</button>
                     </div>
                 </div>
             </div>
@@ -251,393 +317,19 @@
     </a>
     <footer id="footer" class="hidden"></footer>
 
+    <!-- Core scripts: configurações, tema, acessibilidade, tradução e app -->
+    <script src="js/settings.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/accessibility.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/app.js"></script>
     <script>
-    // 1. CONSTANTES E VARIÁVEIS GLOBAIS (Sempre no topo absoluto)
-    const iconesPorEspecialidade = {
-        'clinica': 'ph-stethoscope',
-        'pediatria': 'ph-baby',
-        'dentista': 'ph-tooth',
-        'urgencia': 'ph-first-aid',
-        'psicologia': 'ph-brain',
-        'fisioterapia': 'ph-person-simple-run',
-        'vacinacao': 'ph-syringe',
-        'ginecologia': 'ph-gender-female',
-        'cardiologia': 'ph-heartbeat',
-        'ortopedia': 'ph-bone',
-        'nutricao': 'ph-fork-knife',
-        'farmacia': 'ph-pill',
-        'odontologia': 'ph-tooth'
-    };
-
-    const coresPorEspecialidade = {
-        'clinica': 'text-blue-400',
-        'pediatria': 'text-cyan-400',
-        'dentista': 'text-emerald-400',
-        'urgencia': 'text-red-400',
-        'psicologia': 'text-purple-400',
-        'fisioterapia': 'text-orange-400',
-        'vacinacao': 'text-teal-400',
-        'ginecologia': 'text-pink-400',
-        'cardiologia': 'text-rose-400',
-        'ortopedia': 'text-yellow-400',
-        'nutricao': 'text-lime-400',
-        'farmacia': 'text-green-400',
-        'odontologia': 'text-emerald-400'
-    };
-
-    const labelsPorEspecialidade = {
-        'clinica': 'Clínica',
-        'pediatria': 'Pediatria',
-        'dentista': 'Dentista',
-        'urgencia': 'Urgência',
-        'psicologia': 'Psicologia',
-        'fisioterapia': 'Fisioterapia',
-        'vacinacao': 'Vacinação',
-        'ginecologia': 'Ginecologia',
-        'cardiologia': 'Cardiologia',
-        'ortopedia': 'Ortopedia',
-        'nutricao': 'Nutrição',
-        'farmacia': 'Farmácia',
-        'odontologia': 'Odontologia'
-    };
-
-    let unidades = [];
-    let filtrosDisponiveis = [];
-    let filtroAtivo = 'todos';
-    let currentUser = null;
-
-    function normalizarTexto(texto) {
-        return String(texto || '')
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9\s]/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
-    }
-
-    function extrairEspecialidades(texto) {
-        const textoNormalizado = normalizarTexto(texto);
-        const regras = [
-            { key: 'clinica', padroes: ['clinica', 'clinico', 'clinica medica', 'clinica medica'] },
-            { key: 'ginecologia', padroes: ['ginecologia'] },
-            { key: 'pediatria', padroes: ['pediatria'] },
-            { key: 'odontologia', padroes: ['odontologia', 'odontologica'] },
-            { key: 'urgencia', padroes: ['urgencia', 'emergencia'] },
-            { key: 'psicologia', padroes: ['psicologia'] },
-            { key: 'fisioterapia', padroes: ['fisioterapia'] },
-            { key: 'vacinacao', padroes: ['vacinacao', 'vacina'] },
-            { key: 'cardiologia', padroes: ['cardiologia'] },
-            { key: 'ortopedia', padroes: ['ortopedia'] },
-            { key: 'nutricao', padroes: ['nutricao'] },
-            { key: 'farmacia', padroes: ['farmacia'] },
-            { key: 'dentista', padroes: ['dentista', 'dentaria', 'dental'] }
-        ];
-
-        return regras
-            .filter(regra => regra.padroes.some(p => textoNormalizado.includes(p)))
-            .map(regra => regra.key);
-    }
-
-    // 2. FUNÇÕES DE DADOS E LOGIN
-    async function carregarDadosDoBanco() {
-    try {
-        const response = await fetch('get_unidades.php');
-        if (!response.ok) throw new Error('Erro na requisição');
-        const dadosDoBanco = await response.json();
-
-        unidades = dadosDoBanco.map(u => {
-            const espRaw = u.especialidades || "";
-            const listaEsp = extrairEspecialidades(espRaw);
-            const tags = listaEsp.map(chave => labelsPorEspecialidade[chave] || chave);
-
-            return {
-                nome: u.nome || "Unidade sem nome",
-                endereco: u.localizacao || "Endereço não informado",
-                nota: 4.8,
-                aberto: true,
-                badge: u.horario_atendimento || "",
-                tags,
-                esp: listaEsp,
-                img: (u.url_imagem && u.url_imagem.trim() !== "")
-                    ? u.url_imagem
-                    : 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=500',
-                lat: u.lat,
-                lng: u.lng
-            };
+        // Inicializa configurações persistidas e carrega dados
+        window.addEventListener('DOMContentLoaded', async () => {
+            await Settings.load();
+            Theme.apply(Settings.theme);
+            App.start();
         });
-
-        const contagemEspecialidades = {};
-        unidades.forEach(u => {
-            u.esp.forEach(especialidade => {
-                contagemEspecialidades[especialidade] = (contagemEspecialidades[especialidade] || 0) + 1;
-            });
-        });
-
-        filtrosDisponiveis = Object.entries(contagemEspecialidades)
-            .filter(([, contador]) => contador >= 2)
-            .map(([key]) => ({
-                key,
-                label: labelsPorEspecialidade[key] || key,
-                icon: iconesPorEspecialidade[key] || 'ph-tag',
-                color: coresPorEspecialidade[key] || 'text-slate-300'
-            }))
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-        renderFiltros();
-        aplicarFiltros();
-
-    } catch (error) {
-        console.error("Erro no fetch:", error);
-    }
-}
-
-    function checkLogin() {
-        const user = sessionStorage.getItem('currentUser');
-        if (user) {
-            currentUser = JSON.parse(user);
-            updateAuthUI();
-        }
-    }
-
-    function updateAuthUI() {
-        const authButton = document.getElementById('auth-button');
-        const userGreeting = document.getElementById('user-greeting');
-        if (currentUser && userGreeting) {
-            authButton.classList.add('hidden');
-            userGreeting.classList.remove('hidden');
-            document.getElementById('user-name').textContent = currentUser.nome.split(' ')[0];
-            document.getElementById('user-initial').textContent = currentUser.nome.charAt(0).toUpperCase();
-        }
-    }
-
-    function handleLogout() {
-        sessionStorage.removeItem('currentUser');
-        window.location.reload();
-    }
-
-    const siteSettings = {
-        language: 'pt',
-        theme: 'default',
-        highContrast: false,
-        readableFonts: false,
-        hideImages: false,
-        textMagnifier: false,
-        alignText: 'left',
-        skipLinks: false
-    };
-
-    function toggleSettingsPanel() {
-        const panel = document.getElementById('settings-panel');
-        const button = document.getElementById('settings-toggle');
-        const isOpen = panel.classList.toggle('open');
-        panel.classList.toggle('hidden', !isOpen);
-        button.setAttribute('aria-expanded', isOpen);
-    }
-
-    function setTheme(theme) {
-        document.body.classList.remove('theme-blue', 'theme-green', 'theme-purple', 'theme-dark');
-        if (theme !== 'default') document.body.classList.add(`theme-${theme}`);
-        siteSettings.theme = theme;
-        updateSettingsButtons();
-    }
-
-    function setLanguage(lang) {
-        siteSettings.language = lang;
-        document.getElementById('search-input').placeholder = lang === 'en'
-            ? 'Search for units or specialties...'
-            : 'Buscar unidades ou especialidades...';
-        document.querySelector('h1').textContent = lang === 'en'
-            ? 'Find care now.'
-            : 'Encontre atendimento agora.';
-        document.querySelector('p.text-lg').textContent = lang === 'en'
-            ? 'Select a specialty to see the nearest units to you.'
-            : 'Selecione uma especialidade para ver as unidades mais próximas de você.';
-        document.getElementById('auth-button').querySelector('a').textContent = lang === 'en' ? 'Sign In' : 'Entrar';
-        document.querySelector('a[href="mapa_definitivo.html"]').querySelector('span').textContent = lang === 'en' ? 'Show Map' : 'Exibir Mapa';
-        document.getElementById('section-title-text').textContent = lang === 'en' ? 'All available units' : 'Todas as unidades disponíveis';
-        updateSettingsButtons();
-    }
-
-    function toggleAccessibility(flag) {
-        siteSettings[flag] = !siteSettings[flag];
-        document.body.classList.toggle(flag.replace(/([A-Z])/g, '-$1').toLowerCase(), siteSettings[flag]);
-        updateSettingsButtons();
-    }
-
-    function setAlignment(alignment) {
-        document.body.classList.remove('align-left', 'align-center', 'align-right');
-        document.body.classList.add(`align-${alignment}`);
-        siteSettings.alignText = alignment;
-        updateSettingsButtons();
-    }
-
-    function resetSettings() {
-        siteSettings.language = 'pt';
-        siteSettings.theme = 'default';
-        siteSettings.highContrast = false;
-        siteSettings.readableFonts = false;
-        siteSettings.hideImages = false;
-        siteSettings.textMagnifier = false;
-        siteSettings.alignText = 'left';
-        siteSettings.skipLinks = false;
-        document.body.className = document.body.className
-            .split(' ')
-            .filter(c => !c.startsWith('theme-') && !['high-contrast','readable-fonts','hide-images','text-magnifier','align-left','align-center','align-right','skip-links'].includes(c))
-            .join(' ');
-        document.body.classList.add('min-h-screen');
-        updateSettingsButtons();
-        setTheme('default');
-        setLanguage('pt');
-        updateSkipLinks();
-    }
-
-    function updateSkipLinks() {
-        document.body.classList.toggle('skip-links', siteSettings.skipLinks);
-    }
-
-    function updateSettingsButtons() {
-        const toggleIds = {
-            highContrast: 'btn-highContrast',
-            readableFonts: 'btn-readableFonts',
-            hideImages: 'btn-hideImages',
-            textMagnifier: 'btn-textMagnifier',
-            skipLinks: 'btn-skipLinks'
-        };
-        Object.keys(toggleIds).forEach(key => {
-            const btn = document.getElementById(toggleIds[key]);
-            if (!btn) return;
-            btn.classList.toggle('active', siteSettings[key]);
-            btn.textContent = `${siteSettings[key] ? 'Desativar' : 'Ativar'} ${btn.textContent.replace(/Ativar |Desativar /, '')}`;
-        });
-        document.getElementById('lang-pt').classList.toggle('active', siteSettings.language === 'pt');
-        document.getElementById('lang-en').classList.toggle('active', siteSettings.language === 'en');
-        const toggleMap = {
-            highContrast: { id: 'btn-highContrast', label: 'Alto contraste' },
-            readableFonts: { id: 'btn-readableFonts', label: 'Fonte legível' },
-            hideImages: { id: 'btn-hideImages', label: 'Ocultar imagens' },
-            textMagnifier: { id: 'btn-textMagnifier', label: 'Lupa de texto' },
-            skipLinks: { id: 'btn-skipLinks', label: 'Links de pulo' }
-        };
-
-        Object.values(toggleMap).forEach(({ id, label }) => {
-            const btn = document.getElementById(id);
-            if (!btn) return;
-            btn.textContent = `${siteSettings[id.replace('btn-', '')] ? 'Desativar' : 'Ativar'} ${label}`;
-        });
-
-        document.querySelectorAll('.settings-color-btn').forEach(button => {
-            button.classList.toggle('active', button.textContent.trim().toLowerCase() === siteSettings.theme || (siteSettings.theme === 'default' && button.textContent.trim().toLowerCase() === 'padrão'));
-        });
-        updateSkipLinks();
-    }
-
-    function initializeSettings() {
-        setLanguage(siteSettings.language);
-        setTheme(siteSettings.theme);
-        setAlignment(siteSettings.alignText);
-        if (siteSettings.highContrast) toggleAccessibility('highContrast');
-        if (siteSettings.readableFonts) toggleAccessibility('readableFonts');
-        if (siteSettings.hideImages) toggleAccessibility('hideImages');
-        if (siteSettings.textMagnifier) toggleAccessibility('textMagnifier');
-        if (siteSettings.skipLinks) toggleAccessibility('skipLinks');
-    }
-
-    function getFavorites() {
-        if (!currentUser) return [];
-        return JSON.parse(localStorage.getItem(`fav-${currentUser.email}`)) || [];
-    }
-
-    function toggleFavorite(nome) {
-        if (!currentUser) { window.location.href = 'login.html'; return; }
-        let favs = getFavorites();
-        favs = favs.includes(nome) ? favs.filter(f => f !== nome) : [...favs, nome];
-        localStorage.setItem(`fav-${currentUser.email}`, JSON.stringify(favs));
-        aplicarFiltros();
-    }
-
-    // 3. FUNÇÕES DE INTERFACE
-    function openSidebar() {
-        document.getElementById('sidebar-overlay').classList.replace('opacity-0', 'opacity-100');
-        document.getElementById('sidebar-overlay').classList.remove('pointer-events-none');
-        document.getElementById('sidebar-drawer').classList.replace('-translate-x-full', 'translate-x-0');
-    }
-
-    function closeSidebar() {
-        document.getElementById('sidebar-overlay').classList.replace('opacity-100', 'opacity-0');
-        document.getElementById('sidebar-overlay').classList.add('pointer-events-none');
-        document.getElementById('sidebar-drawer').classList.replace('translate-x-0', '-translate-x-full');
-    }
-
-    function renderFiltros() {
-        const c = document.getElementById('filtros-container');
-        if(!c) return;
-        c.innerHTML = '';
-
-        const botoes = [
-            { key: 'todos', label: 'Ver Todos', icon: 'ph-squares-four', color: 'text-white' },
-            ...filtrosDisponiveis
-        ];
-
-        botoes.forEach(e => {
-            const ativo = filtroAtivo === e.key;
-            const btn = document.createElement('button');
-            btn.className = `category-card min-w-[110px] glass p-5 rounded-2xl flex flex-col items-center gap-3 transition-all border ${ativo ? 'active border-blue-500/50 bg-blue-500/10' : 'border-transparent'}`;
-            btn.innerHTML = `<i class="ph ${e.icon} text-3xl ${e.color}"></i><span class="text-sm font-medium">${e.label}</span>`;
-            btn.onclick = () => { filtroAtivo = e.key; renderFiltros(); aplicarFiltros(); };
-            c.appendChild(btn);
-        });
-    }
-
-    function aplicarFiltros() {
-        const termo = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
-        const resultado = unidades.filter(u => {
-            const matchEsp = filtroAtivo === 'todos' || u.esp.includes(filtroAtivo);
-            const matchSearch = !termo || u.nome.toLowerCase().includes(termo) || u.tags.some(t => t.toLowerCase().includes(termo));
-            return matchEsp && matchSearch;
-        });
-        renderCards(resultado, getFavorites());
-    }
-
-    function renderCards(lista, favs = []) {
-        const c = document.getElementById('cards-container');
-        const nr = document.getElementById('no-results');
-        if(!c) return;
-        c.innerHTML = '';
-        if (!lista.length) { nr.classList.remove('hidden'); return; }
-        nr.classList.add('hidden');
-        
-        lista.forEach(u => {
-            const isFav = favs.includes(u.nome);
-            const div = document.createElement('div');
-            div.className = 'unit-card group relative glass rounded-3xl overflow-hidden transition-all hover:ring-2 hover:ring-blue-500/50';
-            div.innerHTML = `
-                <div class="h-48 bg-slate-800 relative">
-                    <img src="${u.img}" class="w-full h-full object-cover opacity-60" alt="${u.nome}">
-                    <div class="absolute top-4 left-4 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded">${u.badge}</div>
-                    <button onclick="toggleFavorite('${u.nome}')" class="absolute top-4 right-4 bg-white/10 p-2 rounded-full">
-                        <i class="ph ${isFav ? 'ph-fill ph-heart text-red-500' : 'ph ph-heart text-white'} text-lg"></i>
-                    </button>
-                </div>
-                <div class="p-6">
-                    <h3 class="font-bold text-xl">${u.nome}</h3>
-                    <p class="text-slate-400 text-sm mb-4">${u.endereco}</p>
-                    <div class="flex flex-wrap gap-2">${u.tags.map(t => `<span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300">${t}</span>`).join('')}</div>
-                    <a href="mapa_definitivo.html?lat=${u.lat}&lng=${u.lng}" class="mt-6 w-full py-3 bg-white/5 border border-white/10 rounded-xl font-semibold flex items-center justify-center gap-2 text-white no-underline">
-                        <i class="ph ph-map-trifold"></i> Ver no Mapa
-                    </a>
-                </div>`;
-            c.appendChild(div);
-        });
-    }
-
-    // 4. INICIALIZAÇÃO (Onde o site começa)
-    window.addEventListener('DOMContentLoaded', () => {
-        checkLogin();
-        renderFiltros();
-        carregarDadosDoBanco();
-        initializeSettings();
-    });
-</script>
+    </script>
 </body>
 </html>

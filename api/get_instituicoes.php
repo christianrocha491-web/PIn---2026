@@ -42,21 +42,44 @@ try {
         exit;
     }
 
-    // Query para buscar todas as instituições
-    $sql = "SELECT 
-                id,
-                nome,
-                localizacao as endereco,
-                lat as latitude,
-                lng as longitude,
-                especialidades,
-                horario_atendimento,
-                contato,
-                detalhes,
-                url_imagem,
-                atualizado_em
-            FROM instituicoes
-            ORDER BY nome ASC";
+    // Detecta idioma solicitado
+    $lang = isset($_GET['lang']) ? strtolower(substr($_GET['lang'],0,2)) : 'pt';
+    // Verifica se há colunas _en
+    $has_nome_en = false;
+    $colCheck = $pdo->query("SHOW COLUMNS FROM instituicoes LIKE 'nome_en'");
+    if($colCheck && $colCheck->rowCount() > 0) $has_nome_en = true;
+
+    if($lang === 'en' && $has_nome_en){
+        $sql = "SELECT 
+                    id,
+                    COALESCE(nome_en, nome) as nome,
+                    COALESCE(localizacao_en, localizacao) as endereco,
+                    lat as latitude,
+                    lng as longitude,
+                    COALESCE(especialidades_en, especialidades) as especialidades,
+                    COALESCE(horario_atendimento_en, horario_atendimento) as horario_atendimento,
+                    contato,
+                    COALESCE(detalhes_en, detalhes) as detalhes,
+                    url_imagem,
+                    atualizado_em
+                FROM instituicoes
+                ORDER BY (nome_en IS NULL), nome_en ASC";
+    } else {
+        $sql = "SELECT 
+                    id,
+                    nome,
+                    localizacao as endereco,
+                    lat as latitude,
+                    lng as longitude,
+                    especialidades,
+                    horario_atendimento,
+                    contato,
+                    detalhes,
+                    url_imagem,
+                    atualizado_em
+                FROM instituicoes
+                ORDER BY nome ASC";
+    }
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
