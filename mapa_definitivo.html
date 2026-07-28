@@ -95,6 +95,32 @@
             animation: dash 1.2s linear infinite;
         }
 
+        .leaflet-tooltip.unit-label-tooltip {
+            background: rgba(2, 6, 23, 0.93);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #f8fafc;
+            box-shadow: 0 10px 25px rgba(2, 6, 23, 0.35);
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.2;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .leaflet-tooltip.unit-label-tooltip::before {
+            border-top-color: rgba(2, 6, 23, 0.93);
+        }
+
+        .unit-label-tooltip[data-color] {
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .unit-label-tooltip[data-color]::before {
+            border-top-color: var(--tooltip-color, rgba(2, 6, 23, 0.93));
+        }
+
         @keyframes dash {
             to { stroke-dashoffset: -22; }
         }
@@ -362,7 +388,14 @@
         setActiveNavLink();
 
         // ===== MAPA =====
-        const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-22.7338, -47.6476], 13);
+        const map = L.map('map', {
+            zoomControl: false,
+            attributionControl: false,
+            zoomSnap: 0.25,
+            zoomDelta: 0.25,
+            wheelPxPerZoomLevel: 90,
+            zoomAnimation: true
+        }).setView([-22.7338, -47.6476], 13);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -379,6 +412,7 @@
         let routeDestMarker = null;
         let routeActiveUnit = null;
         let travelMode = 'carro';
+        const MIN_LABEL_ZOOM = 14;
 
         // ===== CORES POR TIPO =====
         const typeColors = { 
@@ -456,6 +490,50 @@
                 html: `<div style="width:${size}px;height:${size}px;background:${color};border-radius:50%;border:3px solid rgba(255,255,255,0.7);box-shadow:0 0 10px ${color}99;transition:all .2s"></div>`,
                 iconSize: [size, size],
                 iconAnchor: [size/2, size/2]
+            });
+        }
+
+        function syncMarkerLabels() {
+            const currentZoom = map.getZoom();
+
+            if (currentZoom < MIN_LABEL_ZOOM) {
+                allMarkers.forEach(({ marker }) => {
+                    const tooltip = marker.getTooltip();
+                    const tooltipEl = tooltip?.getElement();
+                    if (tooltipEl) tooltipEl.style.display = 'none';
+                });
+                return;
+            }
+
+            const visibleMarkers = allMarkers.filter(({ marker }) => map.hasLayer(marker));
+            const markerPoints = visibleMarkers.map(({ marker }) => ({
+                marker,
+                point: map.latLngToContainerPoint(marker.getLatLng())
+            }));
+
+            const labelThreshold = Math.max(140, 120 + (currentZoom - MIN_LABEL_ZOOM) * 20);
+
+            markerPoints.forEach(({ marker, point }) => {
+                const tooltip = marker.getTooltip();
+                const tooltipEl = tooltip?.getElement();
+                if (!tooltipEl) return;
+
+                let canShow = true;
+
+                for (const other of markerPoints) {
+                    if (other.marker === marker) continue;
+
+                    const dx = point.x - other.point.x;
+                    const dy = point.y - other.point.y;
+                    const distance = Math.hypot(dx, dy);
+
+                    if (distance < labelThreshold) {
+                        canShow = false;
+                        break;
+                    }
+                }
+
+                tooltipEl.style.display = canShow ? '' : 'none';
             });
         }
 
@@ -672,6 +750,16 @@
             healthUnits.forEach(unit => {
                 if(!isNaN(unit.lat) && !isNaN(unit.lng)) {
                     const marker = L.marker([unit.lat, unit.lng], { icon: createIcon(unit.type) });
+                    const tooltipColor = typeColors[unit.type] || '#3b82f6';
+                    marker.bindTooltip(unit.name, {
+                        permanent: true,
+                        direction: 'top',
+                        offset: [0, -8],
+                        className: 'unit-label-tooltip'
+                    });
+                    marker.getTooltip().setContent(`<span style="color:${tooltipColor};">${unit.name}</span>`);
+                    marker.getTooltip().getElement()?.style.setProperty('--tooltip-color', tooltipColor);
+                    marker.getTooltip().getElement()?.setAttribute('data-color', tooltipColor);
                     marker.on('click', () => openUnitCard(unit));
                     allMarkers.push({ unit, marker });
                 }
@@ -723,6 +811,7 @@
                 else map.removeLayer(marker);
             });
             renderSidebarList(filtered);
+            syncMarkerLabels();
         }
 
         function renderSidebarList(lista) {
@@ -808,6 +897,8 @@
 
         closeBtn.addEventListener('click', hideCard);
         map.on('click', hideCard);
+        map.on('zoom', syncMarkerLabels);
+        map.on('move', syncMarkerLabels);
 
         // ===== INICIAR TUDO =====
         setTravelMode('carro');
