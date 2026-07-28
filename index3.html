@@ -49,7 +49,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         #sidebar-overlay { transition: opacity 0.3s; }
-        #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); }
+        #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); left:0 !important; margin-left:0 !important; }
         .settings-panel {
             position: absolute;
             top: 100%;
@@ -170,12 +170,12 @@
     <!-- Sidebar Drawer -->
     <aside id="sidebar-drawer" class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col -translate-x-full border-r border-white/10 overflow-y-auto" style="background:rgba(2,6,23,0.98);backdrop-filter:blur(20px);">
         <div class="flex items-center justify-between p-5 border-b border-white/10 flex-shrink-0">
-            <div class="flex items-center gap-2">
+            <a href="index3.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="Ir para a página inicial">
                 <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <i class="ph-bold ph-activity text-white"></i>
                 </div>
                 <span class="font-bold text-lg">Saúde<span class="text-blue-500">Pira</span></span>
-            </div>
+            </a>
             <button onclick="closeSidebar()" class="text-slate-400 hover:text-white transition-colors">
                 <i class="ph-bold ph-x text-xl"></i>
             </button>
@@ -207,12 +207,12 @@
             <button onclick="openSidebar()" class="text-slate-300 hover:text-white transition-colors" aria-label="Menu">
                 <i class="ph-bold ph-list text-2xl"></i>
             </button>
-            <div class="flex items-center gap-2">
+            <a href="index3.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="Ir para a página inicial">
                 <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <i class="ph-bold ph-activity text-white"></i>
                 </div>
                 <span class="font-bold text-lg tracking-tight">Saúde<span class="text-blue-500">Pira</span></span>
-            </div>
+            </a>
         </div>
 
             <div class="flex bg-slate-800/50 rounded-full px-4 py-2 border border-white/10 items-center gap-3 flex-1 max-w-md">
@@ -324,11 +324,25 @@
     <script src="js/i18n.js"></script>
     <script src="js/app.js"></script>
     <script>
+        function setActiveNavLink() {
+            const currentPage = window.location.pathname.split('/').pop().toLowerCase();
+            document.querySelectorAll('#sidebar-drawer a[href]').forEach((link) => {
+                const href = (link.getAttribute('href') || '').toLowerCase();
+                const isActive = href === currentPage;
+                link.classList.toggle('bg-blue-500/10', isActive);
+                link.classList.toggle('text-blue-400', isActive);
+                link.classList.toggle('text-slate-300', !isActive);
+                link.classList.toggle('hover:bg-white/5', !isActive);
+                link.classList.toggle('font-medium', true);
+            });
+        }
+
         // Inicializa configurações persistidas e carrega dados
         window.addEventListener('DOMContentLoaded', async () => {
             await Settings.load();
             Theme.apply(Settings.theme);
             App.start();
+            setActiveNavLink();
         });
     </script>
 </body>
