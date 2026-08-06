@@ -99,5 +99,19 @@
         window.closeNavSidebar = closeNavSidebar;
         setActiveNavLink();
     </script>
+<<<<<<< HEAD
+=======
+    <script src="js/settings.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/accessibility.js"></script>
+    <script src="js/settings-widget.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SettingsWidget) {
+                SettingsWidget.init({ hostSelector: 'header' });
+            }
+        });
+    </script>
+>>>>>>> 236e5ca (mudança das config)
 </body>
 </html>
