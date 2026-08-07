@@ -4,22 +4,20 @@ const Theme = (function(){
     function apply(theme){
         theme = THEMES.includes(theme) ? theme : 'default';
         document.documentElement.setAttribute('data-theme', theme);
-        document.body.classList.toggle('theme-light', theme === 'light');
+        if (document.body) document.body.classList.toggle('theme-light', theme === 'light');
         Settings.theme = theme;
         updateThemeButtons();
     }
 
     function updateThemeButtons(){
         document.querySelectorAll('.settings-theme-btn').forEach(btn => {
-            const v = btn.getAttribute('data-theme');
-            btn.classList.toggle('active', Settings.theme === v);
-            btn.setAttribute('aria-pressed', String(Settings.theme === v));
+            const value = btn.getAttribute('data-theme');
+            btn.classList.toggle('active', Settings.theme === value);
+            btn.setAttribute('aria-pressed', String(Settings.theme === value));
         });
     }
 
-    function init(){
-        updateThemeButtons();
-    }
+    function init(){ updateThemeButtons(); }
 
     return { apply, init, THEMES };
 })();

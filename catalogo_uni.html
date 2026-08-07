@@ -38,7 +38,14 @@
             left: 0 !important;
             margin-left: 0 !important;
         }
+        /* Mantém o catálogo alinhado mais perto da lateral, como a Home. */
+        .catalog-shell {
+            width: 100%;
+            padding-left: clamp(1.5rem, 3vw, 3rem);
+            padding-right: clamp(1.5rem, 3vw, 3rem);
+        }
     </style>
+    <link rel="stylesheet" href="css/settings.css">
 </head>
 <body class="min-h-screen text-slate-100">
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeSidebar()"></div>
@@ -76,7 +83,7 @@
         </div>
     </aside>
     <header class="sticky top-0 z-30 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="catalog-shell py-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div class="flex items-center gap-3">
                 <button onclick="openSidebar()" class="text-slate-300 hover:text-white transition-colors" aria-label="Abrir menu">
                     <i class="ph-bold ph-list text-2xl"></i>
@@ -90,6 +97,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-3 w-full md:max-w-xl">
+                <div id="settings-slot-catalog" class="flex-shrink-0"></div>
                 <div class="flex-1 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
                     <i class="ph ph-magnifying-glass text-slate-400"></i>
                     <input id="searchInput" type="search" placeholder="Buscar unidade, endereço ou especialidade..." class="w-full bg-transparent outline-none text-sm placeholder-slate-500">
@@ -98,7 +106,7 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-10">
+    <main class="catalog-shell py-10">
         <section class="mb-8">
             <p class="text-slate-300 leading-relaxed max-w-3xl">
                 Aqui você encontra todas as unidades cadastradas no site, organizadas por tipo de serviço para facilitar a navegação e o entendimento de cada atendimento.
@@ -367,19 +375,9 @@
         document.getElementById('searchInput').addEventListener('input', renderCatalogo);
         window.addEventListener('DOMContentLoaded', carregarUnidades);
     </script>
-<<<<<<< HEAD
-=======
     <script src="js/settings.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/accessibility.js"></script>
-    <script src="js/settings-widget.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SettingsWidget) {
-                SettingsWidget.init({ hostSelector: 'header' });
-            }
-        });
-    </script>
->>>>>>> 236e5ca (mudança das config)
+    <script src="js/settings-ui.js"></script>
 </body>
 </html>

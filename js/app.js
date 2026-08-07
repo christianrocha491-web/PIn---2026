@@ -278,13 +278,7 @@ const App = (function(){
     }
 
     function bindUI(){
-        document.getElementById('settings-toggle').addEventListener('click', toggleSettingsPanel);
-        document.querySelectorAll('[data-theme]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                Theme.apply(btn.getAttribute('data-theme'));
-            });
-        });
-        document.getElementById('reset-settings')?.addEventListener('click', resetSettings);
+        // O painel de configurações é controlado por settings-ui.js em todas as páginas.
         document.getElementById('search-input')?.addEventListener('input', aplicarFiltros);
     }
 

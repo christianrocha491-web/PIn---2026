@@ -114,14 +114,6 @@
             color: #dbeafe !important;
         }
         body.readable-fonts { font-family: 'Inter', Arial, Helvetica, sans-serif; }
-        body.reading-mask main { filter: saturate(1.05) brightness(1.08); }
-        body.reading-mask .glass,
-        body.reading-mask .unit-card,
-        body.reading-mask .settings-panel,
-        body.reading-mask .category-card {
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
-            background-color: rgba(255,255,255,0.92);
-        }
         body.align-left main { text-align: left; }
         body.align-center main { text-align: center; }
         body.align-right main { text-align: right; }
@@ -160,6 +152,7 @@
             color: #1E293B;
         }
     </style>
+    <link rel="stylesheet" href="css/settings.css">
 </head>
 <body class="min-h-screen">
     <!-- O painel de configuração agora usa acesso autoral a recursos de acessibilidade -->
@@ -220,67 +213,19 @@
             <input id="search-input" type="text" placeholder="Buscar unidades ou especialidades..." class="bg-transparent border-none outline-none text-sm w-full">
         </div>
 
-        <div class="relative flex items-center gap-2">
-            <button id="settings-toggle" class="bg-slate-800/80 hover:bg-slate-700 px-4 py-2 rounded-full text-slate-200 transition-colors flex items-center gap-2 flex-shrink-0" aria-expanded="false" aria-controls="settings-panel" aria-label="Abrir configurações">
-                <i class="ph ph-gear text-lg"></i>
+        
+        <div class="flex items-center gap-3 flex-shrink-0" data-settings-auth-group>
+            <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0" id="auth-button">
+                <a href="login.html" class="no-underline text-white">Entrar</a>
             </button>
-            <div id="settings-panel" class="settings-panel hidden glass">
-                <div class="flex items-start justify-between gap-3 p-4 border-b border-white/10">
-                    <div>
-                        <p class="text-slate-400 text-xs uppercase tracking-[0.25em] mb-1">Configurações</p>
-                        <h3 class="text-base font-bold">Preferências do site</h3>
-                    </div>
-                    <button onclick="toggleSettingsPanel()" class="text-slate-300 hover:text-white transition-colors" aria-label="Fechar configurações">
-                        <i class="ph-bold ph-x text-xl"></i>
-                    </button>
+            <div id="user-greeting" class="hidden flex items-center gap-3 flex-shrink-0">
+                <div class="flex flex-col items-end">
+                    <span class="text-sm font-semibold text-white">Olá, <span id="user-name"></span></span>
+                    <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-red-400 transition-colors">Sair</button>
                 </div>
-                <div class="space-y-4 p-4">
-                    <div>
-                        <p class="section-title">Tema</p>
-                        <div class="mt-3 flex flex-wrap gap-2">
-                            <button type="button" data-theme="default" class="settings-theme-btn">Padrão</button>
-                            <button type="button" data-theme="light" class="settings-theme-btn">Claro</button>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="section-title">Acessibilidade</p>
-                        <div class="mt-3 grid gap-3">
-                            <button type="button" data-accessibility="readingMask" class="settings-toggle-btn">Máscara de leitura</button>
-                            <button type="button" data-accessibility="highContrast" class="settings-toggle-btn">Alto contraste</button>
-                            <button type="button" data-accessibility="readableFont" class="settings-toggle-btn">Fonte legível</button>
-                            <div class="grid gap-3">
-                                <label for="acc-fontSize" class="text-xs text-slate-400">Tamanho da fonte</label>
-                                <input id="acc-fontSize" type="range" min="80" max="160" value="100">
-                                <label for="acc-lineHeight" class="text-xs text-slate-400">Altura da linha</label>
-                                <input id="acc-lineHeight" type="range" min="80" max="200" value="100">
-                                <label for="acc-letterSpacing" class="text-xs text-slate-400">Espaçamento entre letras</label>
-                                <input id="acc-letterSpacing" type="range" min="80" max="200" value="100">
-                                <label for="acc-scale" class="text-xs text-slate-400">Dimensionamento do conteúdo</label>
-                                <input id="acc-scale" type="range" min="80" max="140" value="100">
-                            </div>
-                            <div class="flex gap-2">
-                                <button type="button" data-align="left" class="settings-action-btn">Alinhar à esquerda</button>
-                                <button type="button" data-align="center" class="settings-action-btn">Centralizar</button>
-                                <button type="button" data-align="right" class="settings-action-btn">Alinhar à direita</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between gap-2 pt-2 border-t border-white/10">
-                        <button type="button" id="reset-settings" class="w-full py-3 rounded-2xl border border-white/10 text-slate-200 hover:bg-white/5 transition-colors">Redefinir configurações</button>
-                    </div>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold text-white">
+                    <span id="user-initial"></span>
                 </div>
-            </div>
-        </div>
-        <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0" id="auth-button">
-            <a href="login.html" class="no-underline text-white">Entrar</a>
-        </button>
-        <div id="user-greeting" class="hidden flex items-center gap-3 flex-shrink-0">
-            <div class="flex flex-col items-end">
-                <span class="text-sm font-semibold text-white">Olá, <span id="user-name"></span></span>
-                <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-red-400 transition-colors">Sair</button>
-            </div>
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold text-white">
-                <span id="user-initial"></span>
             </div>
         </div>
     </header>
@@ -345,5 +290,6 @@
             setActiveNavLink();
         });
     </script>
+    <script src="js/settings-ui.js"></script>
 </body>
 </html>

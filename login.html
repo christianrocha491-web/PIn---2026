@@ -16,6 +16,7 @@
         #sidebar-overlay { transition: opacity 0.3s ease; }
         #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); left:0 !important; margin-left:0 !important; }
     </style>
+    <link rel="stylesheet" href="css/settings.css">
 </head>
 <body class="min-h-screen">
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeNavSidebar()"></div>
@@ -303,19 +304,9 @@
             window.location.href = 'index3.html';
         }
     </script>
-<<<<<<< HEAD
-=======
     <script src="js/settings.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/accessibility.js"></script>
-    <script src="js/settings-widget.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SettingsWidget) {
-                SettingsWidget.init({ hostSelector: 'header' });
-            }
-        });
-    </script>
->>>>>>> 236e5ca (mudança das config)
+    <script src="js/settings-ui.js"></script>
 </body>
 </html>

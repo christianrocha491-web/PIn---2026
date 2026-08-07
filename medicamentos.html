@@ -16,6 +16,7 @@
         #sidebar-overlay { transition: opacity 0.3s ease; }
         #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); left:0 !important; margin-left:0 !important; }
     </style>
+    <link rel="stylesheet" href="css/settings.css">
 </head>
 <body class="min-h-screen">
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeNavSidebar()"></div>
@@ -68,16 +69,18 @@
                 <span class="font-bold text-lg tracking-tight">Saúde<span class="text-blue-500">Pira</span></span>
             </a>
         </div>
-        <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0" id="auth-button">
-            <a href="login.html" class="no-underline text-white">Entrar</a>
-        </button>
-        <div id="user-greeting" class="hidden flex items-center gap-3 flex-shrink-0">
-            <div class="flex flex-col items-end">
-                <span class="text-sm font-semibold text-white">Olá, <span id="user-name"></span></span>
-                <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-red-400 transition-colors">Sair</button>
-            </div>
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold text-white">
-                <span id="user-initial"></span>
+        <div class="flex items-center gap-3 flex-shrink-0" data-settings-auth-group>
+            <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0" id="auth-button">
+                <a href="login.html" class="no-underline text-white">Entrar</a>
+            </button>
+            <div id="user-greeting" class="hidden flex items-center gap-3 flex-shrink-0">
+                <div class="flex flex-col items-end">
+                    <span class="text-sm font-semibold text-white">Olá, <span id="user-name"></span></span>
+                    <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-red-400 transition-colors">Sair</button>
+                </div>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold text-white">
+                    <span id="user-initial"></span>
+                </div>
             </div>
         </div>
     </header>
@@ -652,19 +655,9 @@
     checkLogin();
     loadPrescriptions();
     </script>
-<<<<<<< HEAD
-=======
     <script src="js/settings.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/accessibility.js"></script>
-    <script src="js/settings-widget.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SettingsWidget) {
-                SettingsWidget.init({ hostSelector: 'header' });
-            }
-        });
-    </script>
->>>>>>> 236e5ca (mudança das config)
+    <script src="js/settings-ui.js"></script>
 </body>
 </html>

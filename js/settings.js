@@ -8,25 +8,31 @@ const Settings = (function(){
             highContrast: false,
             readableFont: false,
             fontSize: 100,
-            lineHeight: 100,
             letterSpacing: 100,
             scale: 100,
-            textAlign: 'left'
+            textAlign: 'default'
         }
     };
 
     let state = JSON.parse(JSON.stringify(DEFAULTS));
 
-    function deepMerge(target, source) {
-        Object.keys(source).forEach(key => {
-            const sourceValue = source[key];
-            if (sourceValue && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
-                target[key] = deepMerge(target[key] || {}, sourceValue);
-            } else {
-                target[key] = sourceValue;
-            }
-        });
-        return target;
+    function normalizeAccessibility(value) {
+        const source = value && typeof value === 'object' ? value : {};
+        return {
+            readingMask: !!source.readingMask,
+            highContrast: !!source.highContrast,
+            readableFont: !!source.readableFont,
+            fontSize: clampNumber(source.fontSize, 80, 160, DEFAULTS.accessibility.fontSize),
+            letterSpacing: clampNumber(source.letterSpacing, 80, 200, DEFAULTS.accessibility.letterSpacing),
+            scale: clampNumber(source.scale, 80, 140, DEFAULTS.accessibility.scale),
+            textAlign: ['default', 'left', 'center', 'right'].includes(source.textAlign) ? source.textAlign : 'default'
+        };
+    }
+
+    function clampNumber(value, min, max, fallback) {
+        const number = Number(value);
+        if (!Number.isFinite(number)) return fallback;
+        return Math.min(max, Math.max(min, number));
     }
 
     function load(){
@@ -35,10 +41,17 @@ const Settings = (function(){
                 const raw = localStorage.getItem(STORAGE_KEY);
                 if (raw) {
                     const saved = JSON.parse(raw);
-                    state = deepMerge(JSON.parse(JSON.stringify(DEFAULTS)), saved);
+                    state = {
+                        language: saved.language || DEFAULTS.language,
+                        theme: ['default', 'light'].includes(saved.theme) ? saved.theme : DEFAULTS.theme,
+                        accessibility: normalizeAccessibility(saved.accessibility)
+                    };
+                    // Regrava para remover opções antigas, como "lineHeight".
+                    save();
                 }
             } catch (error) {
                 console.warn('Settings load failed', error);
+                state = JSON.parse(JSON.stringify(DEFAULTS));
             }
             resolve();
         });
@@ -58,25 +71,19 @@ const Settings = (function(){
     }
 
     return {
-        get language() {
-            return state.language;
-        },
+        get language() { return state.language; },
         set language(value) {
             state.language = value || 'pt';
             save();
         },
-        get theme() {
-            return state.theme;
-        },
+        get theme() { return state.theme; },
         set theme(value) {
             state.theme = ['default','light'].includes(value) ? value : 'default';
             save();
         },
-        get accessibility() {
-            return state.accessibility;
-        },
+        get accessibility() { return Object.assign({}, state.accessibility); },
         set accessibility(value) {
-            state.accessibility = deepMerge(JSON.parse(JSON.stringify(DEFAULTS.accessibility)), value || {});
+            state.accessibility = normalizeAccessibility(value);
             save();
         },
         load,
