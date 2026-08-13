@@ -24,9 +24,9 @@ try {
     if($colCheck && $colCheck->rowCount() > 0) $has_nome_en = true;
 
     if($lang === 'en' && $has_nome_en){
-        $sql = "SELECT id, COALESCE(nome_en, nome) AS nome, COALESCE(localizacao_en, localizacao) AS localizacao, COALESCE(especialidades_en, especialidades) AS especialidades, COALESCE(horario_atendimento_en, horario_atendimento) AS horario_atendimento, lat, lng, url_imagem FROM instituicoes ORDER BY nome_en IS NULL, nome_en ASC";
+        $sql = "SELECT id, COALESCE(nome_en, nome) AS nome, COALESCE(localizacao_en, localizacao) AS localizacao, COALESCE(especialidades_en, especialidades) AS especialidades, COALESCE(horario_atendimento_en, horario_atendimento) AS horario_atendimento, COALESCE(contato_en, contato) AS contato, lat, lng, url_imagem FROM instituicoes ORDER BY nome_en IS NULL, nome_en ASC";
     } else {
-        $sql = "SELECT id, nome, localizacao, especialidades, horario_atendimento, lat, lng, url_imagem FROM instituicoes ORDER BY nome ASC";
+        $sql = "SELECT id, nome, localizacao, especialidades, horario_atendimento, contato, lat, lng, url_imagem FROM instituicoes ORDER BY nome ASC";
     }
     $stmt = $pdo->query($sql);
     $unidades = $stmt->fetchAll(PDO::FETCH_ASSOC);

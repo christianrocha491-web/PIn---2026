@@ -238,7 +238,7 @@ const App = (function(){
                 </div>
                 <div class="p-6">
                     <h3 class="font-bold text-xl">${u.nome}</h3>
-                    <p class="text-slate-400 text-sm mb-4">${u.endereco}</p>
+                    <p class="text-slate-400 text-sm mb-4 break-words">${u.endereco}</p>
                     <div class="flex flex-wrap gap-2">${u.tags.map(t=>`<span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300">${t}</span>`).join('')}</div>
                     <a href="mapa_definitivo.html?lat=${u.lat}&lng=${u.lng}" class="mt-6 w-full py-3 bg-white/5 border border-white/10 rounded-xl font-semibold flex items-center justify-center gap-2 text-white no-underline">
                         <i class="ph ph-map-trifold"></i> Ver no Mapa

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curiosidades — Unidades de Saúde</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/settings.css">
+    <style>
+        :root {
+            --bg-deep: #07111f;
+            --bg-panel: rgba(15, 23, 42, 0.8);
+            --bg-soft: rgba(30,41,59,.72);
+            --edge: rgba(148,163,184,.14);
+            --blue: #60a5fa;
+            --cyan: #22d3ee;
+            --emerald: #34d399;
+            --amber: #fbbf24;
+            --rose: #f87171;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(96,165,250,.18), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(34,211,238,.16), transparent 32%),
+                linear-gradient(180deg, #0f172a 0%, #0b1120 100%);
+        }
+
+        .glass {
+            background: rgba(15,23,42,0.72);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(148,163,184,0.12);
+            box-shadow: 0 18px 40px rgba(2,6,23,.18);
+        }
+
+        .hero-panel {
+            background: linear-gradient(135deg, rgba(14, 116, 144, 0.28), rgba(37,99,235,0.2), rgba(15,23,42,0.88));
+            border: 1px solid rgba(148,163,184,0.18);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(148,163,184,0.16);
+            color: #dbeafe;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .theme-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .pill-blue { background: rgba(59,130,246,0.15); color: #bfdbfe; border: 1px solid rgba(96,165,250,.25); }
+        .pill-cyan { background: rgba(34,211,238,0.12); color: #a5f3fc; border: 1px solid rgba(34,211,238,.25); }
+        .pill-emerald { background: rgba(52,211,153,0.12); color: #a7f3d0; border: 1px solid rgba(52,211,153,.24); }
+        .pill-amber { background: rgba(251,191,36,0.12); color: #fde68a; border: 1px solid rgba(251,191,36,.24); }
+
+        .card-hover:hover { transform: translateY(-3px); border-color: rgba(59,130,246,0.45); }
+        .chip { background: rgba(15,23,42,0.82); border: 1px solid rgba(148,163,184,0.12); }
+        .category-panel { scroll-margin-top: 120px; }
+        #sidebar-overlay { transition: opacity 0.3s ease; }
+        #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); left:0 !important; margin-left:0 !important; }
+        .catalog-shell { width:100%; padding-left: clamp(1.5rem,3vw,3rem); padding-right: clamp(1.5rem,3vw,3rem); }
+        details summary { cursor: pointer; }
+        details summary::-webkit-details-marker { display: none; }
+        .talk-bubble {
+            position: relative;
+            border-radius: 1.2rem;
+        }
+        .talk-bubble::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 24px;
+            width: 18px;
+            height: 18px;
+            background: inherit;
+            transform: rotate(45deg);
+            border-right: 1px solid rgba(148,163,184,.12);
+            border-bottom: 1px solid rgba(148,163,184,.12);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100">
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeSidebar()"></div>
+    <aside id="sidebar-drawer" class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col -translate-x-full border-r border-white/10 overflow-y-auto" style="background:rgba(2,6,23,0.98);backdrop-filter:blur(20px);">
+        <div class="flex items-center justify-between p-5 border-b border-white/10 flex-shrink-0">
+            <a href="index3.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="Ir para a página inicial">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i class="ph-bold ph-activity text-white"></i>
+                </div>
+                <span class="font-bold text-lg">Saúde<span class="text-blue-500">Pira</span></span>
+            </a>
+            <button onclick="closeSidebar()" class="text-slate-400 hover:text-white transition-colors" aria-label="Fechar menu">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
+        </div>
+        <nav class="flex-1 p-4 flex flex-col gap-1">
+            <a href="index3.html" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-500/10 text-blue-400 font-medium"><i class="ph-bold ph-house text-xl"></i> <span>Início</span></a>
+            <a href="mapa_definitivo.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-map-trifold text-xl"></i> <span>Ver Mapa</span></a>
+            <a href="curiosidades.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-list-bullets text-xl"></i> <span>Curiosidades</span></a>
+            <a href="medicamentos.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-pill text-xl"></i> <span>Anotar Medicamentos</span></a>
+            <a href="sobre_nos.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-users text-xl"></i> <span>Sobre nós</span></a>
+            <a href="contato.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-envelope text-xl"></i> <span>Contato</span></a>
+        </nav>
+    </aside>
+
+    <header class="sticky top-0 z-30 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
+        <div class="catalog-shell py-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <button onclick="openSidebar()" class="text-slate-300 hover:text-white transition-colors" aria-label="Abrir menu"><i class="ph-bold ph-list text-2xl"></i></button>
+                <a href="index3.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="Ir para a página inicial">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="ph-bold ph-activity text-white"></i>
+                    </div>
+                    <span class="font-bold text-lg tracking-tight">Saúde<span class="text-blue-500">Pira</span></span>
+                </a>
+            </div>
+            <div class="flex items-center gap-3 w-full md:max-w-xl">
+                <div class="flex-1 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                    <i class="ph ph-magnifying-glass text-slate-400"></i>
+                    <input id="searchInput" type="search" placeholder="Buscar no guia..." class="w-full bg-transparent outline-none text-sm placeholder-slate-500">
+                </div>
+            </div>
+            <div id="settings-slot-catalog" class="flex items-center justify-end min-w-[44px]"></div>
+        </div>
+    </header>
+
+    <main class="catalog-shell py-10">
+        <section class="hero-panel rounded-[28px] p-6 md:p-8 mb-8">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                <div class="max-w-3xl">
+                    <div class="badge mb-4"><i class="ph ph-heartbeat"></i> Guia rápido da saúde</div>
+                    <h1 class="text-3xl md:text-5xl font-black leading-tight">Entenda onde ir e quando procurar cada unidade de saúde</h1>
+                    <p class="text-slate-200 mt-4 leading-relaxed">A rede de atenção à saúde funciona em camadas. Cada unidade tem um papel. Saber a diferença entre UBS, USF, UPA e hospital pode evitar filas desnecessárias e acelerar o cuidado certo para cada momento.</p>
+                </div>
+                <div class="grid grid-cols-3 gap-3 min-w-[260px]">
+                    <div class="glass rounded-2xl p-3 text-center">
+                        <div class="text-xl font-black text-blue-300">UBS</div>
+                        <div class="text-[11px] uppercase tracking-widest text-slate-300 mt-1">Básica</div>
+                    </div>
+                    <div class="glass rounded-2xl p-3 text-center">
+                        <div class="text-xl font-black text-cyan-300">USF</div>
+                        <div class="text-[11px] uppercase tracking-widest text-slate-300 mt-1">Família</div>
+                    </div>
+                    <div class="glass rounded-2xl p-3 text-center">
+                        <div class="text-xl font-black text-amber-300">UPA</div>
+                        <div class="text-[11px] uppercase tracking-widest text-slate-300 mt-1">Urgência</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="entendendo" class="grid gap-6 md:grid-cols-2 mb-8">
+            <article class="glass rounded-3xl p-6 card-hover transition-all">
+                <div class="theme-pill pill-blue mb-3"><i class="ph ph-stethoscope"></i> Atenção básica</div>
+                <h2 class="text-xl font-semibold mb-2">UBS x USF — a porta de entrada da rede</h2>
+                <p class="text-slate-300">A Atenção Básica é o primeiro ponto de contato do paciente com o Sistema Único de Saúde. Ali, o cidadão costuma receber consultas, exames simples, vacinas, curativos, acompanhamento de doenças crônicas e orientação sobre prevenção.</p>
+                <ul class="list-disc pl-5 mt-3 text-slate-300">
+                    <li><strong>UBS:</strong> é a unidade mais próxima do atendimento geral da população, com consulta, prevenção, vacinação, acompanhamento e serviços básicos.</li>
+                    <li><strong>USF:</strong> segue a mesma lógica da atenção básica, mas com forte foco em vínculo familiar e atuação em território, geralmente com visitas domiciliares e acompanhamento comunitário.</li>
+                </ul>
+                <p class="mt-3 text-slate-400 text-sm">Na prática, ambas resolvem a maior parte dos problemas cotidianos. A diferença é principalmente o foco de atuação e o vínculo com a comunidade.</p>
+            </article>
+
+            <article class="glass rounded-3xl p-6 card-hover transition-all">
+                <div class="theme-pill pill-amber mb-3"><i class="ph ph-warning-octagon"></i> Urgência e emergência</div>
+                <h2 class="text-xl font-semibold mb-2">UPA, SAMU e emergência — quando procurar cada um</h2>
+                <p class="text-slate-300">A urgência e a emergência exigem uma leitura de gravidade. Nem todo problema intenso precisa ir direto ao hospital, mas situações de risco iminente devem ser atendidas com prioridade e rapidez.</p>
+                <ul class="list-disc pl-5 mt-3 text-slate-300">
+                    <li><strong>UPA:</strong> atende casos urgentes e muitas vezes de média complexidade, sem necessidade de ir diretamente ao pronto-socorro hospitalar.</li>
+                    <li><strong>SAMU (192):</strong> é o serviço móvel de urgência para situações graves, risco de vida ou quando a pessoa não consegue se deslocar.</li>
+                    <li><strong>Hospital:</strong> é indicado para casos mais complexos, internação, cirurgia ou necessidade de exames mais especializados.</li>
+                </ul>
+                <p class="mt-3 text-slate-400 text-sm">A orientação da Secretaria Municipal de Saúde de Novo Hamburgo reforça isso: a UBS/USF cuidam da rotina e da prevenção; a UPA reorganiza a urgência e a emergência dos hospitais.</p>
+            </article>
+        </section>
+
+        <section id="mais" class="grid gap-6 md:grid-cols-2 mb-8">
+            <article class="glass rounded-3xl p-6 card-hover transition-all">
+                <div class="theme-pill pill-cyan mb-3"><i class="ph ph-user-focus"></i> Fluxo de atenção</div>
+                <h3 class="text-lg font-semibold mb-2">Como a rede se organiza na prática?</h3>
+                <p class="text-slate-300">A primeira linha de atendimento é a atenção básica. Quando a situação exige uma avaliação mais rápida, o paciente pode ser direcionado para a UPA. Já quando há necessidade de internação, cirurgia ou exames mais complexos, entra em cena o hospital e o pronto-socorro.</p>
+                <div class="mt-4 space-y-3">
+                    <div class="talk-bubble glass rounded-2xl p-3 text-slate-200"><strong class="text-white">1.</strong> Sintomas leves e rotina → UBS/USF</div>
+                    <div class="talk-bubble glass rounded-2xl p-3 text-slate-200"><strong class="text-white">2.</strong> Dor forte, lesão, febre alta ou urgência → UPA</div>
+                    <div class="talk-bubble glass rounded-2xl p-3 text-slate-200"><strong class="text-white">3.</strong> Risco iminente ou internação → SAMU / hospital</div>
+                </div>
+            </article>
+
+            <article class="glass rounded-3xl p-6 card-hover transition-all">
+                <div class="theme-pill pill-emerald mb-3"><i class="ph ph-pill"></i> Serviços complementares</div>
+                <h3 class="text-lg font-semibold mb-2">Além do atendimento clínico</h3>
+                <p class="text-slate-300">A rede vai além da consulta médica. COTE, farmácias municipais, CAPS, laboratórios, atenção psicológica e serviços de reabilitação também fazem parte do cuidado, ajudando no tratamento e na continuidade das ações da saúde pública.</p>
+                <ul class="list-disc pl-5 mt-3 text-slate-300">
+                    <li>Farmácias municipais orientam sobre medicamentos e continuidade de tratamento.</li>
+                    <li>CAPS atende demandas de saúde mental com acolhimento e acompanhamento.</li>
+                    <li>Serviços especializados atendem casos que exigem avaliação mais específica.</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold mb-4">Tipos de unidades e o que cada uma faz</h2>
+            <div class="grid gap-6 md:grid-cols-2">
+                <article class="glass rounded-3xl p-6 card-hover transition-all">
+                    <h3 class="text-lg font-semibold mb-2">UBS (Unidade Básica de Saúde)</h3>
+                    <p class="text-slate-300">É a porta de entrada da rede. Atende consultas simples, vacinação, prevenção, curativos, acompanhamento de gestantes, controle de doenças crônicas e orientação em saúde.</p>
+                </article>
+                <article class="glass rounded-3xl p-6 card-hover transition-all">
+                    <h3 class="text-lg font-semibold mb-2">USF (Unidade de Saúde da Família)</h3>
+                    <p class="text-slate-300">Trabalha com vínculo familiar e atenção preventiva. A equipe costuma acompanhar famílias, orientar hábitos de vida e promover ações em saúde na comunidade.</p>
+                </article>
+                <article class="glass rounded-3xl p-6 card-hover transition-all">
+                    <h3 class="text-lg font-semibold mb-2">CAPS (Centro de Atenção Psicossocial)</h3>
+                    <p class="text-slate-300">Atende pessoas com sofrimento psíquico e transtornos mentais, oferecendo acompanhamento terapêutico, acolhimento e apoio à família e à comunidade.</p>
+                </article>
+                <article class="glass rounded-3xl p-6 card-hover transition-all">
+                    <h3 class="text-lg font-semibold mb-2">UPA (Unidade de Pronto Atendimento)</h3>
+                    <p class="text-slate-300">Atende urgências e emergências menos graves, com maior rapidez do que um hospital de referência, sem a mesma estrutura de internação e cirurgia de emergência.</p>
+                </article>
+                <article class="glass rounded-3xl p-6 card-hover transition-all">
+                    <h3 class="text-lg font-semibold mb-2">Hospitais e pronto-socorro</h3>
+                    <p class="text-slate-300">São usados quando há necessidade de exames complexos, internação, cirurgia ou atendimento de maior gravidade. A urgência pode ser encaminhada pela UBS ou UPA conforme a situação.</p>
+                </article>
+                <article class="glass rounded-3xl p-6 card-hover transition-all">
+                    <h3 class="text-lg font-semibold mb-2">Farmácias e medicamentos</h3>
+                    <p class="text-slate-300">Além de dispensar receitas, as farmácias municipais ajudam no controle de medicamentos, orientam os cuidados e podem auxiliar na continuidade de tratamentos.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="faqs" class="mb-10">
+            <h2 class="text-2xl font-bold mb-4">10 dúvidas frequentes</h2>
+            <div class="space-y-3">
+                <details class="glass rounded-2xl p-4">
+                    <summary class="font-semibold">1. Preciso agendar para ser atendido na UBS?</summary>
+                    <div class="mt-2 text-slate-300">Muitas unidades atendem por demanda espontânea para casos de menor complexidade; consultas programadas e agendas para especialistas costumam exigir agendamento. Confira a UBS/USF local para procedimentos específicos.</div>
+                </details>
+
+                <details class="glass rounded-2xl p-4">
+                    <summary class="font-semibold">2. Posso pedir encaminhamento para especialista na UBS/USF?</summary>
+                    <div class="mt-2 text-slate-300">Sim. A atenção primária faz regulação e solicita exames e consultas especializadas quando necessário. O tempo de espera depende da demanda e da regulação municipal.</div>
+                </details>
+
+                <details class="glass rounded-2xl p-4">
+                    <summary class="font-semibold">3. Como faço para consultar horários e contatos?</summary>
+                    <div class="mt-2 text-slate-300">A maioria das unidades possui telefones cadastrados na prefeitura e nos canais da Secretaria Municipal de Saúde. Use a opção "Ver no mapa" na página inicial para encontrar localização e contato da unidade.</div>
+                </details>
+
+                <details class="glass rounded-2xl p-4">
+                    <summary class="font-semibold">4. O que levar na primeira consulta?</summary>
+                    <div class="mt-2 text-slate-300">Documento de identidade, cartão SUS (se tiver), lista de medicamentos em uso, exames anteriores e informações sobre alergias e doenças crônicas.</div>
+                </details>
+
+                <details class="glass rounded-2xl p-4">
+                    <summary class="font-semibold">5. Quando devo procurar uma UPA em vez da UBS?</summary>
+                    <div class="mt-2 text-slate-300">Se a situação pede atendimento mais rápido, você tem forte dor, alguma lesão, febre alta persistente ou dificuldade de locomoção, a UPA costuma ser a opção mais adequada.</div>
+                </details>
+
+                <details class="glass rounded-2xl p-4">
+                    <summary class="font-semibold">6. E quando eu preciso ligar para o SAMU (192)?</summary>
+                    <div class="mt-2 text-slate-300">Quando houver risco de vida, desmaio, parada respiratória, convulsão, trauma grave, dor forte acompanhada de pressão no peito ou qualquer situação que exige atendimento imediato.</div>
+                </details>
+
+                <details class="glass rounded-2xl p-4">
+                    <summary class="font-semibold">7. O que é o CAPS e quem pode buscar atendimento?</summary>
+                    <div class="mt-2 text-slate-300">O CAPS oferece atendimento a pessoas com sofrimento psíquico e transtornos mentais, com acolhimento, acompanhamento e apoio para a família. A busca pode ser feita pelo paciente ou por alguém da família.</div>
+                </details>
+
+                <details class="glass rounded-2xl p-4">
+                    <summary class="font-semibold">8. Qual a diferença entre hospital e UPA?</summary>
+                    <div class="mt-2 text-slate-300">A UPA trata urgências sem risco imediato de vida e atende mais rapidamente. O hospital é indicado para casos com maior complexidade, internação e exames ou cirurgias.</div>
+                </details>
+
+                <details class="glass rounded-2xl p-4">
+                    <summary class="font-semibold">9. Posso ir direto em uma UBS se tenho uma doença crônica?</summary>
+                    <div class="mt-2 text-slate-300">Sim. A atenção básica é o ponto principal para acompanhamento de doenças crônicas, controle de pressão, glicemia, orientações e encaminhamentos quando necessário.</div>
+                </details>
+
+                <details class="glass rounded-2xl p-4">
+                    <summary class="font-semibold">10. Como a rede de saúde organiza os atendimentos?</summary>
+                    <div class="mt-2 text-slate-300">A rede funciona em níveis de atenção: a atenção básica resolve a maioria das necessidades, a urgência atende casos mais imediatos e o hospital atende complexidade maior. A regulação e os encaminhamentos ajudam a evitar filas e perda de tempo.</div>
+                </details>
+            </div>
+        </section>
+
+        <section id="curiosidades" class="mb-10">
+            <h2 class="text-2xl font-bold mb-4">Curiosidades rápidas</h2>
+            <ul class="list-disc pl-5 text-slate-300">
+                <li>As equipes de USF costumam realizar ações proativas como visitas domiciliares, rodas de educação em saúde e acompanhamento de famílias.</li>
+                <li>Farmácias municipais podem ter protocolos para dispensação de alguns medicamentos e listas de prioridade.</li>
+                <li>UPAs reduzem a sobrecarga nos prontos-socorros hospitalares ao tratar casos intermediários.</li>
+                <li>O cuidado em saúde funciona melhor quando a pessoa procura o serviço certo para o momento certo: rotina, urgência ou emergência.</li>
+                <li>Vacinação, acompanhamento de pressão e diabetes, orientação alimentar e prevenção da saúde são atividades centrais da atenção primária.</li>
+            </ul>
+        </section>
+
+        <section id="fontes" class="mb-6 rounded-3xl border border-white/10 bg-slate-950/40 p-6">
+            <h2 class="text-2xl font-bold mb-3">Referência e leitura complementar</h2>
+            <p class="text-slate-300">A explicação de que a Atenção Básica funciona como porta de entrada prioritária do SUS, enquanto a UPA reorganiza a urgência e a emergência, foi reforçada com base na orientação da Prefeitura Municipal de Novo Hamburgo.</p>
+            <p class="mt-3 text-slate-300"><a class="text-blue-400 underline" href="https://www.novohamburgo.rs.gov.br/noticia/entenda-diferencas-ubsusf-upa" target="_blank" rel="noopener">Fonte: Prefeitura Municipal de Novo Hamburgo — Entenda as diferenças entre UBS/USF e UPA</a></p>
+        </section>
+
+        <section id="fontes" class="mb-20">
+            <h2 class="text-2xl font-bold mb-4">Fontes e leitura adicional</h2>
+            <ul class="text-slate-300 list-disc pl-5">
+                <li><a class="text-blue-400 underline" href="https://aps.saude.gov.br/" target="_blank" rel="noopener">Política Nacional de Atenção Básica (Ministério da Saúde)</a></li>
+                <li><a class="text-blue-400 underline" href="https://bvsms.saude.gov.br/" target="_blank" rel="noopener">Biblioteca Virtual em Saúde (BVS)</a></li>
+                <li><a class="text-blue-400 underline" href="https://piracicaba.sp.gov.br/" target="_blank" rel="noopener">Secretaria Municipal de Saúde de Piracicaba</a> (informações locais e contatos)</li>
+            </ul>
+        </section>
+    </main>
+
+    <script>
+        function openSidebar(){ document.getElementById('sidebar-overlay').classList.remove('opacity-0','pointer-events-none'); document.getElementById('sidebar-drawer').classList.remove('-translate-x-full'); document.getElementById('sidebar-drawer').classList.add('translate-x-0'); }
+        function closeSidebar(){ document.getElementById('sidebar-overlay').classList.add('opacity-0','pointer-events-none'); document.getElementById('sidebar-drawer').classList.add('-translate-x-full'); document.getElementById('sidebar-drawer').classList.remove('translate-x-0'); }
+        function setActiveNavLink() {
+            const currentPage = window.location.pathname.split('/').pop().toLowerCase();
+            document.querySelectorAll('#sidebar-drawer a[href]').forEach((link) => {
+                const href = (link.getAttribute('href') || '').toLowerCase();
+                const isActive = href === currentPage;
+                link.classList.toggle('bg-blue-500/10', isActive);
+                link.classList.toggle('text-blue-400', isActive);
+                link.classList.toggle('text-slate-300', !isActive);
+                link.classList.toggle('hover:bg-white/5', !isActive);
+                link.classList.toggle('font-medium', true);
+            });
+        }
+        window.openSidebar = openSidebar; window.closeSidebar = closeSidebar;
+        setActiveNavLink();
+
+        (function(){
+            const search = document.getElementById('searchInput');
+            function filterPage(){
+                const termo = (search?.value || '').toLowerCase().trim();
+                const sections = document.querySelectorAll('main.catalog-shell section');
+                if(!termo){ sections.forEach(s=> s.style.display=''); return; }
+                sections.forEach(s=>{ const text = (s.textContent || '').toLowerCase(); s.style.display = text.includes(termo) ? '' : 'none'; });
+            }
+            search?.addEventListener('input', filterPage);
+        })();
+    </script>
+
+    <script src="js/settings.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/accessibility.js"></script>
+    <script src="js/settings-ui.js"></script>
+</body>
+</html>

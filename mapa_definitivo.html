@@ -176,19 +176,14 @@
             <a href="mapa_definitivo.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
                 <i class="ph-bold ph-map-trifold text-xl"></i> <span>Ver Mapa</span>
             </a>
-            <a href="catalogo_uni.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
-                <i class="ph-bold ph-list-bullets text-xl"></i> <span>Catálogo de Unidades</span>
+            <a href="curiosidades.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+                <i class="ph-bold ph-list-bullets text-xl"></i> <span>Curiosidades</span>
             </a>
             <a href="medicamentos.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
                 <i class="ph-bold ph-pill text-xl"></i> <span>Anotar Medicamentos</span>
             </a>
         </nav>
-        <div class="p-4 border-t border-white/10 flex-shrink-0">
-            <a href="tel:192" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-semibold transition-all no-underline" role="button">
-                <i class="ph-fill ph-warning-circle text-xl animate-pulse"></i> Emergência 192
-            </a>
-        </div>
-    </aside>
+    </aside> 
 
     <!-- O Mapa Base -->
     <div id="map"></div>
@@ -257,11 +252,8 @@
                     <a href="index3.html" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-medium transition-all text-sm">
                         <i class="ph-bold ph-arrow-left text-base"></i> Voltar ao Início
                     </a>
-                    <a href="tel:192" class="w-full flex items-center justify-center gap-2 p-2.5 mt-1 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-semibold transition-all text-sm no-underline" role="button">
-                        <i class="ph-fill ph-warning-circle animate-pulse"></i> Emergência 192
-                    </a>
                 </div>
-            </aside>
+            </aside> 
 
             <!-- Card de Detalhes da Unidade (Aparece ao clicar no mapa) -->
             <!-- Escondido inicialmente via CSS -->
@@ -321,23 +313,21 @@
 
                             <!-- Endereço e Ações -->
                             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
-                                <p class="text-sm text-slate-400 flex items-center gap-1.5 line-clamp-1">
+                                <p class="text-sm text-slate-400 flex items-center gap-1.5 break-words max-w-full sm:max-w-[65%]">
                                     <i class="ph-bold ph-map-pin-line text-blue-400"></i>
                                     <span id="unit-address">Rua Benedito Passuti, 301</span>
                                 </p>
                                 
                                 <div class="flex items-center gap-3 w-full sm:w-auto">
-                                    <button id="btn-call" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-blue-400 font-semibold hover:bg-blue-500/20 transition-colors border border-blue-500/30 bg-blue-500/10">
-                                        <i class="ph-bold ph-phone"></i> Ligar
+                                    <button id="btn-copy-phone" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-blue-400 font-semibold hover:bg-blue-500/20 transition-colors border border-blue-500/30 bg-blue-500/10" title="Copiar telefone">
+                                        <i class="ph-bold ph-phone"></i>
+                                        <span id="btn-phone-number" class="text-sm"></span>
                                     </button>
                                     <button id="btn-start-route" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold bg-slate-700 border border-white/10 hover:bg-slate-600 transition-colors">
                                         <i class="ph-bold ph-arrow-right"></i> Iniciar Rota
                                     </button>
-                                    <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5">
-                                        <i class="ph-bold ph-calendar-check"></i> Agendar
-                                    </button>
                                 </div>
-                            </div>
+                            </div> 
                             <div id="route-summary" class="mt-4 rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-slate-300 hidden">
                                 <p id="route-distance" class="font-semibold text-slate-100"></p>
                                 <p id="route-duration" class="mt-1"></p>
@@ -437,6 +427,7 @@
                     address: u.localizacao,
                     lat: parseFloat(u.lat),
                     lng: parseFloat(u.lng),
+                    contato: u.contato || u.contato || '',
                     rating: 4.5,
                     reviews: Math.floor(Math.random() * 200) + 50,
                     status: (u.horario_atendimento && u.horario_atendimento.includes("24")) ? "24 Horas" : "Aberto",
@@ -447,6 +438,19 @@
 
                 // Inicializa os marcadores SOMENTE após os dados chegarem
                 initMarkers();
+                // Se a página foi aberta a partir do botão "Ver no Mapa" com lat/lng,
+                // tenta localizar e abrir o cartão da unidade correspondente.
+                const params = new URLSearchParams(window.location.search);
+                const latp = params.get('lat'), lngp = params.get('lng');
+                if (latp && lngp) {
+                    const latN = parseFloat(latp), lngN = parseFloat(lngp);
+                    const matched = healthUnits.find(u => Math.abs(u.lat - latN) < 0.0005 && Math.abs(u.lng - lngN) < 0.0005);
+                    if (matched) {
+                        setTimeout(() => openUnitCard(matched), 600);
+                    } else {
+                        map.setView([latN, lngN], 15);
+                    }
+                }
             } catch (error) {
                 console.error("Erro ao carregar dados do banco:", error);
             }
@@ -481,6 +485,21 @@
 
             if (texto.includes('UBS')) return 'UBS';
             return 'UBS';
+        }
+
+        const logoBasePath = 'img/Raekwon%20Sampaio%204%C2%B0Info-2026';
+        const cardLogosPorTipo = {
+            UBS: `${logoBasePath}/UBS_logotipo.png`,
+            USF: `${logoBasePath}/USF_logotipo.png`,
+            'Urgência': `${logoBasePath}/UPA_logotipo.png`,
+            Farmácia: `${logoBasePath}/Farm%C3%A1cia_logotipo.png`,
+            Psicologia: `${logoBasePath}/psicologia_logotipo.png`
+        };
+
+        function getUnitCardLogo(unit) {
+            const nome = String(unit?.name || '').toUpperCase();
+            if (nome.includes('SAMU')) return 'img/Samu192.png';
+            return cardLogosPorTipo[unit?.type] || 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=900&q=80';
         }
 
         function createIcon(type, active = false) {
@@ -862,11 +881,11 @@
 
             const iconContainer = document.getElementById('unit-icon-container');
             const iconDefault = document.getElementById('unit-icon-default');
-            const isSamu = /samu/i.test(unit.name) || /serviço de atendimento móvel de urgência/i.test(unit.name);
+            const unitLogo = getUnitCardLogo(unit);
 
-            if (isSamu) {
+            if (unitLogo) {
                 iconContainer.className = 'w-24 h-24 rounded-2xl bg-white/5 flex items-center justify-center flex-shrink-0 border border-white/10 overflow-hidden';
-                iconContainer.innerHTML = '<img src="img/Samu192.png" alt="SAMU" class="w-full h-full object-cover">';
+                iconContainer.innerHTML = `<img src="${unitLogo}" alt="${unit.name}" class="w-full h-full object-contain p-2">`;
             } else {
                 iconContainer.className = 'w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-900/80 to-indigo-900/80 flex items-center justify-center flex-shrink-0 border border-white/10 overflow-hidden';
                 iconContainer.innerHTML = '';
@@ -880,6 +899,20 @@
             const startButton = document.getElementById('btn-start-route');
             if (startButton) {
                 startButton.onclick = () => iniciarRota(unit.id);
+            }
+            const copyBtn = document.getElementById('btn-copy-phone');
+            const phoneSpan = document.getElementById('btn-phone-number');
+            if (copyBtn) {
+                const phone = unit.contato || unit.contato || '';
+                if (phoneSpan) phoneSpan.textContent = phone;
+                copyBtn.onclick = async () => {
+                    try {
+                        await navigator.clipboard.writeText(phone);
+                        mostrarToast('Número copiado para a área de transferência', 'success');
+                    } catch (e) {
+                        mostrarToast('Não foi possível copiar o número', 'error');
+                    }
+                };
             }
 
             card.classList.remove('slide-up-enter','slide-out');

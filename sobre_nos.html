@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre nós</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/settings.css">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(180deg, #06131f 0%, #0f172a 100%);
+            color: #e2e8f0;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            backdrop-filter: blur(14px);
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            border-color: rgba(96, 165, 250, 0.4);
+        }
+        #sidebar-overlay { transition: opacity 0.3s ease; }
+        #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); left:0 !important; margin-left:0 !important; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100">
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeSidebar()"></div>
+
+    <aside id="sidebar-drawer" class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col -translate-x-full border-r border-white/10 overflow-y-auto" style="background:rgba(2,6,23,0.98);backdrop-filter:blur(20px);">
+        <div class="flex items-center justify-between p-5 border-b border-white/10 flex-shrink-0">
+            <a href="index3.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="Ir para a página inicial">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i class="ph-bold ph-activity text-white"></i>
+                </div>
+                <span class="font-bold text-lg">Saúde<span class="text-blue-500">Pira</span></span>
+            </a>
+            <button onclick="closeSidebar()" class="text-slate-400 hover:text-white transition-colors" aria-label="Fechar menu">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
+        </div>
+        <nav class="flex-1 p-4 flex flex-col gap-1">
+            <a href="index3.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-house text-xl"></i> <span>Início</span></a>
+            <a href="mapa_definitivo.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-map-trifold text-xl"></i> <span>Ver Mapa</span></a>
+            <a href="curiosidades.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-list-bullets text-xl"></i> <span>Curiosidades</span></a>
+            <a href="medicamentos.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-pill text-xl"></i> <span>Anotar Medicamentos</span></a>
+            <a href="sobre_nos.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-users text-xl"></i> <span>Sobre nós</span></a>
+            <a href="contato.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium"><i class="ph-bold ph-envelope text-xl"></i> <span>Contato</span></a>
+        </nav>
+    </aside>
+
+    <header class="sticky top-0 z-30 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <button onclick="openSidebar()" class="text-slate-300 hover:text-white transition-colors" aria-label="Abrir menu">
+                    <i class="ph-bold ph-list text-2xl"></i>
+                </button>
+                <a href="index3.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="Ir para a página inicial">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="ph-bold ph-activity text-white"></i>
+                    </div>
+                    <span class="font-bold text-lg tracking-tight">Saúde<span class="text-blue-500">Pira</span></span>
+                </a>
+            </div>
+            <div id="settings-slot-catalog" class="flex items-center justify-end min-w-[44px]"></div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <section class="mb-10">
+            <div class="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200">
+                <i class="ph ph-info"></i>
+                Página em construção
+            </div>
+            <h1 class="mt-6 text-4xl md:text-5xl font-extrabold leading-tight">Sobre nós</h1>
+            <p class="mt-4 max-w-3xl text-slate-300 text-lg">Este espaço pode ser usado para apresentar a missão do site, quem está por trás do projeto, o propósito da plataforma e o que ela oferece à comunidade.</p>
+        </section>
+
+        <section class="grid gap-6 md:grid-cols-3 mb-10">
+            <article class="glass rounded-3xl p-6 card-hover transition-all">
+                <div class="w-12 h-12 bg-blue-500/15 rounded-2xl flex items-center justify-center text-blue-300 mb-4">
+                    <i class="ph ph-target text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-bold mb-2">Missão</h2>
+                <p class="text-slate-300">Descrever aqui a missão do projeto e a importância de facilitar o acesso às informações de saúde da comunidade.</p>
+            </article>
+            <article class="glass rounded-3xl p-6 card-hover transition-all">
+                <div class="w-12 h-12 bg-cyan-500/15 rounded-2xl flex items-center justify-center text-cyan-300 mb-4">
+                    <i class="ph ph-users text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-bold mb-2">Quem somos</h2>
+                <p class="text-slate-300">Adicionar uma breve apresentação da equipe, do grupo ou da iniciativa responsável pelo site.</p>
+            </article>
+            <article class="glass rounded-3xl p-6 card-hover transition-all">
+                <div class="w-12 h-12 bg-emerald-500/15 rounded-2xl flex items-center justify-center text-emerald-300 mb-4">
+                    <i class="ph ph-heart text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-bold mb-2">Objetivo</h2>
+                <p class="text-slate-300">Explicar que a ideia é centralizar informações úteis e tornar a busca por serviços de saúde mais simples.</p>
+            </article>
+        </section>
+
+        <section class="grid gap-6 lg:grid-cols-[1.3fr_0.7fr] mb-10">
+            <article class="glass rounded-3xl p-8">
+                <h2 class="text-2xl font-bold mb-4">Nossa proposta</h2>
+                <p class="text-slate-300 leading-relaxed">A plataforma foi pensada para aproximar a comunidade de informações relevantes sobre serviços de saúde, unidades de atendimento e recursos locais. A ideia principal é facilitar a navegação, reduzir dúvidas e oferecer acesso rápido a dados úteis.</p>
+                <div class="mt-6 space-y-4">
+                    <div class="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+                        <p class="font-semibold text-white mb-1">Visão</p>
+                        <p class="text-slate-300">Descreva aqui a visão do projeto e o que se quer alcançar no futuro.</p>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+                        <p class="font-semibold text-white mb-1">Valores</p>
+                        <p class="text-slate-300">Inclua valores como acessibilidade, clareza, informação confiável e compromisso com a comunidade.</p>
+                    </div>
+                </div>
+            </article>
+
+            <aside class="glass rounded-3xl p-6">
+                <h3 class="text-xl font-bold mb-4">Resumo</h3>
+                <ul class="space-y-3 text-slate-300">
+                    <li class="flex gap-3"><i class="ph ph-check-circle text-blue-400 mt-1"></i><span>Projeto pensado para facilitar o acesso à informação.</span></li>
+                    <li class="flex gap-3"><i class="ph ph-check-circle text-blue-400 mt-1"></i><span>Foco em clareza, organização e usabilidade.</span></li>
+                    <li class="flex gap-3"><i class="ph ph-check-circle text-blue-400 mt-1"></i><span>Estrutura pronta para receber textos e dados definitivos.</span></li>
+                </ul>
+            </aside>
+        </section>
+    </main>
+
+    <script src="js/settings.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/accessibility.js"></script>
+    <script src="js/settings-ui.js"></script>
+    <script>
+        function openSidebar() {
+            const overlay = document.getElementById('sidebar-overlay');
+            const drawer = document.getElementById('sidebar-drawer');
+            if (!overlay || !drawer) return;
+            overlay.classList.replace('opacity-0', 'opacity-100');
+            overlay.classList.remove('pointer-events-none');
+            drawer.classList.replace('-translate-x-full', 'translate-x-0');
+        }
+
+        function closeSidebar() {
+            const overlay = document.getElementById('sidebar-overlay');
+            const drawer = document.getElementById('sidebar-drawer');
+            if (!overlay || !drawer) return;
+            overlay.classList.replace('opacity-100', 'opacity-0');
+            overlay.classList.add('pointer-events-none');
+            drawer.classList.replace('translate-x-0', '-translate-x-full');
+        }
+
+        function setActiveNavLink() {
+            const currentPage = window.location.pathname.split('/').pop().toLowerCase();
+            document.querySelectorAll('#sidebar-drawer a[href]').forEach((link) => {
+                const href = (link.getAttribute('href') || '').toLowerCase();
+                const isActive = href === currentPage;
+                link.classList.toggle('bg-blue-500/10', isActive);
+                link.classList.toggle('text-blue-400', isActive);
+                link.classList.toggle('text-slate-300', !isActive);
+                link.classList.toggle('hover:bg-white/5', !isActive);
+                link.classList.toggle('font-medium', true);
+            });
+        }
+
+        window.openSidebar = openSidebar;
+        window.closeSidebar = closeSidebar;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setActiveNavLink();
+            if (window.Settings) {
+                Settings.load();
+            }
+        });
+    </script>
+</body>
+</html>
