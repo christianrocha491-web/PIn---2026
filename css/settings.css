@@ -163,83 +163,178 @@ body { letter-spacing: var(--acc-letter-spacing-value) !important; }
 
 /* Tema claro: cinza suave em vez de branco estourado. */
 body.theme-light {
-    --page-bg: #e8edf3;
-    --page-text: #1e293b;
-    --page-muted: #64748b;
-    background-color: #e8edf3 !important;
-    color: #1e293b !important;
+    --page-bg: #FAFBFC;
+    --page-text: #0D1117;
+    --page-muted: #424A52;
+    background-color: #FAFBFC !important;
+    color: #0D1117 !important;
 }
 body.theme-light header,
 body.theme-light nav.navbar {
-    background-color: rgba(237,241,245,.96) !important;
-    border-color: #cbd5e1 !important;
+    background-color: #FFFFFF !important;
+    border-color: #D0D7DE !important;
+}
+body.theme-light header.glass,
+body.theme-light nav.navbar.glass {
+    background: #FFFFFF !important;
+    border-color: #D0D7DE !important;
+    color: #0D1117 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+body.theme-light header.sticky,
+body.theme-light header[class*="bg-slate-950"] {
+    background-color: #FFFFFF !important;
+    border-color: #D0D7DE !important;
+    color: #0D1117 !important;
 }
 body.theme-light .glass,
 body.theme-light .glass-panel,
 body.theme-light .unit-card,
 body.theme-light .category-card {
-    background-color: #f2f5f8 !important;
-    border-color: #cbd5e1 !important;
-    color: #1e293b !important;
+    background-color: #FFFFFF !important;
+    border-color: #D0D7DE !important;
+    color: #0D1117 !important;
 }
 body.theme-light .bg-slate-950\/70,
 body.theme-light .bg-slate-950\/80,
 body.theme-light .bg-slate-950\/90,
 body.theme-light .bg-slate-950 {
-    background-color: #edf1f5 !important;
+    background-color: #F6F8FB !important;
 }
 body.theme-light .bg-slate-900,
 body.theme-light .bg-slate-800,
 body.theme-light .bg-slate-800\/50,
 body.theme-light .bg-slate-800\/60,
 body.theme-light .bg-slate-800\/80 {
-    background-color: #dfe6ed !important;
+    background-color: #EAF0FF !important;
+}
+body.theme-light header i,
+body.theme-light header .ph,
+body.theme-light header .text-slate-300,
+body.theme-light header button,
+body.theme-light header a {
+    color: #0D1117 !important;
+}
+body.theme-light header button:hover,
+body.theme-light header a:hover {
+    opacity: 0.7;
+}
+body.theme-light header .text-slate-400 {
+    color: #424A52 !important;
+}
+body.theme-light #sidebar-drawer,
+body.theme-light aside[id*="sidebar"] {
+    background: #FFFFFF !important;
+    border-color: #D0D7DE !important;
+    color: #0D1117 !important;
+}
+body.theme-light #sidebar-drawer a,
+body.theme-light aside[id*="sidebar"] a {
+    color: #0D1117 !important;
+}
+body.theme-light #sidebar-drawer button,
+body.theme-light aside[id*="sidebar"] button {
+    color: #0D1117 !important;
+}
+body.theme-light #sidebar-drawer .text-slate-300,
+body.theme-light #sidebar-drawer .text-slate-400,
+body.theme-light aside[id*="sidebar"] .text-slate-300,
+body.theme-light aside[id*="sidebar"] .text-slate-400 {
+    color: #424A52 !important;
+}
+body.theme-light #sidebar-drawer .border-white\/10,
+body.theme-light aside[id*="sidebar"] .border-white\/10 {
+    border-color: #D0D7DE !important;
+}
+
+/* Estilos para Leaflet (Mapa) no tema claro */
+body.theme-light .leaflet-container {
+    background: #FAFBFC !important;
+}
+body.theme-light .leaflet-layer,
+body.theme-light .leaflet-control-zoom,
+body.theme-light .leaflet-top,
+body.theme-light .leaflet-bottom {
+    background: transparent;
+}
+body.theme-light .leaflet-control-zoom-in,
+body.theme-light .leaflet-control-zoom-out {
+    background: #FFFFFF !important;
+    border-color: #D0D7DE !important;
+    color: #0D1117 !important;
+}
+body.theme-light .leaflet-control {
+    background: #FFFFFF !important;
+    border-color: #D0D7DE !important;
+}
+body.theme-light .leaflet-popup-content {
+    color: #0D1117 !important;
+}
+body.theme-light .leaflet-popup-content-wrapper,
+body.theme-light .leaflet-popup-tip {
+    background: #FFFFFF !important;
+    color: #0D1117 !important;
+    border: 1px solid #D0D7DE !important;
+}
+
+/* CSS Variables para tema claro em gradientes */
+body.theme-light {
+    --text-color: #0D1117;
+    --text-color-secondary: #424A52;
+}
+
+/* Títulos H1 com gradiente responsivo ao tema */
+body.theme-light h1[style*="gradient"] {
+    background: linear-gradient(to right, #0D1117, #424A52) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
 }
 body.theme-light .text-white,
 body.theme-light .text-slate-100,
 body.theme-light .text-slate-200,
-body.theme-light .text-slate-300 { color: #243247 !important; }
+body.theme-light .text-slate-300 { color: #0D1117 !important; }
 body.theme-light .text-slate-400,
-body.theme-light .text-slate-500 { color: #64748b !important; }
+body.theme-light .text-slate-500 { color: #424A52 !important; }
 body.theme-light input,
 body.theme-light textarea,
-body.theme-light select { color: #1e293b !important; }
+body.theme-light select { color: #0D1117 !important; }
 body.theme-light input::placeholder,
-body.theme-light textarea::placeholder { color: #718096 !important; }
+body.theme-light textarea::placeholder { color: #57606A !important; }
 body.theme-light .border-white\/10,
-body.theme-light .border-white\/20 { border-color: #cbd5e1 !important; }
+body.theme-light .border-white\/20 { border-color: #D0D7DE !important; }
 body.theme-light .settings-panel {
-    background: #edf1f5 !important;
-    color: #1e293b !important;
-    border-color: #b9c5d2 !important;
+    background: #FFFFFF !important;
+    color: #0D1117 !important;
+    border-color: #D0D7DE !important;
 }
 body.theme-light .settings-eyebrow,
 body.theme-light .settings-section-title,
-body.theme-light .settings-range-row { color: #5f6f83; }
-body.theme-light .settings-range-row output { color: #334155; }
+body.theme-light .settings-range-row { color: #424A52; }
+body.theme-light .settings-range-row output { color: #0D1117; }
 body.theme-light .settings-theme-btn,
 body.theme-light .settings-toggle-btn,
 body.theme-light .settings-action-btn,
 body.theme-light .settings-reset {
-    background: #e2e8ef;
-    border-color: #c3ced9;
-    color: #243247;
+    background: #F6F8FB;
+    border-color: #D0D7DE;
+    color: #0D1117;
 }
 body.theme-light .settings-theme-btn:hover,
 body.theme-light .settings-toggle-btn:hover,
 body.theme-light .settings-action-btn:hover,
-body.theme-light .settings-reset:hover { background: #d8e0e8; }
+body.theme-light .settings-reset:hover { background: #EAEFFF; }
 body.theme-light .settings-theme-btn.active,
 body.theme-light .settings-toggle-btn.active,
 body.theme-light .settings-action-btn.active {
-    background: #d5e5fa;
-    border-color: #4f8fd8;
-    color: #17365d;
+    background: #EAF0FF;
+    border-color: #3B82F6;
+    color: #0851B8;
 }
 body.theme-light .site-settings-button {
-    background: #dfe6ed;
-    border-color: #bdc9d5;
-    color: #334155;
+    background: #F6F8FB;
+    border-color: #D0D7DE;
+    color: #0D1117;
 }
 
 /* Alto contraste funcional, sem alterar a disposição dos elementos. */
