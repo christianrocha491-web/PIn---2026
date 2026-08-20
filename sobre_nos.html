@@ -167,66 +167,127 @@
 
 </header>
 
-    <main class="pt-24 px-6 max-w-6xl mx-auto pb-24">
-        <section class="mb-10">
-            <div class="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200">
-                <i class="ph ph-info"></i>
-                Página em construção
-            </div>
-            <h1 class="mt-6 text-4xl md:text-5xl font-extrabold leading-tight">Sobre nós</h1>
-            <p class="mt-4 max-w-3xl text-slate-300 text-lg">Este espaço pode ser usado para apresentar a missão do site, quem está por trás do projeto, o propósito da plataforma e o que ela oferece à comunidade.</p>
-        </section>
+    <main class="pt-24 px-6 max-w-6xl mx-auto pb-24 space-y-12">
+    <!-- Hero / Apresentação com Mini Métricas -->
+    <section class="grid gap-8 lg:grid-cols-[1.4fr_0.6fr] items-center">
+        <div>
+            <br><br>
+            <h1 class="text-4xl md:text-5xl font-extrabold leading-tight text-white">
+                Sobre nós
+            </h1>
+            <p class="mt-4 text-base md:text-lg text-slate-300 leading-relaxed">
+                O <b>SaúdePira</b> é uma iniciativa digital pensada para centralizar, organizar e orientar o cidadão sobre onde encontrar atendimentos, unidades de saúde (UBS, UPA, CRAB) e medicamentos no município.
+            </p>
+        </div>
 
-        <section class="grid gap-6 md:grid-cols-3 mb-10">
-            <article class="glass rounded-3xl p-6 card-hover transition-all">
-                <div class="w-12 h-12 bg-blue-500/15 rounded-2xl flex items-center justify-center text-blue-300 mb-4">
+        <!-- Card de Impacto Rápido -->
+        <div class="glass rounded-3xl p-6 border border-white/10 flex flex-col gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center font-bold">
+                    <i class="ph ph-map-pin-line text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400">Abrangência</p>
+                    <p class="font-bold text-white text-sm">Município de Piracicaba - SP</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold">
+                    <i class="ph ph-database text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400">Origem da Informação</p>
+                    <p class="font-bold text-white text-sm">Dados Oficiais da Prefeitura</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tríade: Missão, Visão e Valores -->
+    <section class="grid gap-6 md:grid-cols-3">
+        <article class="glass rounded-3xl p-6 card-hover transition-all flex flex-col justify-between border border-white/5 hover:border-blue-500/30">
+            <div>
+                <div class="w-12 h-12 bg-blue-500/15 rounded-2xl flex items-center justify-center text-blue-300 mb-5">
                     <i class="ph ph-target text-2xl"></i>
                 </div>
-                <h2 class="text-xl font-bold mb-2">Missão</h2>
-                <p class="text-slate-300">Descrever aqui a missão do projeto e a importância de facilitar o acesso às informações de saúde da comunidade.</p>
-            </article>
-            <article class="glass rounded-3xl p-6 card-hover transition-all">
-                <div class="w-12 h-12 bg-cyan-500/15 rounded-2xl flex items-center justify-center text-cyan-300 mb-4">
-                    <i class="ph ph-users text-2xl"></i>
-                </div>
-                <h2 class="text-xl font-bold mb-2">Quem somos</h2>
-                <p class="text-slate-300">Adicionar uma breve apresentação da equipe, do grupo ou da iniciativa responsável pelo site.</p>
-            </article>
-            <article class="glass rounded-3xl p-6 card-hover transition-all">
-                <div class="w-12 h-12 bg-emerald-500/15 rounded-2xl flex items-center justify-center text-emerald-300 mb-4">
-                    <i class="ph ph-heart text-2xl"></i>
-                </div>
-                <h2 class="text-xl font-bold mb-2">Objetivo</h2>
-                <p class="text-slate-300">Explicar que a ideia é centralizar informações úteis e tornar a busca por serviços de saúde mais simples.</p>
-            </article>
-        </section>
+                <h2 class="text-xl font-bold text-white mb-2">Missão</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Facilitar e desmistificar o acesso aos serviços municipais de saúde por meio da tecnologia, reduzindo filas e deslocamentos incorretos.
+                </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/5 text-xs font-semibold text-blue-400">
+                Foco no Cidadão
+            </div>
+        </article>
 
-        <section class="grid gap-6 lg:grid-cols-[1.3fr_0.7fr] mb-10">
-            <article class="glass rounded-3xl p-8">
-                <h2 class="text-2xl font-bold mb-4">Nossa proposta</h2>
-                <p class="text-slate-300 leading-relaxed">A plataforma foi pensada para aproximar a comunidade de informações relevantes sobre serviços de saúde, unidades de atendimento e recursos locais. A ideia principal é facilitar a navegação, reduzir dúvidas e oferecer acesso rápido a dados úteis.</p>
-                <div class="mt-6 space-y-4">
-                    <div class="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-                        <p class="font-semibold text-white mb-1">Visão</p>
-                        <p class="text-slate-300">Descreva aqui a visão do projeto e o que se quer alcançar no futuro.</p>
-                    </div>
-                    <div class="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-                        <p class="font-semibold text-white mb-1">Valores</p>
-                        <p class="text-slate-300">Inclua valores como acessibilidade, clareza, informação confiável e compromisso com a comunidade.</p>
-                    </div>
+        <article class="glass rounded-3xl p-6 card-hover transition-all flex flex-col justify-between border border-white/5 hover:border-purple-500/30">
+            <div>
+                <div class="w-12 h-12 bg-purple-500/15 rounded-2xl flex items-center justify-center text-purple-300 mb-5">
+                    <i class="ph ph-eye text-2xl"></i>
                 </div>
-            </article>
+                <h2 class="text-xl font-bold text-white mb-2">Visão</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Tornar-se o ponto central digital de consulta e orientação sobre a malha de saúde pública para toda a comunidade piracicabana.
+                </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/5 text-xs font-semibold text-purple-400">
+                Utilidade Pública
+            </div>
+        </article>
 
-            <aside class="glass rounded-3xl p-6">
-                <h3 class="text-xl font-bold mb-4">Resumo</h3>
-                <ul class="space-y-3 text-slate-300">
-                    <li class="flex gap-3"><i class="ph ph-check-circle text-blue-400 mt-1"></i><span>Projeto pensado para facilitar o acesso à informação.</span></li>
-                    <li class="flex gap-3"><i class="ph ph-check-circle text-blue-400 mt-1"></i><span>Foco em clareza, organização e usabilidade.</span></li>
-                    <li class="flex gap-3"><i class="ph ph-check-circle text-blue-400 mt-1"></i><span>Estrutura pronta para receber textos e dados definitivos.</span></li>
-                </ul>
-            </aside>
-        </section>
-    </main>
+        <article class="glass rounded-3xl p-6 card-hover transition-all flex flex-col justify-between border border-white/5 hover:border-emerald-500/30">
+            <div>
+                <div class="w-12 h-12 bg-emerald-500/15 rounded-2xl flex items-center justify-center text-emerald-300 mb-5">
+                    <i class="ph ph-shield-check text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white mb-2">Valores</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Transparência de dados abertos, acessibilidade digital, compromisso com a comunidade e simplicidade na navegação.
+                </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/5 text-xs font-semibold text-emerald-400">
+                Ética e Transparência
+            </div>
+        </article>
+    </section>
+
+    <!-- Origem Acadêmica + Termo de Responsabilidade -->
+    <section class="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
+        <article class="glass rounded-3xl p-8 flex flex-col justify-between border border-white/5">
+            <div>
+                <div class="flex items-center gap-3 text-cyan-300 mb-4">
+                    <i class="ph ph-graduation-cap text-2xl"></i>
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Contexto Institucional</span>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-3">Origem Acadêmica (IFSP)</h3>
+                <p class="text-slate-300 leading-relaxed text-sm md:text-base mb-4">
+                    O SaúdePira nasceu no âmbito do <b>Projeto Integrador (PIN / TCC)</b> do curso Técnico em Informática Integrado ao Ensino Médio do <b>Instituto Federal de São Paulo (IFSP) – Campus Piracicaba</b>, unindo tecnologia à resolução de problemas da sociedade.
+                </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-white/10 text-xs text-slate-400">
+                <span class="flex items-center gap-1.5"><i class="ph ph-buildings"></i> IFSP Piracicaba</span>
+                <span class="flex items-center gap-1.5"><i class="ph ph-code"></i> Técnico em Informática</span>
+            </div>
+        </article>
+
+        <article class="glass rounded-3xl p-8 flex flex-col justify-between border border-white/5">
+            <div>
+                <div class="flex items-center gap-3 text-amber-300 mb-4">
+                    <i class="ph ph-warning-circle text-2xl"></i>
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Transparência</span>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-3">Fonte & Aviso</h3>
+                <p class="text-slate-300 text-xs md:text-sm leading-relaxed mb-4">
+                    As informações são baseadas nos dados abertos da Secretaria Municipal de Saúde de Piracicaba. Trata-se de um portal informativo independente.
+                </p>
+            </div>
+            <div class="rounded-2xl bg-amber-500/10 border border-amber-500/20 p-3.5 text-xs text-amber-200">
+                <p class="font-bold mb-1">Emergências Médicas:</p>
+                Ligue diretamente para o <b>SAMU (192)</b> ou <b>Corpo de Bombeiros (193)</b>.
+            </div>
+        </article>
+    </section>
+</main>
 
     <script src="js/settings.js"></script>
     <script src="js/theme.js"></script>
