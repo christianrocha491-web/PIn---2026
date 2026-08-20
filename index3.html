@@ -118,38 +118,39 @@
         body.align-center main { text-align: center; }
         body.align-right main { text-align: right; }
         body.theme-light {
-            background-color: #F3F5F8;
-            color: #1E293B;
+            background-color: #FAFBFC;
+            color: #0D1117;
         }
-        body.theme-light .glass { background: #FFFFFF; border-color: #E2E8F0; color: #1E293B; box-shadow: 0 16px 30px rgba(15,23,42,0.06); }
-        body.theme-light header { background: #F8FAFC; }
-        body.theme-light .text-slate-400 { color: #64748B !important; }
-        body.theme-light .text-white { color: #1E293B !important; }
-        body.theme-light .bg-slate-800\/50 { background-color: rgba(226,232,240,0.35) !important; }
-        body.theme-light .border-white\/10 { border-color: rgba(226,232,240,0.35) !important; }
-        body.theme-light .category-card { background: #FFFFFF; color: #1E293B; box-shadow: 0 14px 28px rgba(15,23,42,0.04); }
-        body.theme-light .category-card:hover { background: #F8FAFC; }
-        body.theme-light .unit-card { background: #FFFFFF; border-color: #E2E8F0; }
-        body.theme-light .unit-card .h-48 { background: #F8FAFC !important; }
-        body.theme-light .unit-card h3 { color: #0F172A !important; }
-        body.theme-light .unit-card p { color: #475569 !important; }
-        body.theme-light .unit-card .text-slate-300 { color: #64748B !important; }
-        body.theme-light .unit-card a { background: #E2E8F0 !important; color: #0F172A !important; border-color: #CBD5E1 !important; }
-        body.theme-light .settings-panel { background: #FFFFFF; color: #1E293B; border-color: #E2E8F0; }
-        body.theme-light a { color: #1E293B !important; }
+        body.theme-light .glass { background: #FFFFFF; border-color: #D0D7DE; color: #0D1117; box-shadow: 0 16px 30px rgba(0,0,0,0.08); }
+        body.theme-light header { background: #FFFFFF !important; border-bottom-color: #D0D7DE !important; color: #0D1117; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        body.theme-light header.glass { background: #FFFFFF !important; border-color: #D0D7DE !important; color: #0D1117 !important; }
+        body.theme-light .text-slate-400 { color: #424A52 !important; }
+        body.theme-light .text-white { color: #0D1117 !important; }
+        body.theme-light .bg-slate-800\/50 { background-color: #F0F2F5 !important; }
+        body.theme-light .border-white\/10 { border-color: #D0D7DE !important; }
+        body.theme-light .category-card { background: #FFFFFF; color: #0D1117; box-shadow: 0 14px 28px rgba(0,0,0,0.06); border-color: #D0D7DE; }
+        body.theme-light .category-card:hover { background: #F6F8FB; border-color: #3B82F6; }
+        body.theme-light .unit-card { background: #FFFFFF; border-color: #D0D7DE; }
+        body.theme-light .unit-card .h-48 { background: #F6F8FB !important; }
+        body.theme-light .unit-card h3 { color: #0D1117 !important; }
+        body.theme-light .unit-card p { color: #424A52 !important; }
+        body.theme-light .unit-card .text-slate-300 { color: #57606A !important; }
+        body.theme-light .unit-card a { background: #EAF0FF !important; color: #0851B8 !important; border-color: #BDD7FF !important; }
+        body.theme-light .settings-panel { background: #FFFFFF; color: #0D1117; border-color: #D0D7DE; }
+        body.theme-light a { color: #0851B8 !important; }
         body.theme-light .settings-theme-btn,
         body.theme-light .settings-action-btn,
         body.theme-light .settings-toggle-btn {
-            border-color: #E2E8F0;
-            background: #F8FAFC;
-            color: #1E293B;
+            border-color: #D0D7DE;
+            background: #F6F8FB;
+            color: #0D1117;
         }
         body.theme-light .settings-theme-btn.active,
         body.theme-light .settings-action-btn.active,
         body.theme-light .settings-toggle-btn.active {
-            background: rgba(59,130,246,0.14);
-            border-color: rgba(59,130,246,0.35);
-            color: #1E293B;
+            background: #EAF0FF;
+            border-color: #3B82F6;
+            color: #0851B8;
         }
     </style>
     <link rel="stylesheet" href="css/settings.css">
@@ -233,7 +234,7 @@
 
     <main id="main-content" class="pt-36 px-6 max-w-7xl mx-auto pb-24">
         <section class="mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 py-1 bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 py-1 bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-white dark:to-slate-500 theme-light:bg-none theme-light:text-gradient-none" style="background: linear-gradient(to right, var(--text-color, #f8fafc), var(--text-color-secondary, #94a3b8)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
                 Encontre atendimento agora.
             </h1>
             <p class="text-slate-400 text-lg">Selecione uma especialidade para ver as unidades mais próximas de você.</p>

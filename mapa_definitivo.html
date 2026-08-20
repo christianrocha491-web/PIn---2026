@@ -149,6 +149,38 @@
         #sidebar-overlay { transition: opacity 0.3s ease; }
         #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); left:0 !important; margin-left:0 !important; }
 
+        /* Tema claro para mapa Leaflet */
+        body.theme-light .leaflet-container {
+            background: #FAFBFC !important;
+        }
+        body.theme-light .leaflet-control-zoom-in,
+        body.theme-light .leaflet-control-zoom-out {
+            background: #FFFFFF !important;
+            border-color: #D0D7DE !important;
+            color: #0D1117 !important;
+        }
+        body.theme-light .leaflet-control {
+            background: #FFFFFF !important;
+            border-color: #D0D7DE !important;
+        }
+        body.theme-light .leaflet-popup-content-wrapper,
+        body.theme-light .leaflet-popup-tip {
+            background: #FFFFFF !important;
+            color: #0D1117 !important;
+            border: 1px solid #D0D7DE !important;
+        }
+        body.theme-light .leaflet-popup-content {
+            color: #0D1117 !important;
+        }
+        body.theme-light .leaflet-tooltip.unit-label-tooltip {
+            background: #FFFFFF !important;
+            border-color: #D0D7DE !important;
+            color: #0D1117 !important;
+        }
+        body.theme-light .leaflet-tooltip.unit-label-tooltip::before {
+            border-top-color: #FFFFFF !important;
+        }
+
     </style>
     <link rel="stylesheet" href="css/settings.css">
 </head>
@@ -182,6 +214,12 @@
             <a href="medicamentos.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
                 <i class="ph-bold ph-pill text-xl"></i> <span>Anotar Medicamentos</span>
             </a>
+            <a href="sobre_nos.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+                <i class="ph-bold ph-users text-xl"></i> <span>Sobre nós</span>
+            </a>
+            <a href="contato.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-colors font-medium">
+                <i class="ph-bold ph-envelope text-xl"></i> <span>Contato</span>
+            </a>
         </nav>
     </aside> 
 
@@ -192,7 +230,7 @@
     <div class="ui-layer">
         
         <!-- Header / Navbar Topo -->
-        <header class="interactive-ui glass-panel m-4 rounded-2xl flex items-center justify-between px-6 py-4">
+        <header class="interactive-ui glass-panel m-4 rounded-2xl flex items-center justify-between px-6 py-4" style="background: rgba(10, 15, 30, 0.92); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08);">
             <div class="flex items-center gap-3">
                 <!-- Ícone de menu hamburguer - sempre visível -->
                 <button id="btn-nav-menu" class="mr-2 text-slate-300 hover:text-white focus:outline-none" onclick="openNavSidebar()">
@@ -201,12 +239,11 @@
                 <button id="btn-menu" class="mr-2 text-slate-300 hover:text-white focus:outline-none" onclick="toggleSidebar()">
                     <i class="ph-bold ph-funnel-simple text-3xl"></i>
                 </button>
-                <div class="bg-gradient-to-tr from-blue-600 to-cyan-400 p-2 rounded-xl text-white shadow-lg">
-                    <i class="ph-bold ph-heartbeat text-2xl"></i>
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i class="ph-bold ph-activity text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-white tracking-tight">Saúde Piracicaba</h1>
-                    <p class="text-xs text-slate-400 font-medium">Rede Integrada de Atendimento</p>
+                    <h1 class="text-lg font-bold text-white tracking-tight">Saúde<span class="text-blue-500">Pira</span></h1>
                 </div>
             </div>
 
@@ -387,7 +424,35 @@
             wheelPxPerZoomLevel: 90,
             zoomAnimation: true
         }).setView([-22.7338, -47.6476], 13);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+        
+        let currentTileLayer = null;
+        
+        // Função para mudar tema do mapa
+        function updateMapTheme() {
+            const isLightTheme = document.body.classList.contains('theme-light');
+            const tileUrl = isLightTheme 
+                ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+                : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+            
+            // Remove a tile layer anterior
+            if (currentTileLayer) {
+                map.removeLayer(currentTileLayer);
+            }
+            
+            // Adiciona a nova tile layer
+            currentTileLayer = L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(map);
+        }
+        
+        // Inicializa o mapa com o tema atual
+        updateMapTheme();
+        
+        // Monitora mudanças de tema
+        const observer = new MutationObserver(() => {
+            updateMapTheme();
+        });
+        
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         // ===== ESTADO (DINÂMICO) =====
