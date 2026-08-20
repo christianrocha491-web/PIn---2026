@@ -15,9 +15,9 @@
             color: #e2e8f0;
         }
         .glass {
-            background: rgba(15, 23, 42, 0.72);
-            border: 1px solid rgba(148, 163, 184, 0.12);
-            backdrop-filter: blur(14px);
+            background: rgba(15,23,42,0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
         .card-hover:hover {
             transform: translateY(-2px);
@@ -110,24 +110,64 @@
         </nav>
     </aside>
 
-    <header class="sticky top-0 z-30 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <button onclick="openSidebar()" class="text-slate-300 hover:text-white transition-colors" aria-label="Abrir menu">
-                    <i class="ph-bold ph-list text-2xl"></i>
-                </button>
-                <a href="index3.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="Ir para a página inicial">
-                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <i class="ph-bold ph-activity text-white"></i>
-                    </div>
-                    <span class="font-bold text-lg tracking-tight">Saúde<span class="text-blue-500">Pira</span></span>
-                </a>
-            </div>
-            <div id="settings-slot-catalog" class="flex items-center justify-end min-w-[44px]"></div>
-        </div>
-    </header>
+    <header class="fixed top-0 w-full z-40 glass px-4 md:px-6 py-4 flex justify-between items-center gap-4">
 
-    <main class="max-w-6xl mx-auto px-4 py-12">
+    <div class="flex items-center gap-3 flex-shrink-0">
+        <button onclick="openSidebar()"
+            class="text-slate-300 hover:text-white transition-colors"
+            aria-label="Abrir menu">
+
+            <i class="ph-bold ph-list text-2xl"></i>
+        </button>
+
+        <a href="index3.html"
+            class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
+
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <i class="ph-bold ph-activity text-white"></i>
+            </div>
+
+            <span class="font-bold text-lg tracking-tight">
+                Saúde<span class="text-blue-500">Pira</span>
+            </span>
+        </a>
+    </div>
+
+    <div class="flex items-center gap-3 flex-shrink-0"
+         data-settings-auth-group>
+
+        <button class="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0"
+                id="auth-button">
+
+            <a href="login.html" class="no-underline text-white">
+                Entrar
+            </a>
+        </button>
+
+        <div id="user-greeting"
+             class="hidden flex items-center gap-3 flex-shrink-0">
+
+            <div class="flex flex-col items-end">
+                <span class="text-sm font-semibold text-white">
+                    Olá, <span id="user-name"></span>
+                </span>
+
+                <button onclick="handleLogout()"
+                        class="text-xs text-slate-400 hover:text-red-400 transition-colors">
+
+                    Sair
+                </button>
+            </div>
+
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold text-white">
+                <span id="user-initial"></span>
+            </div>
+        </div>
+    </div>
+
+</header>
+
+    <main class="pt-24 px-6 max-w-6xl mx-auto pb-24">
         <section class="mb-10">
             <div class="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200">
                 <i class="ph ph-info"></i>
