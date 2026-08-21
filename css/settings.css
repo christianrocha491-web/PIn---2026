@@ -161,95 +161,103 @@ body { letter-spacing: var(--acc-letter-spacing-value) !important; }
 .settings-footer { padding: 14px 18px 18px; }
 .settings-reset { width: 100%; }
 
-/* Tema claro: cinza suave em vez de branco estourado. */
+/* ============================================================
+   Tema claro — a troca de paleta em si (dark -> light) acontece
+   em css/theme.css, redefinindo as variáveis --page-bg, --surface,
+   --border, --accent etc.
+
+   O que resta AQUI é só a "ponte" para classes do Tailwind e
+   componentes específicos (Leaflet, settings panel) que ainda não
+   foram migrados para usar var() diretamente no HTML — etapa 4 do
+   plano. Cada regra abaixo agora lê a variável central em vez de
+   repetir um valor hexadecimal fixo, então ajustar a paleta passa
+   a exigir editar SÓ o theme.css.
+   ============================================================ */
 body.theme-light {
-    --page-bg: #FAFBFC;
-    --page-text: #0D1117;
-    --page-muted: #424A52;
-    background-color: #FAFBFC !important;
-    color: #0D1117 !important;
+    background-color: var(--page-bg) !important;
+    color: var(--page-text) !important;
 }
 body.theme-light header,
 body.theme-light nav.navbar {
-    background-color: #FFFFFF !important;
-    border-color: #D0D7DE !important;
+    background-color: var(--surface-strong) !important;
+    border-color: var(--border) !important;
 }
 body.theme-light header.glass,
 body.theme-light nav.navbar.glass {
-    background: #FFFFFF !important;
-    border-color: #D0D7DE !important;
-    color: #0D1117 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+    background: var(--surface-strong) !important;
+    border-color: var(--border) !important;
+    color: var(--page-text) !important;
+    box-shadow: var(--shadow) !important;
 }
 body.theme-light header.sticky,
 body.theme-light header[class*="bg-slate-950"] {
-    background-color: #FFFFFF !important;
-    border-color: #D0D7DE !important;
-    color: #0D1117 !important;
+    background-color: var(--surface-strong) !important;
+    border-color: var(--border) !important;
+    color: var(--page-text) !important;
 }
 body.theme-light .glass,
 body.theme-light .glass-panel,
 body.theme-light .unit-card,
 body.theme-light .category-card {
-    background-color: #FFFFFF !important;
-    border-color: #D0D7DE !important;
-    color: #0D1117 !important;
+    background-color: var(--surface-strong) !important;
+    border-color: var(--border) !important;
+    color: var(--page-text) !important;
 }
 body.theme-light .bg-slate-950\/70,
 body.theme-light .bg-slate-950\/80,
 body.theme-light .bg-slate-950\/90,
 body.theme-light .bg-slate-950 {
-    background-color: #F6F8FB !important;
+    background-color: var(--control-bg) !important;
 }
 body.theme-light .bg-slate-900,
 body.theme-light .bg-slate-800,
 body.theme-light .bg-slate-800\/50,
 body.theme-light .bg-slate-800\/60,
 body.theme-light .bg-slate-800\/80 {
-    background-color: #EAF0FF !important;
+    background-color: var(--accent-soft) !important;
 }
 body.theme-light header i,
 body.theme-light header .ph,
 body.theme-light header .text-slate-300,
 body.theme-light header button,
 body.theme-light header a {
-    color: #0D1117 !important;
+    color: var(--page-text) !important;
 }
 body.theme-light header button:hover,
 body.theme-light header a:hover {
     opacity: 0.7;
 }
 body.theme-light header .text-slate-400 {
-    color: #424A52 !important;
+    color: var(--text-secondary) !important;
 }
 body.theme-light #sidebar-drawer,
 body.theme-light aside[id*="sidebar"] {
-    background: #FFFFFF !important;
-    border-color: #D0D7DE !important;
-    color: #0D1117 !important;
+    background: var(--surface-strong) !important;
+    border-color: var(--border) !important;
+    color: var(--page-text) !important;
 }
 body.theme-light #sidebar-drawer a,
 body.theme-light aside[id*="sidebar"] a {
-    color: #0D1117 !important;
+    color: var(--page-text) !important;
 }
 body.theme-light #sidebar-drawer button,
 body.theme-light aside[id*="sidebar"] button {
-    color: #0D1117 !important;
+    color: var(--page-text) !important;
 }
 body.theme-light #sidebar-drawer .text-slate-300,
 body.theme-light #sidebar-drawer .text-slate-400,
 body.theme-light aside[id*="sidebar"] .text-slate-300,
 body.theme-light aside[id*="sidebar"] .text-slate-400 {
-    color: #424A52 !important;
+    color: var(--text-secondary) !important;
 }
 body.theme-light #sidebar-drawer .border-white\/10,
 body.theme-light aside[id*="sidebar"] .border-white\/10 {
-    border-color: #D0D7DE !important;
+    border-color: var(--border) !important;
 }
 
 /* Estilos para Leaflet (Mapa) no tema claro */
 body.theme-light .leaflet-container {
-    background: #FAFBFC !important;
+    background: var(--page-bg) !important;
 }
 body.theme-light .leaflet-layer,
 body.theme-light .leaflet-control-zoom,
@@ -259,33 +267,27 @@ body.theme-light .leaflet-bottom {
 }
 body.theme-light .leaflet-control-zoom-in,
 body.theme-light .leaflet-control-zoom-out {
-    background: #FFFFFF !important;
-    border-color: #D0D7DE !important;
-    color: #0D1117 !important;
+    background: var(--surface-strong) !important;
+    border-color: var(--border) !important;
+    color: var(--page-text) !important;
 }
 body.theme-light .leaflet-control {
-    background: #FFFFFF !important;
-    border-color: #D0D7DE !important;
+    background: var(--surface-strong) !important;
+    border-color: var(--border) !important;
 }
 body.theme-light .leaflet-popup-content {
-    color: #0D1117 !important;
+    color: var(--page-text) !important;
 }
 body.theme-light .leaflet-popup-content-wrapper,
 body.theme-light .leaflet-popup-tip {
-    background: #FFFFFF !important;
-    color: #0D1117 !important;
-    border: 1px solid #D0D7DE !important;
-}
-
-/* CSS Variables para tema claro em gradientes */
-body.theme-light {
-    --text-color: #0D1117;
-    --text-color-secondary: #424A52;
+    background: var(--surface-strong) !important;
+    color: var(--page-text) !important;
+    border: 1px solid var(--border) !important;
 }
 
 /* Títulos H1 com gradiente responsivo ao tema */
 body.theme-light h1[style*="gradient"] {
-    background: linear-gradient(to right, #0D1117, #424A52) !important;
+    background: linear-gradient(to right, var(--page-text), var(--text-secondary)) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
@@ -293,48 +295,48 @@ body.theme-light h1[style*="gradient"] {
 body.theme-light .text-white,
 body.theme-light .text-slate-100,
 body.theme-light .text-slate-200,
-body.theme-light .text-slate-300 { color: #0D1117 !important; }
+body.theme-light .text-slate-300 { color: var(--page-text) !important; }
 body.theme-light .text-slate-400,
-body.theme-light .text-slate-500 { color: #424A52 !important; }
+body.theme-light .text-slate-500 { color: var(--text-secondary) !important; }
 body.theme-light input,
 body.theme-light textarea,
-body.theme-light select { color: #0D1117 !important; }
+body.theme-light select { color: var(--page-text) !important; }
 body.theme-light input::placeholder,
-body.theme-light textarea::placeholder { color: #57606A !important; }
+body.theme-light textarea::placeholder { color: var(--text-tertiary) !important; }
 body.theme-light .border-white\/10,
-body.theme-light .border-white\/20 { border-color: #D0D7DE !important; }
+body.theme-light .border-white\/20 { border-color: var(--border) !important; }
 body.theme-light .settings-panel {
-    background: #FFFFFF !important;
-    color: #0D1117 !important;
-    border-color: #D0D7DE !important;
+    background: var(--surface-strong) !important;
+    color: var(--page-text) !important;
+    border-color: var(--border) !important;
 }
 body.theme-light .settings-eyebrow,
 body.theme-light .settings-section-title,
-body.theme-light .settings-range-row { color: #424A52; }
-body.theme-light .settings-range-row output { color: #0D1117; }
+body.theme-light .settings-range-row { color: var(--text-secondary); }
+body.theme-light .settings-range-row output { color: var(--page-text); }
 body.theme-light .settings-theme-btn,
 body.theme-light .settings-toggle-btn,
 body.theme-light .settings-action-btn,
 body.theme-light .settings-reset {
-    background: #F6F8FB;
-    border-color: #D0D7DE;
-    color: #0D1117;
+    background: var(--control-bg);
+    border-color: var(--border);
+    color: var(--page-text);
 }
 body.theme-light .settings-theme-btn:hover,
 body.theme-light .settings-toggle-btn:hover,
 body.theme-light .settings-action-btn:hover,
-body.theme-light .settings-reset:hover { background: #EAEFFF; }
+body.theme-light .settings-reset:hover { background: var(--accent-soft); }
 body.theme-light .settings-theme-btn.active,
 body.theme-light .settings-toggle-btn.active,
 body.theme-light .settings-action-btn.active {
-    background: #EAF0FF;
-    border-color: #3B82F6;
-    color: #0851B8;
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent-strong);
 }
 body.theme-light .site-settings-button {
-    background: #F6F8FB;
-    border-color: #D0D7DE;
-    color: #0D1117;
+    background: var(--control-bg);
+    border-color: var(--border);
+    color: var(--page-text);
 }
 
 /* Alto contraste funcional, sem alterar a disposição dos elementos. */
@@ -406,3 +408,47 @@ body.theme-light .bg-blue-600 .text-white,
 body.theme-light .bg-blue-500 .text-white,
 body.theme-light .bg-gradient-to-br .text-white,
 body.theme-light .bg-gradient-to-tr .text-white { color: #fff !important; }
+
+/* Etapa 4: cobertura de tema claro para login, cadastro, redefinir senha,
+   anotar medicamentos e configurações — páginas que não tinham nenhum
+   override de tema claro próprio. */
+
+/* Mensagens de alerta (erro/sucesso) em formulários */
+body.theme-light .bg-red-500\/10 { background-color: var(--danger-soft) !important; }
+body.theme-light .border-red-500\/30,
+body.theme-light .border-red-500\/20 { border-color: var(--danger-border) !important; }
+body.theme-light .text-red-400 { color: var(--danger) !important; }
+body.theme-light .bg-emerald-500\/10 { background-color: var(--success-soft) !important; }
+body.theme-light .border-emerald-500\/30,
+body.theme-light .border-emerald-500\/20 { border-color: var(--success-border) !important; }
+body.theme-light .text-emerald-400 { color: var(--success) !important; }
+body.theme-light .text-amber-400 { color: var(--warning) !important; }
+
+/* Links e destaques em azul (texto) — tom mais escuro para manter contraste no fundo claro */
+body.theme-light .text-blue-300,
+body.theme-light .text-blue-400,
+body.theme-light .text-blue-500 { color: var(--accent-strong) !important; }
+body.theme-light .bg-blue-500\/10 { background-color: var(--accent-soft) !important; }
+body.theme-light .border-blue-500 { border-color: var(--accent) !important; }
+
+/* Hover sutil em links de sidebar (usa branco/5% no escuro — invisível no claro) */
+body.theme-light .hover\:bg-white\/5:hover { background-color: var(--control-bg) !important; }
+body.theme-light .bg-white\/5 { background-color: var(--control-bg) !important; }
+
+/* Botões secundários de modal (ex.: "Cancelar", "Depois" em medicamentos.html) */
+body.theme-light .bg-slate-700 { background-color: var(--control-bg) !important; color: var(--page-text) !important; }
+body.theme-light .hover\:bg-slate-600:hover { background-color: var(--border) !important; }
+
+/* Painel de detalhes de unidade no mapa (mapa_definitivo.html) */
+body.theme-light .bg-slate-950\/40 { background-color: var(--control-bg) !important; }
+body.theme-light .bg-slate-700\/60 { background-color: var(--control-bg) !important; }
+body.theme-light .bg-slate-800\/70 { background-color: var(--accent-soft) !important; }
+body.theme-light .bg-slate-900\/70 { background-color: var(--control-bg) !important; }
+body.theme-light .border-slate-700 { border-color: var(--border) !important; }
+body.theme-light .hover\:bg-slate-700:hover { background-color: var(--border) !important; }
+
+/* Badges/links azuis genéricos ainda sem cobertura */
+body.theme-light .border-blue-500\/30,
+body.theme-light .border-blue-400\/30,
+body.theme-light .border-blue-400 { border-color: var(--accent) !important; }
+body.theme-light .text-blue-200 { color: var(--accent-strong) !important; }

@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/theme.css">
     <title>Redefinir Senha - Saúde Pira</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .glass {
-            background: rgba(30, 41, 59, 0.7);
+            background: var(--surface);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
         }
         #sidebar-overlay { transition: opacity 0.3s ease; }
         #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); left:0 !important; margin-left:0 !important; }
@@ -216,7 +217,7 @@
 
                 if (json.success) {
                     form.classList.add('hidden'); // Esconde o formulário para evitar múltiplos cliques
-                    exibirMensagem('Senha updated com sucesso! Redirecionando para a tela de login...', 'sucesso');
+                    exibirMensagem('Senha atualizada com sucesso! Redirecionando para a tela de login...', 'sucesso');
                     setTimeout(() => window.location.href = 'login.html', 3000);
                 } else {
                     exibirMensagem(json.message || 'Erro ao redefinir a senha.', 'erro');

@@ -3,24 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/theme.css">
     <title>Curiosidades — Unidades de Saúde</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/settings.css">
     <style>
-        :root {
-            --bg-deep: #07111f;
-            --bg-panel: rgba(15, 23, 42, 0.8);
-            --bg-soft: rgba(30,41,59,.72);
-            --edge: rgba(148,163,184,.14);
-            --blue: #60a5fa;
-            --cyan: #22d3ee;
-            --emerald: #34d399;
-            --amber: #fbbf24;
-            --rose: #f87171;
-        }
-
+        /* :root removido — nenhuma dessas variáveis (--bg-deep, --blue etc.) era
+           referenciada em nenhuma regra deste arquivo, era código morto.
+           A página já usava valores fixos abaixo; agora herda a paleta base
+           de css/theme.css, e mantém aqui só o que é exclusivo dela
+           (gradiente de fundo, pills coloridas, talk-bubble). */
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background:
@@ -95,71 +89,74 @@
             border-bottom: 1px solid rgba(148,163,184,.12);
         }
 
-        /* Tema Claro */
+        /* Tema Claro — cores do núcleo (fundo, texto, superfícies, bordas) vêm
+           de var(), definidas em css/theme.css. As pills coloridas (blue/cyan/
+           emerald/amber) são exclusivas desta página e continuam com valor
+           próprio, já que não fazem parte da paleta central do site. */
         body.theme-light {
-            background: #FAFBFC !important;
-            color: #0D1117 !important;
+            background: var(--page-bg) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light .glass {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
-            color: #0D1117 !important;
+            background: var(--surface-strong) !important;
+            border-color: var(--border) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light .hero-panel {
-            background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(34,211,238,0.08), #FFFFFF) !important;
-            border-color: #D0D7DE !important;
+            background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(34,211,238,0.08), var(--surface-strong)) !important;
+            border-color: var(--border) !important;
         }
         body.theme-light h1, body.theme-light h2, body.theme-light h3 {
-            color: #0D1117 !important;
+            color: var(--page-text) !important;
         }
         body.theme-light p, body.theme-light .text-slate-200, body.theme-light .text-slate-300 {
-            color: #424A52 !important;
+            color: var(--text-secondary) !important;
         }
         body.theme-light .badge {
-            background: #F6F8FB !important;
-            border-color: #D0D7DE !important;
-            color: #0851B8 !important;
+            background: var(--control-bg) !important;
+            border-color: var(--border) !important;
+            color: var(--accent-strong) !important;
         }
-        body.theme-light .pill-blue { background: rgba(59,130,246,0.12) !important; color: #0851B8 !important; border-color: #BDD7FF !important; }
+        body.theme-light .pill-blue { background: rgba(59,130,246,0.12) !important; color: var(--accent-strong) !important; border-color: #BDD7FF !important; }
         body.theme-light .pill-cyan { background: rgba(34,211,238,0.12) !important; color: #0891b2 !important; border-color: #A5F3FC !important; }
         body.theme-light .pill-emerald { background: rgba(52,211,153,0.12) !important; color: #059669 !important; border-color: #A7F3D0 !important; }
         body.theme-light .pill-amber { background: rgba(251,191,36,0.12) !important; color: #b45309 !important; border-color: #FDE68A !important; }
-        body.theme-light .card-hover { border-color: #D0D7DE; }
-        body.theme-light .card-hover:hover { border-color: #3B82F6; }
+        body.theme-light .card-hover { border-color: var(--border); }
+        body.theme-light .card-hover:hover { border-color: var(--accent); }
         body.theme-light .chip {
-            background: #F6F8FB !important;
-            border-color: #D0D7DE !important;
-            color: #0D1117 !important;
+            background: var(--control-bg) !important;
+            border-color: var(--border) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light header {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
+            background: var(--surface-strong) !important;
+            border-color: var(--border) !important;
         }
         body.theme-light header button, body.theme-light header .text-slate-300, body.theme-light header .text-slate-400 {
-            color: #0D1117 !important;
+            color: var(--page-text) !important;
         }
         body.theme-light #sidebar-drawer {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
+            background: var(--surface-strong) !important;
+            border-color: var(--border) !important;
         }
         body.theme-light #sidebar-drawer .text-slate-300, body.theme-light #sidebar-drawer .text-slate-400 {
-            color: #424A52 !important;
+            color: var(--text-secondary) !important;
         }
         body.theme-light .talk-bubble {
-            background: #F6F8FB !important;
-            border-color: #D0D7DE !important;
-            color: #0D1117 !important;
+            background: var(--control-bg) !important;
+            border-color: var(--border) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light li {
-            color: #424A52 !important;
+            color: var(--text-secondary) !important;
         }
         body.theme-light input {
-            background: #F6F8FB !important;
-            border-color: #D0D7DE !important;
-            color: #0D1117 !important;
+            background: var(--control-bg) !important;
+            border-color: var(--border) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light input::placeholder {
-            color: #57606A !important;
+            color: var(--text-tertiary) !important;
         }
     </style>
 </head>
@@ -384,9 +381,9 @@
             <h2 class="text-2xl font-bold mb-3">Referência e leitura complementar</h2>
             <p class="text-slate-300">A explicação de que a Atenção Básica funciona como porta de entrada prioritária do SUS, enquanto a UPA reorganiza a urgência e a emergência, foi reforçada com base na orientação da Prefeitura Municipal de Novo Hamburgo.</p>
             <p class="mt-3 text-slate-300"><a class="text-blue-400 underline" href="https://www.novohamburgo.rs.gov.br/noticia/entenda-diferencas-ubsusf-upa" target="_blank" rel="noopener">Fonte: Prefeitura Municipal de Novo Hamburgo — Entenda as diferenças entre UBS/USF e UPA</a></p>
-            <p class="text-blue-400 underline" href="https://aps.saude.gov.br/" target="_blank" rel="noopener">Política Nacional de Atenção Básica (Ministério da Saúde)</p>
-            <p class="text-blue-400 underline" href="https://bvsms.saude.gov.br/" target="_blank" rel="noopener">Biblioteca Virtual em Saúde (BVS)</p>
-            <p class="text-blue-400 underline" href="https://piracicaba.sp.gov.br/" target="_blank" rel="noopener">Secretaria Municipal de Saúde de Piracicaba</p> (informações locais e contatos)
+            <p><a class="text-blue-400 underline" href="https://aps.saude.gov.br/" target="_blank" rel="noopener">Política Nacional de Atenção Básica (Ministério da Saúde)</a></p>
+            <p><a class="text-blue-400 underline" href="https://bvsms.saude.gov.br/" target="_blank" rel="noopener">Biblioteca Virtual em Saúde (BVS)</a></p>
+            <p><a class="text-blue-400 underline" href="https://piracicaba.sp.gov.br/" target="_blank" rel="noopener">Secretaria Municipal de Saúde de Piracicaba</a> (informações locais e contatos)</p>
         </section>
 
         

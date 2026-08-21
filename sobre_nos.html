@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/theme.css">
     <title>Sobre nós</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -11,13 +12,13 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(180deg, #06131f 0%, #0f172a 100%);
-            color: #e2e8f0;
+            background: var(--page-bg);
+            color: var(--page-text);
         }
         .glass {
-            background: rgba(15,23,42,0.6);
+            background: var(--surface);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
         }
         .card-hover:hover {
             transform: translateY(-2px);
@@ -28,60 +29,79 @@
 
         /* Tema Claro */
         body.theme-light {
-            background: #FAFBFC !important;
-            color: #0D1117 !important;
+            background: var(--page-bg) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light .glass {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
-            color: #0D1117 !important;
+            background: var(--surface-strong) !important;
+            border-color: var(--border) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light h1, body.theme-light h2, body.theme-light h3 {
-            color: #0D1117 !important;
+            color: var(--page-text) !important;
         }
         body.theme-light p, body.theme-light .text-slate-300, body.theme-light .text-slate-400 {
-            color: #424A52 !important;
+            color: var(--text-secondary) !important;
         }
         body.theme-light .text-slate-300 {
-            color: #424A52 !important;
+            color: var(--text-secondary) !important;
         }
         body.theme-light header {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
+            background: var(--surface-strong) !important;
+            border-color: var(--border) !important;
         }
         body.theme-light header button, body.theme-light header .text-slate-300 {
-            color: #0D1117 !important;
+            color: var(--page-text) !important;
         }
         body.theme-light #sidebar-drawer {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
+            background: var(--surface-strong) !important;
+            border-color: var(--border) !important;
         }
         body.theme-light #sidebar-drawer .text-slate-300, body.theme-light #sidebar-drawer .text-slate-400 {
-            color: #424A52 !important;
+            color: var(--text-secondary) !important;
         }
         body.theme-light .bg-blue-500\/15,
         body.theme-light .bg-cyan-500\/15,
-        body.theme-light .bg-emerald-500\/15 {
-            background: #F6F8FB !important;
+        body.theme-light .bg-emerald-500\/15,
+        body.theme-light .bg-purple-500\/15 {
+            background: var(--control-bg) !important;
         }
         body.theme-light .text-blue-300,
         body.theme-light .text-cyan-300,
-        body.theme-light .text-emerald-300 {
-            color: #0851B8 !important;
+        body.theme-light .text-cyan-400,
+        body.theme-light .text-emerald-300,
+        body.theme-light .text-purple-300,
+        body.theme-light .text-purple-400 {
+            color: var(--accent-strong) !important;
         }
-        body.theme-light .border-white\/10 {
-            border-color: #D0D7DE !important;
+        body.theme-light .border-white\/10,
+        body.theme-light .border-white\/5 {
+            border-color: var(--border) !important;
+        }
+        body.theme-light .hover\:border-purple-500\/30:hover {
+            border-color: var(--accent) !important;
         }
         body.theme-light .bg-slate-950\/40 {
-            background: #F6F8FB !important;
+            background: var(--control-bg) !important;
+        }
+        
+        body.theme-light .bg-amber-500\/10 {
+            background: var(--warning-soft) !important;
+        }
+        body.theme-light .border-amber-500\/20 {
+            border-color: var(--warning-border) !important;
+        }
+        body.theme-light .text-amber-300,
+        body.theme-light .text-amber-200 {
+            color: var(--warning) !important;
         }
         body.theme-light input {
-            background: #F6F8FB !important;
-            border-color: #D0D7DE !important;
-            color: #0D1117 !important;
+            background: var(--control-bg) !important;
+            border-color: var(--border) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light input::placeholder {
-            color: #57606A !important;
+            color: var(--text-tertiary) !important;
         }
     </style>
 </head>

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/theme.css">
     <title>Contato</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -11,13 +12,13 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(180deg, #06131f 0%, #0f172a 100%);
-            color: #e2e8f0;
+            background: var(--page-bg);
+            color: var(--page-text);
         }
         .glass {
-            background: rgba(15,23,42,0.6);
+            background: var(--surface);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
         }
         .card-hover:hover {
             transform: translateY(-2px);
@@ -28,54 +29,54 @@
 
         /* Tema Claro */
         body.theme-light {
-            background: #FAFBFC !important;
-            color: #0D1117 !important;
+            background: var(--page-bg) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light .glass {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
-            color: #0D1117 !important;
+            background: var(--surface-strong) !important;
+            border-color: var(--border) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light h1, body.theme-light h2, body.theme-light h3 {
-            color: #0D1117 !important;
+            color: var(--page-text) !important;
         }
         body.theme-light p, body.theme-light .text-slate-300, body.theme-light .text-slate-400 {
-            color: #424A52 !important;
+            color: var(--text-secondary) !important;
         }
         body.theme-light .text-slate-300 {
-            color: #424A52 !important;
+            color: var(--text-secondary) !important;
         }
         body.theme-light header {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
+            background: var(--surface-strong) !important;
+            border-color: var(--border) !important;
         }
         body.theme-light header button, body.theme-light header .text-slate-300 {
-            color: #0D1117 !important;
+            color: var(--page-text) !important;
         }
         body.theme-light #sidebar-drawer {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
+            background: var(--surface-strong) !important;
+            border-color: var(--border) !important;
         }
         body.theme-light #sidebar-drawer .text-slate-300, body.theme-light #sidebar-drawer .text-slate-400 {
-            color: #424A52 !important;
+            color: var(--text-secondary) !important;
         }
         body.theme-light input, body.theme-light textarea {
-            background: #F6F8FB !important;
-            border-color: #D0D7DE !important;
-            color: #0D1117 !important;
+            background: var(--control-bg) !important;
+            border-color: var(--border) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light input::placeholder, body.theme-light textarea::placeholder {
-            color: #57606A !important;
+            color: var(--text-tertiary) !important;
         }
         body.theme-light button[type="button"] {
-            background: #3B82F6 !important;
+            background: var(--accent) !important;
             color: #FFFFFF !important;
         }
         body.theme-light button[type="button"]:hover {
-            background: #2563EB !important;
+            background: var(--accent-strong) !important;
         }
         body.theme-light ul {
-            color: #424A52 !important;
+            color: var(--text-secondary) !important;
         }
     </style>
 </head>
