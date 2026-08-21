@@ -3,31 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/theme.css">
     <title>Saúde Piracicaba Definitivo. - Buscar Especialidade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --page-bg: #020617;
-            --page-text: #f8fafc;
-            --page-muted: #94a3b8;
-            --surface: rgba(15,23,42,0.6);
-            --surface-strong: rgba(15,23,42,0.98);
-            --border: rgba(255,255,255,0.12);
-            --panel-border: rgba(255,255,255,0.12);
-            --shadow: 0 28px 90px rgba(0,0,0,0.3);
-            --button-bg: rgba(255,255,255,0.08);
-            --button-text: #e2e8f0;
-            --control-bg: rgba(255,255,255,0.04);
-            --accent: #3b82f6;
-            --accent-soft: rgba(59,130,246,0.2);
-            --acc-font-size: 100;
-            --acc-line-height: 100;
-            --acc-letter-spacing: 100;
-            --acc-scale: 100;
-        }
+        /* :root removido — as variáveis (--page-bg, --surface, --accent, --acc-font-size etc.)
+           agora vêm só de css/theme.css, carregado no <head> antes deste bloco.*/
         html {
             font-size: calc(var(--acc-font-size, 100) * var(--acc-scale, 100) / 100 * 1%);
         }
@@ -118,39 +102,39 @@
         body.align-center main { text-align: center; }
         body.align-right main { text-align: right; }
         body.theme-light {
-            background-color: #FAFBFC;
-            color: #0D1117;
+            background-color: var(--page-bg);
+            color: var(--page-text);
         }
-        body.theme-light .glass { background: #FFFFFF; border-color: #D0D7DE; color: #0D1117; box-shadow: 0 16px 30px rgba(0,0,0,0.08); }
-        body.theme-light header { background: #FFFFFF !important; border-bottom-color: #D0D7DE !important; color: #0D1117; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        body.theme-light header.glass { background: #FFFFFF !important; border-color: #D0D7DE !important; color: #0D1117 !important; }
-        body.theme-light .text-slate-400 { color: #424A52 !important; }
-        body.theme-light .text-white { color: #0D1117 !important; }
-        body.theme-light .bg-slate-800\/50 { background-color: #F0F2F5 !important; }
-        body.theme-light .border-white\/10 { border-color: #D0D7DE !important; }
-        body.theme-light .category-card { background: #FFFFFF; color: #0D1117; box-shadow: 0 14px 28px rgba(0,0,0,0.06); border-color: #D0D7DE; }
-        body.theme-light .category-card:hover { background: #F6F8FB; border-color: #3B82F6; }
-        body.theme-light .unit-card { background: #FFFFFF; border-color: #D0D7DE; }
-        body.theme-light .unit-card .h-48 { background: #F6F8FB !important; }
-        body.theme-light .unit-card h3 { color: #0D1117 !important; }
-        body.theme-light .unit-card p { color: #424A52 !important; }
-        body.theme-light .unit-card .text-slate-300 { color: #57606A !important; }
-        body.theme-light .unit-card a { background: #EAF0FF !important; color: #0851B8 !important; border-color: #BDD7FF !important; }
-        body.theme-light .settings-panel { background: #FFFFFF; color: #0D1117; border-color: #D0D7DE; }
-        body.theme-light a { color: #0851B8 !important; }
+        body.theme-light .glass { background: var(--surface-strong); border-color: var(--border); color: var(--page-text); box-shadow: 0 16px 30px rgba(0,0,0,0.08); }
+        body.theme-light header { background: var(--surface-strong) !important; border-bottom-color: var(--border) !important; color: var(--page-text); box-shadow: var(--shadow); }
+        body.theme-light header.glass { background: var(--surface-strong) !important; border-color: var(--border) !important; color: var(--page-text) !important; }
+        body.theme-light .text-slate-400 { color: var(--text-secondary) !important; }
+        body.theme-light .text-white { color: var(--page-text) !important; }
+        body.theme-light .bg-slate-800\/50 { background-color: var(--control-bg) !important; }
+        body.theme-light .border-white\/10 { border-color: var(--border) !important; }
+        body.theme-light .category-card { background: var(--surface-strong); color: var(--page-text); box-shadow: 0 14px 28px rgba(0,0,0,0.06); border-color: var(--border); }
+        body.theme-light .category-card:hover { background: var(--control-bg); border-color: var(--accent); }
+        body.theme-light .unit-card { background: var(--surface-strong); border-color: var(--border); }
+        body.theme-light .unit-card .h-48 { background: var(--control-bg) !important; }
+        body.theme-light .unit-card h3 { color: var(--page-text) !important; }
+        body.theme-light .unit-card p { color: var(--text-secondary) !important; }
+        body.theme-light .unit-card .text-slate-300 { color: var(--text-tertiary) !important; }
+        body.theme-light .unit-card a { background: var(--accent-soft) !important; color: var(--accent-strong) !important; border-color: #BDD7FF !important; }
+        body.theme-light .settings-panel { background: var(--surface-strong); color: var(--page-text); border-color: var(--border); }
+        body.theme-light a { color: var(--accent-strong) !important; }
         body.theme-light .settings-theme-btn,
         body.theme-light .settings-action-btn,
         body.theme-light .settings-toggle-btn {
-            border-color: #D0D7DE;
-            background: #F6F8FB;
-            color: #0D1117;
+            border-color: var(--border);
+            background: var(--control-bg);
+            color: var(--page-text);
         }
         body.theme-light .settings-theme-btn.active,
         body.theme-light .settings-action-btn.active,
         body.theme-light .settings-toggle-btn.active {
-            background: #EAF0FF;
-            border-color: #3B82F6;
-            color: #0851B8;
+            background: var(--accent-soft);
+            border-color: var(--accent);
+            color: var(--accent-strong);
         }
     </style>
     <link rel="stylesheet" href="css/settings.css">

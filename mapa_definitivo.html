@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/theme.css">
     <title>Saúde Piracicaba - Nova UI</title>
     
     <!-- Tailwind CSS para Estilização Rápida -->
@@ -149,36 +150,15 @@
         #sidebar-overlay { transition: opacity 0.3s ease; }
         #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); left:0 !important; margin-left:0 !important; }
 
-        /* Tema claro para mapa Leaflet */
-        body.theme-light .leaflet-container {
-            background: #FAFBFC !important;
-        }
-        body.theme-light .leaflet-control-zoom-in,
-        body.theme-light .leaflet-control-zoom-out {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
-            color: #0D1117 !important;
-        }
-        body.theme-light .leaflet-control {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
-        }
-        body.theme-light .leaflet-popup-content-wrapper,
-        body.theme-light .leaflet-popup-tip {
-            background: #FFFFFF !important;
-            color: #0D1117 !important;
-            border: 1px solid #D0D7DE !important;
-        }
-        body.theme-light .leaflet-popup-content {
-            color: #0D1117 !important;
-        }
+        /* Tema claro para o mapa Leaflet: as regras gerais já vêm de css/settings.css. Só ficam as duas regras que
+           são exclusivas desta página (tooltip de rótulo de unidade). */
         body.theme-light .leaflet-tooltip.unit-label-tooltip {
-            background: #FFFFFF !important;
-            border-color: #D0D7DE !important;
-            color: #0D1117 !important;
+            background: var(--surface-strong) !important;
+            border-color: var(--border) !important;
+            color: var(--page-text) !important;
         }
         body.theme-light .leaflet-tooltip.unit-label-tooltip::before {
-            border-top-color: #FFFFFF !important;
+            border-top-color: var(--surface-strong) !important;
         }
 
     </style>
