@@ -11,6 +11,10 @@
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <!-- Leaflet MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
     
     <!-- Phosphor Icons para ícones modernos -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -360,6 +364,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <script>
         function setActiveNavLink() {
             const currentPage = window.location.pathname.split('/').pop().toLowerCase();
@@ -400,11 +405,20 @@
         const map = L.map('map', {
             zoomControl: false,
             attributionControl: false,
+            maxZoom: 19,
             zoomSnap: 0.25,
             zoomDelta: 0.25,
             wheelPxPerZoomLevel: 90,
             zoomAnimation: true
         }).setView([-22.7338, -47.6476], 13);
+
+        const markerClusterGroup = L.markerClusterGroup({
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            removeOutsideVisibleBounds: true,
+            chunkedLoading: true
+        }).addTo(map);
         
         let currentTileLayer = null;
         
@@ -809,8 +823,8 @@
 
         // 2. INICIALIZAR MARCADORES (Limpando os antigos primeiro)
         function initMarkers() {
-            // Limpa o mapa se já houver algo
-            allMarkers.forEach(m => map.removeLayer(m.marker));
+            // Limpa o grupo para evitar marcadores duplicados após recarregar os dados
+            markerClusterGroup.clearLayers();
             allMarkers = [];
 
             healthUnits.forEach(unit => {
@@ -827,6 +841,7 @@
                     marker.getTooltip().getElement()?.style.setProperty('--tooltip-color', tooltipColor);
                     marker.getTooltip().getElement()?.setAttribute('data-color', tooltipColor);
                     marker.on('click', () => openUnitCard(unit));
+                    markerClusterGroup.addLayer(marker);
                     allMarkers.push({ unit, marker });
                 }
             });
@@ -873,8 +888,8 @@
 
             const filteredIds = new Set(filtered.map(u => u.id));
             allMarkers.forEach(({ unit, marker }) => {
-                if (filteredIds.has(unit.id)) marker.addTo(map); 
-                else map.removeLayer(marker);
+                if (filteredIds.has(unit.id)) markerClusterGroup.addLayer(marker);
+                else markerClusterGroup.removeLayer(marker);
             });
             renderSidebarList(filtered);
             syncMarkerLabels();
