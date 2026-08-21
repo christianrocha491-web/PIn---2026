@@ -14,7 +14,7 @@
     </style>
     <link rel="stylesheet" href="css/settings.css">
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen" data-settings-inline>
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeNavSidebar()"></div>
     <aside id="sidebar-drawer" class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col -translate-x-full border-r border-white/10 overflow-y-auto" style="background:rgba(2,6,23,0.98);backdrop-filter:blur(20px);">
         <div class="flex items-center justify-between p-5 border-b border-white/10 flex-shrink-0">
@@ -66,9 +66,56 @@
         <div class="w-8"></div>
     </header>
 
-    <main class="pt-24 px-6 max-w-5xl mx-auto pb-8">
-        <h1 class="text-3xl font-bold mb-3">Configurações</h1>
-        <p class="text-slate-400">Ajustes e preferências do site estarão disponíveis aqui em breve.</p>
+    <main class="pt-24 px-6 max-w-3xl mx-auto pb-16">
+        <h1 class="text-3xl font-bold mb-2">Configurações</h1>
+        <p class="text-slate-400 mb-8">Ajuste o tema, a acessibilidade e o alinhamento do conteúdo. As alterações são salvas automaticamente neste navegador.</p>
+
+        <section class="glass rounded-2xl p-6 mb-6">
+            <p class="settings-section-title mb-3">Tema</p>
+            <div class="settings-grid settings-grid-2">
+                <button type="button" data-theme="default" class="settings-theme-btn">Escuro</button>
+                <button type="button" data-theme="light" class="settings-theme-btn">Claro suave</button>
+            </div>
+        </section>
+
+        <section class="glass rounded-2xl p-6 mb-6">
+            <p class="settings-section-title mb-3">Acessibilidade</p>
+            <div class="settings-grid settings-grid-2">
+                <button type="button" data-accessibility="readingMask" class="settings-toggle-btn">Máscara de leitura</button>
+                <button type="button" data-accessibility="highContrast" class="settings-toggle-btn">Alto contraste</button>
+                <button type="button" data-accessibility="readableFont" class="settings-toggle-btn">Fonte legível</button>
+            </div>
+
+            <div class="settings-range-list">
+                <label class="settings-range-row" for="acc-fontSize">
+                    <span>Tamanho da fonte</span><output data-range-value="fontSize">100%</output>
+                </label>
+                <input id="acc-fontSize" type="range" min="80" max="160" value="100">
+
+                <label class="settings-range-row" for="acc-letterSpacing">
+                    <span>Espaçamento das letras</span><output data-range-value="letterSpacing">100%</output>
+                </label>
+                <input id="acc-letterSpacing" type="range" min="80" max="200" value="100">
+
+                <label class="settings-range-row" for="acc-scale">
+                    <span>Escala da interface</span><output data-range-value="scale">100%</output>
+                </label>
+                <input id="acc-scale" type="range" min="80" max="140" value="100">
+            </div>
+        </section>
+
+        <section class="glass rounded-2xl p-6 mb-6">
+            <p class="settings-section-title mb-3">Alinhamento do conteúdo</p>
+            <div class="settings-grid settings-grid-3">
+                <button type="button" data-align="left" class="settings-action-btn">Esquerda</button>
+                <button type="button" data-align="center" class="settings-action-btn">Centro</button>
+                <button type="button" data-align="right" class="settings-action-btn">Direita</button>
+            </div>
+        </section>
+
+        <section class="glass rounded-2xl p-4">
+            <button type="button" id="reset-settings" class="settings-reset">Redefinir configurações</button>
+        </section>
     </main>
 
     <script>

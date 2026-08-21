@@ -12,7 +12,8 @@
     </style>
     <link rel="stylesheet" href="css/settings.css">
 </head>
-<body class="min-h-screen bg-slate-900 text-white">
+<body class="min-h-screen">
+    <script>(function(){try{var s=JSON.parse(localStorage.getItem('saudepira-settings-v1'));if(s&&s.theme==='light'){document.body.classList.add('theme-light');}}catch(e){}})();</script>
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeNavSidebar()"></div>
     <aside id="sidebar-drawer" class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col -translate-x-full border-r border-white/10 overflow-y-auto" style="background:rgba(2,6,23,0.98);backdrop-filter:blur(20px);">
         <div class="flex items-center justify-between p-5 border-b border-white/10 flex-shrink-0">

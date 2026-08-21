@@ -8,6 +8,7 @@
 
     function buildUI(){
         if (document.getElementById(BUTTON_ID)) return;
+        if (document.body && document.body.hasAttribute('data-settings-inline')) return;
 
         const wrapper = document.createElement('div');
         wrapper.id = 'site-settings';
@@ -167,15 +168,29 @@
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') setOpen(false);
         });
+    }
 
-        wrapper.querySelectorAll('[data-theme]').forEach(btn => {
+    // Liga os botões de tema e o botão de redefinir onde quer que estejam no
+    // documento — dentro do widget flutuante (a maioria das páginas) ou
+    // direto no conteúdo da página (configuracoes.html, que tem os controles
+    // fixos em vez do popup). Guardado por dataset pra nunca ligar 2x o
+    // mesmo elemento.
+    function bindGlobalControls(){
+        document.querySelectorAll('[data-theme]').forEach(btn => {
+            if (btn.dataset.themeBound === '1') return;
+            btn.dataset.themeBound = '1';
             btn.addEventListener('click', () => Theme.apply(btn.getAttribute('data-theme')));
         });
 
-        wrapper.querySelector('#reset-settings').addEventListener('click', () => {
-            Settings.reset();
-            Theme.apply(Settings.theme);
-            if (window.UnityAccessibility) UnityAccessibility.initialize();
+        document.querySelectorAll('#reset-settings').forEach(btn => {
+            if (btn.dataset.resetBound === '1') return;
+            btn.dataset.resetBound = '1';
+            btn.addEventListener('click', () => {
+                Settings.reset();
+                Theme.apply(Settings.theme);
+                if (window.UnityAccessibility) UnityAccessibility.initialize();
+                if (window.I18n) I18n.applyLanguage(Settings.language);
+            });
         });
     }
 
@@ -183,6 +198,8 @@
         await Settings.load();
         Theme.apply(Settings.theme);
         if (window.UnityAccessibility) UnityAccessibility.initialize();
+        if (window.I18n) I18n.applyLanguage(Settings.language);
+        bindGlobalControls();
     }
 
     function start(){

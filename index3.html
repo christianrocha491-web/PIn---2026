@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* :root removido — as variáveis (--page-bg, --surface, --accent, --acc-font-size etc.)
-           agora vêm só de css/theme.css, carregado no <head> antes deste bloco.*/
+           agora vêm só de css/theme.css*/
         html {
             font-size: calc(var(--acc-font-size, 100) * var(--acc-scale, 100) / 100 * 1%);
         }
@@ -140,6 +140,7 @@
     <link rel="stylesheet" href="css/settings.css">
 </head>
 <body class="min-h-screen">
+    <script>(function(){try{var s=JSON.parse(localStorage.getItem('saudepira-settings-v1'));if(s&&s.theme==='light'){document.body.classList.add('theme-light');}}catch(e){}})();</script>
     <!-- O painel de configuração agora usa acesso autoral a recursos de acessibilidade -->
 
     <!-- Overlay do Sidebar -->
@@ -268,7 +269,9 @@
             });
         }
 
-        // Inicializa configurações persistidas e carrega dados
+        // Aplica o tema salvo ANTES de renderizar os cards, pra evitar o
+        // "flash" do tema escuro por uma fração de segundo em quem usa o
+        // tema claro.
         window.addEventListener('DOMContentLoaded', async () => {
             await Settings.load();
             Theme.apply(Settings.theme);
