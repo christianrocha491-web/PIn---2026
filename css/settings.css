@@ -408,3 +408,47 @@ body.theme-light .bg-blue-600 .text-white,
 body.theme-light .bg-blue-500 .text-white,
 body.theme-light .bg-gradient-to-br .text-white,
 body.theme-light .bg-gradient-to-tr .text-white { color: #fff !important; }
+
+/* Etapa 4: cobertura de tema claro para login, cadastro, redefinir senha,
+   anotar medicamentos e configurações — páginas que não tinham nenhum
+   override de tema claro próprio. */
+
+/* Mensagens de alerta (erro/sucesso) em formulários */
+body.theme-light .bg-red-500\/10 { background-color: var(--danger-soft) !important; }
+body.theme-light .border-red-500\/30,
+body.theme-light .border-red-500\/20 { border-color: var(--danger-border) !important; }
+body.theme-light .text-red-400 { color: var(--danger) !important; }
+body.theme-light .bg-emerald-500\/10 { background-color: var(--success-soft) !important; }
+body.theme-light .border-emerald-500\/30,
+body.theme-light .border-emerald-500\/20 { border-color: var(--success-border) !important; }
+body.theme-light .text-emerald-400 { color: var(--success) !important; }
+body.theme-light .text-amber-400 { color: var(--warning) !important; }
+
+/* Links e destaques em azul (texto) — tom mais escuro para manter contraste no fundo claro */
+body.theme-light .text-blue-300,
+body.theme-light .text-blue-400,
+body.theme-light .text-blue-500 { color: var(--accent-strong) !important; }
+body.theme-light .bg-blue-500\/10 { background-color: var(--accent-soft) !important; }
+body.theme-light .border-blue-500 { border-color: var(--accent) !important; }
+
+/* Hover sutil em links de sidebar (usa branco/5% no escuro — invisível no claro) */
+body.theme-light .hover\:bg-white\/5:hover { background-color: var(--control-bg) !important; }
+body.theme-light .bg-white\/5 { background-color: var(--control-bg) !important; }
+
+/* Botões secundários de modal (ex.: "Cancelar", "Depois" em medicamentos.html) */
+body.theme-light .bg-slate-700 { background-color: var(--control-bg) !important; color: var(--page-text) !important; }
+body.theme-light .hover\:bg-slate-600:hover { background-color: var(--border) !important; }
+
+/* Painel de detalhes de unidade no mapa (mapa_definitivo.html) */
+body.theme-light .bg-slate-950\/40 { background-color: var(--control-bg) !important; }
+body.theme-light .bg-slate-700\/60 { background-color: var(--control-bg) !important; }
+body.theme-light .bg-slate-800\/70 { background-color: var(--accent-soft) !important; }
+body.theme-light .bg-slate-900\/70 { background-color: var(--control-bg) !important; }
+body.theme-light .border-slate-700 { border-color: var(--border) !important; }
+body.theme-light .hover\:bg-slate-700:hover { background-color: var(--border) !important; }
+
+/* Badges/links azuis genéricos ainda sem cobertura */
+body.theme-light .border-blue-500\/30,
+body.theme-light .border-blue-400\/30,
+body.theme-light .border-blue-400 { border-color: var(--accent) !important; }
+body.theme-light .text-blue-200 { color: var(--accent-strong) !important; }
