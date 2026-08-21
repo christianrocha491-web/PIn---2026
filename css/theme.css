@@ -1,0 +1,139 @@
+/* ============================================================
+   theme.css — Fonte única de verdade para cores do site.
+   Toda página deve carregar este arquivo ANTES de settings.css
+   e de qualquer <style> local de cor.
+
+   Como funciona:
+   - As variáveis abaixo definem a paleta padrão (tema escuro).
+   - O bloco "body.theme-light" redefine as MESMAS variáveis com
+     outros valores. Nenhum outro CSS precisa saber qual tema
+     está ativo — ele só usa var(--nome-da-variavel).
+   ============================================================ */
+
+:root {
+    /* Fundo e texto base */
+    --page-bg: #020617;
+    --page-text: #f8fafc;
+    --page-muted: #94a3b8;
+
+    /* Superfícies (cards, headers, painéis) */
+    --surface: rgba(15, 23, 42, 0.6);
+    --surface-strong: rgba(15, 23, 42, 0.98);
+    --surface-solid: #0f172a;
+
+    /* Bordas e sombra */
+    --border: rgba(255, 255, 255, 0.12);
+    --panel-border: rgba(255, 255, 255, 0.12);
+    --shadow: 0 28px 90px rgba(0, 0, 0, 0.3);
+
+    /* Botões e controles */
+    --button-bg: rgba(255, 255, 255, 0.08);
+    --button-text: #e2e8f0;
+    --control-bg: rgba(255, 255, 255, 0.04);
+
+    /* Cor de destaque (accent) */
+    --accent: #3b82f6;
+    --accent-soft: rgba(59, 130, 246, 0.2);
+    --accent-strong: #60a5fa;
+
+    /* Texto secundário / placeholders */
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+
+    /* Cores semânticas de status (erro, sucesso, aviso) — usadas em
+       mensagens de validação (login, cadastro, redefinir senha). */
+    --danger: #f87171;
+    --danger-soft: rgba(239, 68, 68, 0.1);
+    --danger-border: rgba(239, 68, 68, 0.3);
+    --success: #34d399;
+    --success-soft: rgba(16, 185, 129, 0.1);
+    --success-border: rgba(16, 185, 129, 0.3);
+    --warning: #fbbf24;
+    --warning-soft: rgba(245, 158, 11, 0.1);
+    --warning-border: rgba(245, 158, 11, 0.3);
+
+    /* Aliases de compatibilidade — usados hoje só em curiosidades.html.
+       Apontam para as variáveis acima; serão removidos quando a página
+       for migrada (etapa 4 do plano). Não altere estes valores aqui,
+       altere os originais acima. */
+    --bg-deep: var(--page-bg);
+    --bg-panel: var(--surface-strong);
+    --bg-soft: var(--surface);
+    --edge: var(--border);
+    --blue: var(--accent-strong);
+    --cyan: #22d3ee;
+    --emerald: #34d399;
+    --amber: #fbbf24;
+    --rose: #f87171;
+
+    /* Variáveis de acessibilidade (escala de fonte/espaçamento),
+       já existentes no projeto — centralizadas aqui também. */
+    --acc-font-size: 100;
+    --acc-line-height: 100;
+    --acc-letter-spacing: 100;
+    --acc-scale: 100;
+}
+
+/* ------------------------------------------------------------
+   TEMA CLARO
+   Mesma lista de variáveis, valores diferentes. Qualquer regra
+   de CSS que já usa var(--page-bg), var(--surface) etc. vai
+   mudar de cor automaticamente quando body.theme-light for
+   aplicado — sem precisar caçar classe por classe.
+   ------------------------------------------------------------ */
+body.theme-light {
+    --page-bg: #FAFBFC;
+    --page-text: #0D1117;
+    --page-muted: #424A52;
+
+    --surface: #FFFFFF;
+    --surface-strong: #FFFFFF;
+    --surface-solid: #FFFFFF;
+
+    --border: #D0D7DE;
+    --panel-border: #D0D7DE;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    --button-bg: #F6F8FB;
+    --button-text: #0D1117;
+    --control-bg: #F6F8FB;
+
+    --accent: #3B82F6;
+    --accent-soft: #EAF0FF;
+    --accent-strong: #0851B8;
+
+    --text-secondary: #424A52;
+    --text-tertiary: #57606A;
+
+    --danger: #DC2626;
+    --danger-soft: #FDECEC;
+    --danger-border: #F5B5B5;
+    --success: #15803D;
+    --success-soft: #E9F7EF;
+    --success-border: #A7E3BE;
+    --warning: #B45309;
+    --warning-soft: #FDF3E4;
+    --warning-border: #F5D496;
+
+    --bg-deep: var(--page-bg);
+    --bg-panel: var(--surface-strong);
+    --bg-soft: var(--surface);
+    --edge: var(--border);
+    --blue: var(--accent-strong);
+}
+
+/* ------------------------------------------------------------
+   ALTO CONTRASTE
+   Mesmo mecanismo — hoje usado só via classes diretas no
+   settings.css. Centralizado aqui para consistência futura.
+   ------------------------------------------------------------ */
+body.high-contrast {
+    --page-bg: #000000;
+    --page-text: #ffffff;
+    --page-muted: #ffffff;
+    --surface: #000000;
+    --surface-strong: #000000;
+    --surface-solid: #000000;
+    --border: #ffffff;
+    --panel-border: #ffffff;
+}
