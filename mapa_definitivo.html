@@ -118,6 +118,10 @@
             border-top-color: rgba(2, 6, 23, 0.93);
         }
 
+        .osm-tiles-dark {
+            filter: brightness(0.72) contrast(1.15) saturate(0.7) hue-rotate(180deg) invert(1);
+        }
+
         .unit-label-tooltip[data-color] {
             border-color: rgba(255, 255, 255, 0.18);
         }
@@ -221,9 +225,6 @@
                 <button id="btn-nav-menu" class="mr-2 text-slate-300 hover:text-white focus:outline-none" onclick="openNavSidebar()">
                     <i class="ph-bold ph-list text-3xl"></i>
                 </button>
-                <button id="btn-menu" class="mr-2 text-slate-300 hover:text-white focus:outline-none" onclick="toggleSidebar()">
-                    <i class="ph-bold ph-funnel-simple text-3xl"></i>
-                </button>
                 <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <i class="ph-bold ph-activity text-white"></i>
                 </div>
@@ -268,12 +269,6 @@
 
                 <!-- Rodapé do sidebar -->
                 <div class="border-t border-white/10 pt-2 flex flex-col gap-1 flex-shrink-0 mt-auto">
-                    <a href="medicamentos.html" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-medium transition-all text-sm">
-                        <i class="ph-bold ph-pill text-base"></i> Medicamentos
-                    </a>
-                    <a href="index3.html" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-medium transition-all text-sm">
-                        <i class="ph-bold ph-arrow-left text-base"></i> Voltar ao Início
-                    </a>
                 </div>
             </aside> 
 
@@ -304,12 +299,10 @@
                             
                             <h2 id="unit-name" class="text-2xl font-bold text-white leading-tight mb-1">UBS Cidade Alta</h2>
                             
-                            <div class="flex items-center gap-1 text-sm text-slate-400 mb-3">
-                                <div class="flex text-amber-400 text-xs">
-                                    <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star-half"></i>
-                                </div>
-                                <span id="unit-rating" class="font-semibold text-slate-200 ml-1">4.9</span>
-                                <span id="unit-reviews">(120 avaliações)</span>
+                            <div class="flex items-center gap-2 text-sm text-slate-400 mb-3">
+                                <i class="ph-fill ph-shield-check text-emerald-400"></i>
+                                <span class="font-semibold text-slate-200">Dados públicos</span>
+                                <span>Prefeitura/CNES</span>
                             </div>
 
                             <!-- Tags de Especialidades -->
@@ -404,7 +397,7 @@
         // ===== MAPA =====
         const map = L.map('map', {
             zoomControl: false,
-            attributionControl: false,
+            attributionControl: true,
             maxZoom: 19,
             zoomSnap: 0.25,
             zoomDelta: 0.25,
@@ -425,9 +418,6 @@
         // Função para mudar tema do mapa
         function updateMapTheme() {
             const isLightTheme = document.body.classList.contains('theme-light');
-            const tileUrl = isLightTheme 
-                ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-                : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
             
             // Remove a tile layer anterior
             if (currentTileLayer) {
@@ -435,7 +425,12 @@
             }
             
             // Adiciona a nova tile layer
-            currentTileLayer = L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(map);
+            currentTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                maxNativeZoom: 19,
+                className: isLightTheme ? 'osm-tiles' : 'osm-tiles osm-tiles-dark',
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
         }
         
         // Inicializa o mapa com o tema atual
@@ -487,9 +482,7 @@
                     address: u.localizacao,
                     lat: parseFloat(u.lat),
                     lng: parseFloat(u.lng),
-                    contato: u.contato || u.contato || '',
-                    rating: 4.5,
-                    reviews: Math.floor(Math.random() * 200) + 50,
+                    contato: u.contato || '',
                     status: (u.horario_atendimento && u.horario_atendimento.includes("24")) ? "24 Horas" : "Aberto",
                     time: u.horario_atendimento || "08h - 17h",
                     tags: u.especialidades ? u.especialidades.split(',').map(t => t.trim()) : [],
@@ -927,8 +920,6 @@
 
             document.getElementById('unit-name').textContent = unit.name;
             document.getElementById('unit-address').textContent = unit.address;
-            document.getElementById('unit-rating').textContent = unit.rating;
-            document.getElementById('unit-reviews').textContent = `(${unit.reviews} avaliações)`;
             document.getElementById('unit-time-badge').innerHTML = `<i class="ph-fill ph-clock"></i> ${unit.time}`;
 
             const badge = document.getElementById('unit-status-badge');
