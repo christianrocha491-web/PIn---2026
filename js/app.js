@@ -63,12 +63,25 @@ const App = (function(){
         'USF': 'img/USF.png',
         'UPA / Urgência': 'img/UPA.png',
         'Farmácia': 'img/FARM%C3%81CIA.png',
-        'COTE': 'https://images.unsplash.com/photo-1633356122544-f134324ef6db?auto=format&fit=crop&w=900&q=80',
-        'SAMU': 'https://images.unsplash.com/photo-1587745416684-47e87dc00e57?auto=format&fit=crop&w=900&q=80',
-        'Urgência Bucal': 'https://images.unsplash.com/photo-1606811841689-23def461ba6f?auto=format&fit=crop&w=900&q=80',
-        'Serviços Especializados': 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80',
-        'Programas e Apoio': 'https://images.unsplash.com/photo-1590909691063-dd70bb236b86?auto=format&fit=crop&w=900&q=80',
-        'Outros Serviços': 'https://images.unsplash.com/photo-1576091160675-112163c7f1ca?auto=format&fit=crop&w=900&q=80'
+        'COTE': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_48 (2).png',
+        'SAMU': 'img/Samu192.png',
+        'Urgência Bucal': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (7).png',
+        'Serviços Especializados': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (5).png',
+        'Programas e Apoio': 'img/transferir (3).jpg',
+        'Outros Serviços': 'img/UBS.png'
+    };
+
+    const imagensPorUnidadeEspecial = {
+        '110': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_48 (2).png',
+        '114': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_48 (1).png',
+        '118': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (9).png',
+        '122': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (7).png',
+        '123': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (8).png',
+        '125': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (6).png',
+        '126': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_48 (3).png',
+        '136': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (4).png',
+        '142': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (5).png',
+        '171': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (10).png'
     };
 
     function definirCategoria(unidade) {
@@ -91,7 +104,12 @@ const App = (function(){
     }
 
     function obterImagemPorCategoria(categoria) {
-        return imagensPorCategoria[categoria] || 'https://images.unsplash.com/photo-1491897554428-130a60dd4757?auto=format&fit=crop&w=900&q=80';
+        return imagensPorCategoria[categoria] || 'img/UBS.png';
+    }
+
+    function obterImagemDaUnidade(unidade, categoria) {
+        const imagemEspecifica = imagensPorUnidadeEspecial[String(unidade.id || '')];
+        return imagemEspecifica || unidade.url_imagem || obterImagemPorCategoria(categoria);
     }
 
     let unidades = [];
@@ -149,6 +167,7 @@ const App = (function(){
                 });
                 const categoria = definirCategoria(u);
                 return {
+                    id: u.id,
                     nome: u.nome || 'Unidade sem nome',
                     endereco: u.localizacao || u.endereco || 'Endereço não informado',
                     nota: 4.8,
@@ -157,7 +176,7 @@ const App = (function(){
                     tags,
                     esp: listaEsp,
                     categoria,
-                    img: obterImagemPorCategoria(categoria),
+                    img: obterImagemDaUnidade(u, categoria),
                     lat: u.lat || u.latitude,
                     lng: u.lng || u.longitude
                 };

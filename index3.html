@@ -145,16 +145,20 @@
             align-items: center;
             justify-content: center;
             padding: 1.5rem;
-            background: rgba(2, 6, 23, 0.68);
-            backdrop-filter: blur(4px);
-            animation: welcomeBackdrop .35s ease both;
+            background: rgba(2, 6, 23, 0.78);
+            backdrop-filter: blur(5px);
+            animation: welcomeBackdrop .72s ease both;
         }
 
         .welcome-overlay.is-closing {
-            animation: welcomeClose .25s ease both;
+            animation: welcomeClose .28s ease both;
         }
 
         .welcome-overlay.is-hidden {
+            display: none;
+        }
+
+        html.welcome-seen .welcome-overlay {
             display: none;
         }
 
@@ -163,31 +167,33 @@
             align-items: center;
             justify-content: center;
             gap: 0;
-            max-width: min(920px, 94vw);
+            max-width: min(820px, 94vw);
             transform-origin: center;
-            animation: welcomeRise .58s cubic-bezier(.16, 1, .3, 1) both;
         }
 
         .welcome-character {
-            width: clamp(160px, 26vw, 280px);
-            max-height: min(68vh, 440px);
+            width: clamp(210px, 27vw, 320px);
+            max-height: min(58vh, 320px);
             object-fit: contain;
             object-position: center bottom;
-            margin-right: -14px;
-            border-radius: 28px;
-            box-shadow: 0 28px 70px rgba(2, 6, 23, 0.38);
-            filter: drop-shadow(0 24px 28px rgba(2, 6, 23, 0.32));
-            background: #f8fafc;
+            margin-left: -18px;
+            filter: drop-shadow(0 28px 30px rgba(2, 6, 23, 0.42));
+            animation: welcomeCharacterIn .68s cubic-bezier(.16, 1, .3, 1) both;
         }
 
         .welcome-card {
-            width: min(560px, 56vw);
+            width: min(500px, 54vw);
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             padding: clamp(1.35rem, 3vw, 2rem);
             border: 1px solid rgba(255,255,255,0.14);
             border-radius: 24px;
             background: linear-gradient(145deg, rgba(15,23,42,0.97), rgba(30,41,59,0.96));
             box-shadow: 0 28px 90px rgba(2, 6, 23, 0.46);
             color: #e2e8f0;
+            animation: welcomeCardIn .72s cubic-bezier(.16, 1, .3, 1) .08s both;
         }
 
         .welcome-card p {
@@ -258,18 +264,35 @@
         }
 
         @keyframes welcomeBackdrop {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes welcomeRise {
             from {
                 opacity: 0;
-                transform: translateY(24px) scale(0.92);
+                backdrop-filter: blur(0);
+            }
+            to {
+                opacity: 1;
+                backdrop-filter: blur(5px);
+            }
+        }
+
+        @keyframes welcomeCharacterIn {
+            from {
+                opacity: 0;
+                transform: translate(-22px, 18px) scale(0.88);
             }
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes welcomeCardIn {
+            from {
+                opacity: 0;
+                transform: translate(22px, 18px) scale(0.94);
+            }
+            to {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
             }
         }
 
@@ -285,14 +308,16 @@
             }
 
             .welcome-character {
-                width: min(220px, 64vw);
-                max-height: 300px;
+                width: min(270px, 76vw);
+                max-height: 260px;
+                margin-left: 0;
                 margin-right: 0;
                 margin-bottom: -10px;
             }
 
             .welcome-card {
                 width: 100%;
+                min-height: 0;
                 text-align: center;
             }
         }
@@ -300,7 +325,8 @@
         @media (prefers-reduced-motion: reduce) {
             .welcome-overlay,
             .welcome-overlay.is-closing,
-            .welcome-stage {
+            .welcome-character,
+            .welcome-card {
                 animation: none;
             }
         }
@@ -308,7 +334,24 @@
     <link rel="stylesheet" href="css/settings.css">
 </head>
 <body class="min-h-screen">
-    <script>(function(){try{var s=JSON.parse(localStorage.getItem('saudepira-settings-v1'));if(s&&s.theme==='light'){document.body.classList.add('theme-light');}}catch(e){}})();</script>
+    <script>(function(){try{var s=JSON.parse(localStorage.getItem('saudepira-settings-v1'));if(s&&s.theme==='light'){document.body.classList.add('theme-light');}if(sessionStorage.getItem('currentUser')||sessionStorage.getItem('saudepira-welcome-seen-session-v1')==='true'){document.documentElement.classList.add('welcome-seen');}}catch(e){}})();</script>
+    <div id="welcome-overlay" class="welcome-overlay" role="dialog" aria-modal="true" aria-labelledby="welcome-title" aria-describedby="welcome-message">
+        <div class="welcome-stage">
+            <section class="welcome-card" aria-label="Boas-vindas">
+                <p id="welcome-message">
+                    <span id="welcome-title" class="welcome-card-title">Olá pessoal!</span>
+                    Sejam <strong>Bem-vindos ao nosso portal de saúde!</strong>
+                    Encontre unidades, serviços e informações de saúde de forma rápida, simples e acessível. Tudo o que você precisa, em um só lugar.
+                </p>
+                <button id="welcome-next" class="welcome-next-btn" type="button">
+                    <span>Avançar</span>
+                    <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </section>
+            <img class="welcome-character" src="img/alyssonanimado.png" alt="Personagem acenando">
+        </div>
+    </div>
+
     <!-- O painel de configuração agora usa acesso autoral a recursos de acessibilidade -->
 
     <!-- Overlay do Sidebar -->
@@ -422,7 +465,7 @@
     <script src="js/theme.js"></script>
     <script src="js/accessibility.js"></script>
     <script src="js/i18n.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=20260828-index-images-local"></script>
     <script>
         function setActiveNavLink() {
             const currentPage = window.location.pathname.split('/').pop().toLowerCase();
@@ -435,6 +478,42 @@
                 link.classList.toggle('hover:bg-white/5', !isActive);
                 link.classList.toggle('font-medium', true);
             });
+        }
+
+        function initWelcomeOverlay() {
+            const overlay = document.getElementById('welcome-overlay');
+            const nextButton = document.getElementById('welcome-next');
+            if (!overlay || !nextButton) return;
+            const storageKey = 'saudepira-welcome-seen-session-v1';
+            const isLoggedIn = Boolean(sessionStorage.getItem('currentUser'));
+
+            if (isLoggedIn || sessionStorage.getItem(storageKey) === 'true') {
+                if (isLoggedIn) {
+                    sessionStorage.setItem(storageKey, 'true');
+                }
+                overlay.classList.add('is-hidden');
+                overlay.setAttribute('aria-hidden', 'true');
+                return;
+            }
+
+            sessionStorage.setItem(storageKey, 'true');
+
+            const closeWelcome = () => {
+                sessionStorage.setItem(storageKey, 'true');
+                overlay.classList.add('is-closing');
+                window.setTimeout(() => {
+                    overlay.classList.add('is-hidden');
+                    overlay.setAttribute('aria-hidden', 'true');
+                }, 280);
+            };
+
+            nextButton.addEventListener('click', closeWelcome);
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !overlay.classList.contains('is-hidden')) {
+                    closeWelcome();
+                }
+            });
+            nextButton.focus({ preventScroll: true });
         }
 
         // Aplica o tema salvo ANTES de renderizar os cards, pra evitar o

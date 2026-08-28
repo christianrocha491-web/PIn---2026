@@ -157,6 +157,48 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         #sidebar-overlay { transition: opacity 0.3s ease; }
         #sidebar-drawer { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); left:0 !important; margin-left:0 !important; }
+        .map-filter-sidebar {
+            --filter-sidebar-collapsed-x: -236px;
+            transform: translateX(0);
+        }
+        .map-filter-sidebar.is-collapsed {
+            transform: translateX(var(--filter-sidebar-collapsed-x)) !important;
+        }
+        .map-filter-sidebar.is-open {
+            transform: translateX(0) !important;
+        }
+        @media (max-width: 767px) {
+            .map-filter-sidebar:not(.is-open) {
+                transform: translateX(var(--filter-sidebar-collapsed-x));
+            }
+        }
+        .map-filter-toggle {
+            position: absolute;
+            left: calc(100% - 1px);
+            top: 50%;
+            width: 34px;
+            height: 64px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-50%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-left: 0;
+            border-radius: 0 18px 18px 0;
+            background: rgba(10, 15, 30, 0.94);
+            color: #cbd5e1;
+            box-shadow: 10px 12px 28px rgba(2, 6, 23, 0.28);
+            transition: background-color .18s ease, color .18s ease, box-shadow .18s ease;
+        }
+        .map-filter-toggle:hover {
+            background: rgba(15, 23, 42, 0.98);
+            color: #ffffff;
+            box-shadow: 12px 16px 34px rgba(2, 6, 23, 0.34);
+        }
+        .map-filter-toggle:focus-visible {
+            outline: 2px solid rgba(59, 130, 246, 0.8);
+            outline-offset: 2px;
+        }
 
         /* Tema claro para o mapa Leaflet: as regras gerais já vêm de css/settings.css — eram
            uma cópia exata aqui e foram removidas. Só ficam as duas regras que
@@ -168,6 +210,11 @@
         }
         body.theme-light .leaflet-tooltip.unit-label-tooltip::before {
             border-top-color: var(--surface-strong) !important;
+        }
+        body.theme-light .map-filter-toggle {
+            background: var(--surface-strong);
+            border-color: var(--border);
+            color: var(--page-text);
         }
 
     </style>
@@ -250,7 +297,7 @@
         <div class="flex flex-1 overflow-hidden relative">
             
             <!-- Menu Lateral Flutuante (Filtros) -->
-            <aside id="sidebar" class="interactive-ui glass-panel ml-4 mb-4 rounded-2xl w-64 max-w-xs flex flex-col p-3 transition-all duration-300 z-20 fixed md:static left-4 top-[80px] bottom-4 md:top-auto md:bottom-auto md:left-auto -translate-x-[280px] md:translate-x-0" style="pointer-events:auto;">
+            <aside id="sidebar" class="interactive-ui map-filter-sidebar glass-panel ml-4 mb-4 rounded-2xl w-64 max-w-xs flex flex-col p-3 transition-all duration-300 z-20 fixed md:relative left-4 top-[80px] bottom-4 md:top-auto md:bottom-auto md:left-auto" style="pointer-events:auto;">
                 <!-- Filtros rápidos -->
                 <div class="px-1 pb-3 border-b border-white/10 flex-shrink-0">
                     <p class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2 mt-1">Filtrar</p>
@@ -261,6 +308,7 @@
                         <button onclick="setMapFilter('Urgência')" id="mf-urgencia" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-orange-400 hover:border-orange-500/30 font-medium transition-all">UPA / Urgência</button>
                         <button onclick="setMapFilter('Farmácia')" id="mf-farmacia" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-green-400 hover:border-green-500/30 font-medium transition-all">Farmácias</button>
                         <button onclick="setMapFilter('Psicologia')" id="mf-psicologia" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-purple-400 hover:border-purple-500/30 font-medium transition-all">Psicologia</button>
+                        <button onclick="setMapFilter('Outras')" id="mf-outras" class="mf-btn text-xs px-2.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-slate-300 hover:text-yellow-400 hover:border-yellow-500/30 font-medium transition-all">Outras</button>
                     </div>
                 </div>
                 <!-- Lista de unidades -->
@@ -271,6 +319,9 @@
                 <!-- Rodapé do sidebar -->
                 <div class="border-t border-white/10 pt-2 flex flex-col gap-1 flex-shrink-0 mt-auto">
                 </div>
+                <button id="filter-sidebar-toggle" class="map-filter-toggle" type="button" onclick="toggleSidebar()" aria-label="Fechar filtros" aria-expanded="true" aria-controls="sidebar-unit-list" title="Fechar filtros">
+                    <i id="filter-sidebar-toggle-icon" class="ph-bold ph-caret-left text-lg" aria-hidden="true"></i>
+                </button>
             </aside> 
 
             <!-- Card de Detalhes da Unidade (Aparece ao clicar no mapa) -->
@@ -283,14 +334,9 @@
                         <i class="ph-bold ph-x"></i>
                     </button>
 
-                    <div class="flex gap-5">
-                        <!-- Imagem/Ícone da Unidade -->
-                        <div id="unit-icon-container" class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-900/80 to-indigo-900/80 flex items-center justify-center flex-shrink-0 border border-white/10 overflow-hidden">
-                            <i id="unit-icon-default" class="ph-fill ph-hospital text-4xl text-blue-400"></i>
-                        </div>
-
+                    <div class="flex">
                         <!-- Info Principal -->
-                        <div class="flex-1">
+                        <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1">
                                 <span id="unit-status-badge" class="bg-emerald-900/50 text-emerald-400 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1">
                                     <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Aberto
@@ -467,8 +513,11 @@
             'USF':'#10b981',
             'Urgência':'#f97316',
             'Farmácia':'#22c55e',
-            'Psicologia':'#a855f7'
+            'Psicologia':'#a855f7',
+            'Outras':'#eab308'
         };
+
+        const outrasUnitIds = new Set(['110', '114', '118', '122', '123', '125', '126', '136', '142', '171']);
 
         // 1. BUSCAR DADOS DO BANCO
         async function carregarDadosDoBanco() {
@@ -487,7 +536,7 @@
                     status: (u.horario_atendimento && u.horario_atendimento.includes("24")) ? "24 Horas" : "Aberto",
                     time: u.horario_atendimento || "08h - 17h",
                     tags: u.especialidades ? u.especialidades.split(',').map(t => t.trim()) : [],
-                    type: determinarTipo(u.nome, u.especialidades)
+                    type: determinarTipo(u.id, u.nome, u.especialidades)
                 }));
 
                 // Inicializa os marcadores SOMENTE após os dados chegarem
@@ -510,7 +559,9 @@
             }
         }
 
-        function determinarTipo(nome, especialidades = '') {
+        function determinarTipo(id, nome, especialidades = '') {
+            if (outrasUnitIds.has(String(id))) return 'Outras';
+
             const texto = `${nome} ${especialidades}`.toUpperCase();
 
             if (texto.includes('UPA') ||
@@ -539,21 +590,6 @@
 
             if (texto.includes('UBS')) return 'UBS';
             return 'UBS';
-        }
-
-        const logoBasePath = 'img/Raekwon%20Sampaio%204%C2%B0Info-2026';
-        const cardLogosPorTipo = {
-            UBS: `${logoBasePath}/UBS_logotipo.png`,
-            USF: `${logoBasePath}/USF_logotipo.png`,
-            'Urgência': `${logoBasePath}/UPA_logotipo.png`,
-            Farmácia: `${logoBasePath}/Farm%C3%A1cia_logotipo.png`,
-            Psicologia: `${logoBasePath}/psicologia_logotipo.png`
-        };
-
-        function getUnitCardLogo(unit) {
-            const nome = String(unit?.name || '').toUpperCase();
-            if (nome.includes('SAMU')) return 'img/Samu192.png';
-            return cardLogosPorTipo[unit?.type] || 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=900&q=80';
         }
 
         function createIcon(type, active = false) {
@@ -843,16 +879,42 @@
         }
 
         // ===== INTERAÇÕES =====
+        function setFilterSidebarOpen(isOpen) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleButton = document.getElementById('filter-sidebar-toggle');
+            const toggleIcon = document.getElementById('filter-sidebar-toggle-icon');
+            if (!sidebar) return;
+
+            sidebar.classList.toggle('is-open', isOpen);
+            sidebar.classList.toggle('is-collapsed', !isOpen);
+
+            if (toggleButton) {
+                toggleButton.setAttribute('aria-expanded', String(isOpen));
+                toggleButton.setAttribute('aria-label', isOpen ? 'Fechar filtros' : 'Abrir filtros');
+                toggleButton.setAttribute('title', isOpen ? 'Fechar filtros' : 'Abrir filtros');
+            }
+
+            if (toggleIcon) {
+                toggleIcon.classList.toggle('ph-caret-left', isOpen);
+                toggleIcon.classList.toggle('ph-caret-right', !isOpen);
+            }
+        }
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-[280px]');
-            sidebar.classList.toggle('translate-x-0');
+            if (!sidebar) return;
+            const isCurrentlyOpen = sidebar.classList.contains('is-open') && !sidebar.classList.contains('is-collapsed');
+            setFilterSidebarOpen(!isCurrentlyOpen);
+        }
+
+        function initFilterSidebarToggle() {
+            setFilterSidebarOpen(window.matchMedia('(min-width: 768px)').matches);
         }
 
         function setMapFilter(type) {
             mapFilter = type;
             document.querySelectorAll('.mf-btn').forEach(b => {
-                b.classList.remove('border-blue-500/40','bg-blue-500/15','text-blue-400');
+                b.classList.remove('border-blue-500/40','bg-blue-500/15','text-blue-400','border-yellow-500/40','bg-yellow-500/15','text-yellow-400');
                 b.classList.add('border-white/10','bg-white/5','text-slate-300');
             });
             const idMap = {
@@ -861,10 +923,17 @@
                 'USF':'mf-usf',
                 'Urgência':'mf-urgencia',
                 'Farmácia':'mf-farmacia',
-                'Psicologia':'mf-psicologia'
+                'Psicologia':'mf-psicologia',
+                'Outras':'mf-outras'
             };
             const btn = document.getElementById(idMap[type]);
-            if (btn) btn.classList.add('border-blue-500/40','bg-blue-500/15','text-blue-400');
+            if (btn) {
+                if (type === 'Outras') {
+                    btn.classList.add('border-yellow-500/40','bg-yellow-500/15','text-yellow-400');
+                } else {
+                    btn.classList.add('border-blue-500/40','bg-blue-500/15','text-blue-400');
+                }
+            }
             aplicarFiltrosMapa();
         }
 
@@ -932,20 +1001,6 @@
                 badge.innerHTML = '<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> ABERTO';
             }
 
-            const iconContainer = document.getElementById('unit-icon-container');
-            const iconDefault = document.getElementById('unit-icon-default');
-            const unitLogo = getUnitCardLogo(unit);
-
-            if (unitLogo) {
-                iconContainer.className = 'w-24 h-24 rounded-2xl bg-white/5 flex items-center justify-center flex-shrink-0 border border-white/10 overflow-hidden';
-                iconContainer.innerHTML = `<img src="${unitLogo}" alt="${unit.name}" class="w-full h-full object-contain p-2">`;
-            } else {
-                iconContainer.className = 'w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-900/80 to-indigo-900/80 flex items-center justify-center flex-shrink-0 border border-white/10 overflow-hidden';
-                iconContainer.innerHTML = '';
-                iconContainer.appendChild(iconDefault);
-                iconDefault.className = 'ph-fill ph-hospital text-4xl text-blue-400';
-            }
-
             const tagsContainer = document.getElementById('unit-tags');
             tagsContainer.innerHTML = unit.tags.map(t => `<span class="bg-slate-700/60 text-slate-300 text-xs px-2.5 py-1 rounded-md font-medium border border-white/10">${t}</span>`).join('');
 
@@ -988,6 +1043,7 @@
         map.on('move', syncMarkerLabels);
 
         // ===== INICIAR TUDO =====
+        initFilterSidebarToggle();
         setTravelMode('carro');
         obterLocalizacaoUsuario();
         carregarDadosDoBanco();
