@@ -1,13 +1,5 @@
 /* ============================================================
    theme.css — Fonte única de verdade para cores do site.
-   Toda página deve carregar este arquivo ANTES de settings.css
-   e de qualquer <style> local de cor.
-
-   Como funciona:
-   - As variáveis abaixo definem a paleta padrão (tema escuro).
-   - O bloco "body.theme-light" redefine as MESMAS variáveis com
-     outros valores. Nenhum outro CSS precisa saber qual tema
-     está ativo — ele só usa var(--nome-da-variavel).
    ============================================================ */
 
 :root {
@@ -16,7 +8,7 @@
     --page-text: #f8fafc;
     --page-muted: #94a3b8;
 
-    /* Superfícies (cards, headers, painéis) */
+    /* Superfícies */
     --surface: rgba(15, 23, 42, 0.6);
     --surface-strong: rgba(15, 23, 42, 0.98);
     --surface-solid: #0f172a;
@@ -31,31 +23,29 @@
     --button-text: #e2e8f0;
     --control-bg: rgba(255, 255, 255, 0.04);
 
-    /* Cor de destaque (accent) */
+    /* Destaque */
     --accent: #3b82f6;
     --accent-soft: rgba(59, 130, 246, 0.2);
     --accent-strong: #60a5fa;
 
-    /* Texto secundário / placeholders */
+    /* Textos */
     --text-secondary: #94a3b8;
     --text-tertiary: #64748b;
 
-    /* Cores semânticas de status (erro, sucesso, aviso) — usadas em
-       mensagens de validação (login, cadastro, redefinir senha). */
+    /* Status */
     --danger: #f87171;
     --danger-soft: rgba(239, 68, 68, 0.1);
     --danger-border: rgba(239, 68, 68, 0.3);
+
     --success: #34d399;
     --success-soft: rgba(16, 185, 129, 0.1);
     --success-border: rgba(16, 185, 129, 0.3);
+
     --warning: #fbbf24;
     --warning-soft: rgba(245, 158, 11, 0.1);
     --warning-border: rgba(245, 158, 11, 0.3);
 
-    /* Aliases de compatibilidade — usados hoje só em curiosidades.html.
-       Apontam para as variáveis acima; serão removidos quando a página
-       for migrada (etapa 4 do plano). Não altere estes valores aqui,
-       altere os originais acima. */
+    /* Aliases de compatibilidade */
     --bg-deep: var(--page-bg);
     --bg-panel: var(--surface-strong);
     --bg-soft: var(--surface);
@@ -66,22 +56,33 @@
     --amber: #fbbf24;
     --rose: #f87171;
 
-    /* Variáveis de acessibilidade (escala de fonte/espaçamento),
-       já existentes no projeto — centralizadas aqui também. */
+    /* Variáveis adicionais */
+    --primary-color: #60a5fa;
+    --primary-hover: #3b82f6;
+    --text-primary: #f8fafc;
+    --light-gray: #1e293b;
+    --border-gray: rgba(148, 163, 184, 0.24);
+    --success-color: #34d399;
+    --danger-color: #f87171;
+
+    --radius: 12px;
+    --shadow-md: 0 8px 20px rgba(2, 6, 23, 0.22);
+    --shadow-lg: 0 18px 42px rgba(2, 6, 23, 0.3);
+    --transition: all 0.2s ease;
+
+    /* Acessibilidade */
     --acc-font-size: 100;
     --acc-line-height: 100;
     --acc-letter-spacing: 100;
     --acc-scale: 100;
 }
 
-/* ------------------------------------------------------------
+/* ============================================================
    TEMA CLARO
-   Mesma lista de variáveis, valores diferentes. Qualquer regra
-   de CSS que já usa var(--page-bg), var(--surface) etc. vai
-   mudar de cor automaticamente quando body.theme-light for
-   aplicado — sem precisar caçar classe por classe.
-   ------------------------------------------------------------ */
-body.theme-light {
+   ============================================================ */
+
+body.theme-light,
+html[data-theme="light"] {
     --page-bg: #FAFBFC;
     --page-text: #0D1117;
     --page-muted: #424A52;
@@ -108,9 +109,11 @@ body.theme-light {
     --danger: #DC2626;
     --danger-soft: #FDECEC;
     --danger-border: #F5B5B5;
+
     --success: #15803D;
     --success-soft: #E9F7EF;
     --success-border: #A7E3BE;
+
     --warning: #B45309;
     --warning-soft: #FDF3E4;
     --warning-border: #F5D496;
@@ -120,13 +123,23 @@ body.theme-light {
     --bg-soft: var(--surface);
     --edge: var(--border);
     --blue: var(--accent-strong);
+
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --text-primary: #172033;
+    --light-gray: #e7eef7;
+    --border-gray: rgba(71, 91, 116, 0.22);
+    --success-color: #059669;
+    --danger-color: #dc2626;
+
+    --shadow-md: 0 8px 20px rgba(30, 64, 94, 0.1);
+    --shadow-lg: 0 18px 42px rgba(30, 64, 94, 0.14);
 }
 
-/* ------------------------------------------------------------
+/* ============================================================
    ALTO CONTRASTE
-   Mesmo mecanismo — hoje usado só via classes diretas no
-   settings.css. Centralizado aqui para consistência futura.
-   ------------------------------------------------------------ */
+   ============================================================ */
+
 body.high-contrast {
     --page-bg: #000000;
     --page-text: #ffffff;
@@ -136,4 +149,14 @@ body.high-contrast {
     --surface-solid: #000000;
     --border: #ffffff;
     --panel-border: #ffffff;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
+html,
+body {
+    background-color: var(--page-bg);
+    color: var(--page-text);
 }

@@ -59,10 +59,10 @@ const App = (function(){
     };
 
     const imagensPorCategoria = {
-        'UBS': 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80',
-        'USF': 'https://images.unsplash.com/photo-1631217b5f35-c903400b2315?auto=format&fit=crop&w=900&q=80',
-        'UPA / Urgência': 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=900&q=80',
-        'Farmácia': 'https://images.unsplash.com/photo-1552318949-67b8c6bea38a?auto=format&fit=crop&w=900&q=80',
+        'UBS': 'img/UBS.png',
+        'USF': 'img/USF.png',
+        'UPA / Urgência': 'img/UPA.png',
+        'Farmácia': 'img/FARM%C3%81CIA.png',
         'COTE': 'https://images.unsplash.com/photo-1633356122544-f134324ef6db?auto=format&fit=crop&w=900&q=80',
         'SAMU': 'https://images.unsplash.com/photo-1587745416684-47e87dc00e57?auto=format&fit=crop&w=900&q=80',
         'Urgência Bucal': 'https://images.unsplash.com/photo-1606811841689-23def461ba6f?auto=format&fit=crop&w=900&q=80',
