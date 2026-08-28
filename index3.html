@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* :root removido — as variáveis (--page-bg, --surface, --accent, --acc-font-size etc.)
-           agora vêm só de css/theme.css, carregado no <head> antes deste bloco.*/
+           agora vêm só de css/theme.css*/
         html {
             font-size: calc(var(--acc-font-size, 100) * var(--acc-scale, 100) / 100 * 1%);
         }
@@ -308,24 +308,7 @@
     <link rel="stylesheet" href="css/settings.css">
 </head>
 <body class="min-h-screen">
-    <div id="welcome-overlay" class="welcome-overlay" role="dialog" aria-modal="true" aria-labelledby="welcome-title" aria-describedby="welcome-message">
-        <div class="welcome-stage">
-            <section class="welcome-card" aria-label="Boas-vindas">
-                <p id="welcome-message">
-                    <span id="welcome-title" class="welcome-card-title">Olá pessoal!</span>
-                    Sejam <strong>Bem-vindos ao nosso portal de saúde!</strong>
-                    Encontre unidades, serviços e informações de saúde de forma rápida, simples e acessível. Tudo o que você precisa, em um só lugar.
-                </p>
-
-                <button id="welcome-next" class="welcome-next-btn" type="button">
-                    <span>Avançar</span>
-                    <i class="ph-bold ph-arrow-right"></i>
-                </button>
-            </section>
-                <img class="welcome-character" src="img/welcome-character.png" alt="Personagem acenando">
-        </div>
-    </div>
-
+    <script>(function(){try{var s=JSON.parse(localStorage.getItem('saudepira-settings-v1'));if(s&&s.theme==='light'){document.body.classList.add('theme-light');}}catch(e){}})();</script>
     <!-- O painel de configuração agora usa acesso autoral a recursos de acessibilidade -->
 
     <!-- Overlay do Sidebar -->
@@ -454,29 +437,9 @@
             });
         }
 
-        function initWelcomeOverlay() {
-            const overlay = document.getElementById('welcome-overlay');
-            const nextButton = document.getElementById('welcome-next');
-            if (!overlay || !nextButton) return;
-
-            const closeWelcome = () => {
-                overlay.classList.add('is-closing');
-                window.setTimeout(() => {
-                    overlay.classList.add('is-hidden');
-                    overlay.setAttribute('aria-hidden', 'true');
-                }, 250);
-            };
-
-            nextButton.addEventListener('click', closeWelcome);
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && !overlay.classList.contains('is-hidden')) {
-                    closeWelcome();
-                }
-            });
-            nextButton.focus({ preventScroll: true });
-        }
-
-        // Inicializa configurações persistidas e carrega dados
+        // Aplica o tema salvo ANTES de renderizar os cards, pra evitar o
+        // "flash" do tema escuro por uma fração de segundo em quem usa o
+        // tema claro.
         window.addEventListener('DOMContentLoaded', async () => {
             await Settings.load();
             Theme.apply(Settings.theme);
