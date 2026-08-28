@@ -224,15 +224,7 @@
     <script>(function(){try{var s=JSON.parse(localStorage.getItem('saudepira-settings-v1'));if(s&&s.theme==='light'){document.body.classList.add('theme-light');}}catch(e){}})();</script>
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none" onclick="closeNavSidebar()"></div>
     <aside id="sidebar-drawer" class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col -translate-x-full border-r border-white/10 overflow-y-auto" style="background:rgba(2,6,23,0.98);backdrop-filter:blur(20px);">
-        <div class="flex items-center justify-between p-5 border-b border-white/10 flex-shrink-0">
-            <div class="flex items-center gap-2">
-                <a href="index3.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="Ir para a página inicial">
-                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <i class="ph-bold ph-activity text-white"></i>
-                    </div>
-                    <span class="font-bold text-lg">Saúde<span class="text-blue-500">Pira</span></span>
-                </a>
-            </div>
+        <div class="flex items-center justify-end p-5 border-b border-white/10 flex-shrink-0">
             <button onclick="closeNavSidebar()" class="text-slate-400 hover:text-white transition-colors" aria-label="Fechar menu">
                 <i class="ph-bold ph-x text-xl"></i>
             </button>
@@ -273,12 +265,12 @@
                 <button id="btn-nav-menu" class="mr-2 text-slate-300 hover:text-white focus:outline-none" onclick="openNavSidebar()">
                     <i class="ph-bold ph-list text-3xl"></i>
                 </button>
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <i class="ph-bold ph-activity text-white"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold text-white tracking-tight">Saúde<span class="text-blue-500">Pira</span></h1>
-                </div>
+                <a href="index3.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity no-underline" aria-label="Ir para a página inicial">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="ph-bold ph-activity text-white"></i>
+                    </div>
+                    <span class="font-bold text-lg text-white tracking-tight">Saúde<span class="text-blue-500">Pira</span></span>
+                </a>
             </div>
 
             <!-- Busca Global -->
@@ -334,7 +326,12 @@
                         <i class="ph-bold ph-x"></i>
                     </button>
 
-                    <div class="flex">
+                    <div class="flex gap-5">
+                        <!-- Ícone da Unidade -->
+                        <div id="unit-icon-container" class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-900/80 to-indigo-900/80 flex items-center justify-center flex-shrink-0 border border-white/10">
+                            <i id="unit-icon-default" class="ph-fill ph-hospital text-4xl text-blue-400"></i>
+                        </div>
+
                         <!-- Info Principal -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1">
@@ -515,6 +512,15 @@
             'Farmácia':'#22c55e',
             'Psicologia':'#a855f7',
             'Outras':'#eab308'
+        };
+
+        const logoBasePath = 'img/Raekwon%20Sampaio%204%C2%B0Info-2026';
+        const cardLogosPorTipo = {
+            'UBS': `${logoBasePath}/UBS_logotipo.png`,
+            'USF': `${logoBasePath}/USF_logotipo.png`,
+            'Urgência': `${logoBasePath}/UPA_logotipo.png`,
+            'Farmácia': `${logoBasePath}/Farm%C3%A1cia_logotipo.png`,
+            'Psicologia': `${logoBasePath}/psicologia_logotipo.png`
         };
 
         const outrasUnitIds = new Set(['110', '114', '118', '122', '123', '125', '126', '136', '142', '171']);
@@ -999,6 +1005,20 @@
             } else {
                 badge.className = 'bg-emerald-900/50 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1';
                 badge.innerHTML = '<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> ABERTO';
+            }
+
+            const iconContainer = document.getElementById('unit-icon-container');
+            const typeColor = typeColors[unit.type] || '#3b82f6';
+            const cardLogo = cardLogosPorTipo[unit.type];
+            if (iconContainer) {
+                iconContainer.style.background = `linear-gradient(135deg, ${typeColor}26, ${typeColor}10)`;
+                iconContainer.style.borderColor = `${typeColor}66`;
+                iconContainer.style.boxShadow = `0 18px 36px ${typeColor}1f`;
+                if (cardLogo) {
+                    iconContainer.innerHTML = `<img src="${cardLogo}" alt="Ícone ${unit.type}" class="w-full h-full object-contain p-2">`;
+                } else {
+                    iconContainer.innerHTML = `<i class="ph-fill ph-buildings text-4xl" style="color:${typeColor}"></i>`;
+                }
             }
 
             const tagsContainer = document.getElementById('unit-tags');
