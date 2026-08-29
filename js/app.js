@@ -73,23 +73,45 @@ const App = (function(){
 
     const imagensPorUnidadeEspecial = {
         '110': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_48 (2).png',
+        '112': 'img/SUB.png',
+        '113': 'img/Policlinica.png',
         '114': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_48 (1).png',
         '116': 'img/CADME.png',
+        '117': 'img/ESPECIALIDADES-MÉDICAS.png',
         '118': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (9).png',
+        '119': 'img/REABILITAÇÃOESPECIAL.png',
         '121': 'img/CPAN.png',
         '122': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (7).png',
         '123': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (8).png',
+        '124': 'img/PACTO.png',
         '125': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (6).png',
         '126': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_48 (3).png',
+        '127': 'img/VILA CRISTINA.png',
+        '128': 'img/CAPSIIBELAVISTA.png',
         '129': 'img/CAPSIIGIRASSOL.png',
         '130': 'img/CAPSIJ.png',
+        '131': 'img/REABILITAÇÃOESPECIAL.png',
         '133': 'img/VIGILANCIA.png',
         '134': 'img/VIGILANCIA.png',
         '135': 'img/VIGILANCIA.png',
         '136': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (4).png',
+        '137': 'img/CENTRUS.png',
+        '141': 'img/LABMUNICIPAL.png',
         '142': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (5).png',
-        '171': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (10).png'
+        '171': 'img/ChatGPT Image 28 de ago. de 2026, 14_09_49 (10).png',
+        '173': 'img/HR.png',
+        '174': 'img/SANTACASA.png',
+        '175': 'img/HFC.png'
     };
+
+    function limparNomeDeUnidade(nome) {
+        return String(nome || '')
+            .replace(/\uFFFD/g, '')
+            .replace(/\?/g, '')
+            .replace(/[\u0000-\u001F\u007F]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
 
     function definirCategoria(unidade) {
         const nome = normalizarTexto(unidade.nome || '');
@@ -168,14 +190,16 @@ const App = (function(){
             unidades = dados.map(u=>{
                 const espRaw = u.especialidades || '';
                 const listaEsp = extrairEspecialidades(espRaw);
+                const nomeLimpo = limparNomeDeUnidade(u.nome || 'Unidade sem nome');
+                const unidadeNormalizada = { ...u, nome: nomeLimpo };
                 const tags = listaEsp.map(chave=>{
                     const lbl = labelsPorEspecialidade[chave];
                     return lbl ? lbl.pt : chave;
                 });
-                const categoria = definirCategoria(u);
+                const categoria = definirCategoria(unidadeNormalizada);
                 return {
-                    id: u.id,
-                    nome: u.nome || 'Unidade sem nome',
+                    id: unidadeNormalizada.id,
+                    nome: nomeLimpo,
                     endereco: u.localizacao || u.endereco || 'Endereço não informado',
                     nota: 4.8,
                     aberto: true,
@@ -183,7 +207,7 @@ const App = (function(){
                     tags,
                     esp: listaEsp,
                     categoria,
-                    img: obterImagemDaUnidade(u, categoria),
+                    img: obterImagemDaUnidade(unidadeNormalizada, categoria),
                     lat: u.lat || u.latitude,
                     lng: u.lng || u.longitude
                 };
@@ -235,7 +259,7 @@ const App = (function(){
     }
 
     function getFavorites(){ if(!currentUser) return []; return JSON.parse(localStorage.getItem(`fav-${currentUser.email}`)) || []; }
-    function toggleFavorite(nome){ if(!currentUser){ window.location.href='login.html'; return; } let favs = getFavorites(); favs = favs.includes(nome)?favs.filter(f=>f!==nome):[...favs,nome]; localStorage.setItem(`fav-${currentUser.email}`, JSON.stringify(favs)); aplicarFiltros(); }
+    function toggleFavorite(nome){ if(!currentUser){ window.location.href='login.html'; return; } const nomeLimpo = limparNomeDeUnidade(nome); let favs = getFavorites(); favs = favs.includes(nomeLimpo)?favs.filter(f=>limparNomeDeUnidade(f)!==nomeLimpo):[...favs,nomeLimpo]; localStorage.setItem(`fav-${currentUser.email}`, JSON.stringify(favs)); aplicarFiltros(); }
 
     function renderCards(lista, favs=[]){
         const c = document.getElementById('cards-container');
@@ -246,13 +270,14 @@ const App = (function(){
         nr.classList.add('hidden');
 
         lista.forEach(u=>{
-            const isFav = favs.includes(u.nome);
+            const nomeExibicao = limparNomeDeUnidade(u.nome);
+            const isFav = favs.includes(nomeExibicao) || favs.includes(u.nome);
             const categoryChipClass = coresPorCategoria[u.categoria] || 'bg-slate-900/70 text-white border-white/10';
             const div = document.createElement('div');
             div.className = 'unit-card group relative glass rounded-3xl overflow-hidden transition-all hover:ring-2 hover:ring-blue-500/50';
             div.innerHTML = `
                 <div class="h-48 bg-slate-800 relative">
-                    <img src="${u.img}" class="w-full h-full object-cover opacity-70" alt="${u.nome}">
+                    <img src="${u.img}" class="w-full h-full object-cover opacity-70" alt="${nomeExibicao}">
                     <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent"></div>
                     <div class="absolute top-4 left-4 rounded-full border px-3 py-1 text-[11px] font-semibold ${categoryChipClass}">${u.categoria}</div>
                     <div class="absolute top-4 right-4 bg-white/10 p-2 rounded-full" aria-label="favoritar">
@@ -263,7 +288,7 @@ const App = (function(){
                     <div class="absolute bottom-4 left-4 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded">${u.badge}</div>
                 </div>
                 <div class="p-6">
-                    <h3 class="font-bold text-xl">${u.nome}</h3>
+                    <h3 class="font-bold text-xl">${nomeExibicao}</h3>
                     <p class="text-slate-400 text-sm mb-4 break-words">${u.endereco}</p>
                     <div class="flex flex-wrap gap-2">${u.tags.map(t=>`<span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300">${t}</span>`).join('')}</div>
                     <a href="mapa_definitivo.html?lat=${u.lat}&lng=${u.lng}" class="mt-6 w-full py-3 bg-white/5 border border-white/10 rounded-xl font-semibold flex items-center justify-center gap-2 text-white no-underline">
@@ -272,7 +297,7 @@ const App = (function(){
                 </div>`;
             c.appendChild(div);
             const favBtn = div.querySelector('.fav-btn');
-            if(favBtn){ favBtn.addEventListener('click', ()=>{ toggleFavorite(u.nome); // refresh UI for current results
+            if(favBtn){ favBtn.addEventListener('click', ()=>{ toggleFavorite(nomeExibicao); // refresh UI for current results
                 const updatedFavs = getFavorites(); renderCards(lista, updatedFavs); }); }
         });
     }
