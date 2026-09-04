@@ -96,8 +96,43 @@
 
         .animated-route path {
             stroke-linecap: round;
-            stroke-dasharray: 10 12;
-            animation: dash 1.2s linear infinite;
+            stroke-linecap: round;
+        }
+
+        .map-action-bar {
+            position: absolute;
+            right: 1rem;
+            bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+            z-index: 20;
+        }
+
+        .map-action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            min-height: 44px;
+            padding: .7rem 1rem;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 999px;
+            background: rgba(10,15,30,.94);
+            color: #f8fafc;
+            box-shadow: 0 8px 22px rgba(2,6,23,.35);
+            font-size: .8rem;
+            font-weight: 700;
+        }
+
+        .map-action-button:hover { background: rgba(30,41,59,.98); }
+        .map-action-button.is-active { color: #67e8f9; border-color: rgba(34,211,238,.55); }
+        .nearby-unit { border-color: rgba(34,211,238,.4) !important; background: rgba(8,145,178,.12); }
+
+        @media (max-width: 767px) {
+            .map-action-bar { right: .75rem; bottom: 1rem; }
+            .map-action-button { width: 44px; padding: .7rem; }
+            .map-action-button span { display: none; }
         }
 
         .leaflet-tooltip.unit-label-tooltip {
@@ -254,6 +289,14 @@
 
     <!-- O Mapa Base -->
     <div id="map"></div>
+    <div class="map-action-bar interactive-ui" aria-label="Ações do mapa">
+        <button id="btn-my-location" class="map-action-button" type="button" title="Usar minha localização">
+            <i class="ph-bold ph-crosshair"></i><span>Minha localização</span>
+        </button>
+        <button id="btn-nearby-units" class="map-action-button" type="button" title="Encontrar unidades próximas">
+            <i class="ph-bold ph-navigation-arrow"></i><span>Unidades próximas</span>
+        </button>
+    </div>
 
     <!-- Camada de Interface do Usuário -->
     <div class="ui-layer">
@@ -383,7 +426,10 @@
                                         <span id="btn-phone-number" class="text-sm"></span>
                                     </button>
                                     <button id="btn-start-route" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold bg-slate-700 border border-white/10 hover:bg-slate-600 transition-colors">
-                                        <i class="ph-bold ph-arrow-right"></i> Iniciar Rota
+                                        <i class="ph-bold ph-map-trifold"></i> Traçar rota
+                                    </button>
+                                    <button id="btn-start-navigation" class="hidden items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold bg-cyan-600 border border-cyan-400/30 hover:bg-cyan-500 transition-colors">
+                                        <i class="ph-bold ph-navigation-arrow"></i> Iniciar trajeto
                                     </button>
                                 </div>
                             </div> 
@@ -498,9 +544,13 @@
         let usuarioLocalizacao = null;
         let userMarker = null;
         let routeLayer = null;
+        let routeShadowLayer = null;
         let routeStartMarker = null;
         let routeDestMarker = null;
         let routeActiveUnit = null;
+        let routeWatchId = null;
+        let accuracyCircle = null;
+        let routeFollowing = false;
         let travelMode = 'carro';
         const MIN_LABEL_ZOOM = 14;
 
@@ -694,35 +744,116 @@
             return 'driving';
         }
 
+        function dispositivoMovel() {
+            return window.matchMedia('(max-width: 767px), (pointer: coarse)').matches;
+        }
+
+        function atualizarAcoesPorDispositivo() {
+            const navigationButton = document.getElementById('btn-start-navigation');
+            if (!navigationButton) return;
+            navigationButton.classList.toggle('hidden', !dispositivoMovel());
+            navigationButton.classList.toggle('inline-flex', dispositivoMovel());
+        }
+
         async function obterLocalizacaoUsuario() {
             if (!navigator.geolocation) {
                 mostrarToast('Geolocalização não suportada neste navegador', 'error');
                 return;
             }
 
+            if (!window.isSecureContext && !['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+                mostrarToast('A localização exige HTTPS ou acesso por localhost.', 'error');
+                return;
+            }
+
             return new Promise((resolve) => {
                 navigator.geolocation.getCurrentPosition(
                     position => {
-                        const { latitude, longitude } = position.coords;
+                        const { latitude, longitude, accuracy } = position.coords;
                         usuarioLocalizacao = { lat: latitude, lng: longitude };
                         if (userMarker) map.removeLayer(userMarker);
                         userMarker = L.circleMarker([latitude, longitude], {
-                            radius: 9,
+                            radius: 10,
                             fillColor: '#06b6d4',
                             fillOpacity: 0.9,
                             color: '#ffffff',
                             weight: 2
                         }).addTo(map).bindPopup('Sua localização');
+                        if (accuracyCircle) map.removeLayer(accuracyCircle);
+                        accuracyCircle = L.circle([latitude, longitude], {
+                            radius: Math.min((accuracy || 80) * 1.5, 500),
+                            color: '#22d3ee',
+                            fillColor: '#22d3ee',
+                            fillOpacity: 0.12,
+                            weight: 1
+                        }).addTo(map);
+                        atualizarDestaqueProximasUnidades();
                         resolve();
                     },
                     error => {
                         console.warn('Erro na geolocalização:', error);
-                        mostrarToast('Não foi possível obter sua localização. Verifique permissão do navegador.', 'error');
+                        const mensagens = {
+                            1: 'Permissão negada. Libere a localização nas configurações do navegador e tente novamente.',
+                            2: 'Sua posição não pôde ser determinada. Verifique o GPS ou a rede.',
+                            3: 'A localização demorou demais. Tente novamente em um local com melhor sinal.'
+                        };
+                        mostrarToast(mensagens[error.code] || 'Não foi possível obter sua localização.', 'error');
                         resolve();
                     },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
                 );
             });
+        }
+
+        function atualizarPosicaoNoMapa(latitude, longitude, accuracy) {
+            usuarioLocalizacao = { lat: latitude, lng: longitude };
+            if (userMarker) userMarker.setLatLng([latitude, longitude]);
+            if (accuracyCircle) accuracyCircle.setLatLng([latitude, longitude]).setRadius(Math.min((accuracy || 80) * 1.5, 500));
+            atualizarDestaqueProximasUnidades();
+        }
+
+        function iniciarAcompanhamento() {
+            if (!navigator.geolocation || routeWatchId !== null) return;
+            routeFollowing = true;
+            routeWatchId = navigator.geolocation.watchPosition(position => {
+                atualizarPosicaoNoMapa(position.coords.latitude, position.coords.longitude, position.coords.accuracy);
+                map.setView([position.coords.latitude, position.coords.longitude], Math.max(map.getZoom(), 15), { animate: true });
+                if (routeActiveUnit) iniciarRota(routeActiveUnit.id, true);
+            }, error => mostrarToast(error.code === 1 ? 'A permissão de localização foi revogada.' : 'Não foi possível atualizar sua posição.', 'error'), {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 15000
+            });
+            mostrarToast('Acompanhamento do trajeto ativado', 'success');
+        }
+
+        function localizarUnidadesProximas() {
+            if (!usuarioLocalizacao) {
+                mostrarToast('Obtendo sua localização...', 'info');
+                obterLocalizacaoUsuario().then(localizarUnidadesProximas);
+                return;
+            }
+            const proximas = [...healthUnits]
+                .filter(unit => Number.isFinite(unit.lat) && Number.isFinite(unit.lng))
+                .sort((a, b) => distanciaEmMetros(usuarioLocalizacao, a) - distanciaEmMetros(usuarioLocalizacao, b))
+                .slice(0, 5);
+            atualizarDestaqueProximasUnidades(proximas);
+            if (proximas.length) {
+                map.fitBounds(L.latLngBounds(proximas.map(unit => [unit.lat, unit.lng])).extend([usuarioLocalizacao.lat, usuarioLocalizacao.lng]).pad(0.2));
+                renderSidebarList(proximas);
+                mostrarToast(`${proximas.length} unidades mais próximas destacadas`, 'success');
+            }
+        }
+
+        function distanciaEmMetros(origem, unidade) {
+            return map.distance([origem.lat, origem.lng], [unidade.lat, unidade.lng]);
+        }
+
+        function atualizarDestaqueProximasUnidades(unidades = null) {
+            if (!usuarioLocalizacao || !allMarkers.length) return;
+            const proximas = unidades || [...healthUnits].filter(unit => Number.isFinite(unit.lat) && Number.isFinite(unit.lng)).sort((a, b) => distanciaEmMetros(usuarioLocalizacao, a) - distanciaEmMetros(usuarioLocalizacao, b)).slice(0, 3);
+            const ids = new Set(proximas.map(unit => String(unit.id)));
+            allMarkers.forEach(({ unit, marker }) => marker.setIcon(createIcon(unit.type, ids.has(String(unit.id)))));
         }
 
         function formatarDistancia(metros) {
@@ -777,10 +908,14 @@
             }
         }
 
-        function limparRota() {
+        function limparRota(encerrarAcompanhamento = true) {
             if (routeLayer) {
                 map.removeLayer(routeLayer);
                 routeLayer = null;
+            }
+            if (routeShadowLayer) {
+                map.removeLayer(routeShadowLayer);
+                routeShadowLayer = null;
             }
             if (routeStartMarker) {
                 map.removeLayer(routeStartMarker);
@@ -790,20 +925,32 @@
                 map.removeLayer(routeDestMarker);
                 routeDestMarker = null;
             }
+            if (encerrarAcompanhamento && routeWatchId !== null) {
+                navigator.geolocation?.clearWatch(routeWatchId);
+                routeWatchId = null;
+            }
+            if (encerrarAcompanhamento) routeFollowing = false;
             routeActiveUnit = null;
             document.getElementById('route-summary').classList.add('hidden');
         }
 
         function desenharRota(rota, unit) {
-            limparRota();
+            limparRota(false);
             const pontos = rota.coordenadas.map(coord => [coord[1], coord[0]]);
+            routeShadowLayer = L.polyline(pontos, {
+                color: '#ffffff',
+                weight: 11,
+                opacity: 0.95,
+                lineCap: 'round',
+                lineJoin: 'round'
+            }).addTo(map);
             routeLayer = L.polyline(pontos, {
                 className: 'animated-route',
-                color: '#38bdf8',
-                weight: 6,
-                opacity: 0.85,
+                color: '#1a73e8',
+                weight: 7,
+                opacity: 1,
                 lineCap: 'round',
-                dashArray: '10, 12'
+                lineJoin: 'round'
             }).addTo(map);
 
             routeStartMarker = L.circleMarker([usuarioLocalizacao.lat, usuarioLocalizacao.lng], {
@@ -831,7 +978,7 @@
             document.getElementById('route-summary').classList.remove('hidden');
         }
 
-        async function iniciarRota(unitId) {
+        async function iniciarRota(unitId, atualizacao = false) {
             if (!usuarioLocalizacao) {
                 mostrarToast('Tentando obter sua localização...', 'info');
                 await obterLocalizacaoUsuario();
@@ -850,7 +997,7 @@
                 const rota = await calcularRotaOSRM(usuarioLocalizacao, { lat: unit.lat, lng: unit.lng });
                 desenharRota(rota, unit);
                 routeActiveUnit = unit;
-                mostrarToast('Rota traçada com sucesso!', 'success');
+                if (!atualizacao) mostrarToast('Rota traçada com sucesso!', 'success');
             } catch (erro) {
                 console.error(erro);
                 mostrarToast(erro.message, 'error');
@@ -882,6 +1029,7 @@
                 }
             });
             aplicarFiltrosMapa(); // Isso vai desenhar os marcadores permitidos e a sidebar
+            atualizarDestaqueProximasUnidades();
         }
 
         // ===== INTERAÇÕES =====
@@ -973,7 +1121,8 @@
             lista.forEach(unit => {
                 const color = typeColors[unit.type] || '#3b82f6';
                 const div = document.createElement('div');
-                div.className = 'flex items-start gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 transition-all border border-transparent hover:border-white/10';
+                const isNearby = usuarioLocalizacao && distanciaEmMetros(usuarioLocalizacao, unit) < 5000;
+                div.className = `flex items-start gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-white/5 transition-all border border-transparent hover:border-white/10${isNearby ? ' nearby-unit' : ''}`;
                 div.innerHTML = `<div class="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5" style="background:${color};box-shadow:0 0 6px ${color}88"></div><div class="min-w-0"><p class="text-sm font-semibold text-slate-100 leading-tight truncate">${unit.name}</p><p class="text-xs text-slate-500 mt-0.5">${unit.type} · ${unit.status}</p></div>`;
                 div.onclick = () => openUnitCard(unit);
                 container.appendChild(div);
@@ -1028,6 +1177,13 @@
             if (startButton) {
                 startButton.onclick = () => iniciarRota(unit.id);
             }
+            const navigationButton = document.getElementById('btn-start-navigation');
+            if (navigationButton) {
+                navigationButton.onclick = async () => {
+                    if (!routeLayer) await iniciarRota(unit.id);
+                    iniciarAcompanhamento();
+                };
+            }
             const copyBtn = document.getElementById('btn-copy-phone');
             const phoneSpan = document.getElementById('btn-phone-number');
             if (copyBtn) {
@@ -1065,6 +1221,13 @@
         // ===== INICIAR TUDO =====
         initFilterSidebarToggle();
         setTravelMode('carro');
+        atualizarAcoesPorDispositivo();
+        window.addEventListener('resize', atualizarAcoesPorDispositivo);
+        document.getElementById('btn-my-location').addEventListener('click', async () => {
+            await obterLocalizacaoUsuario();
+            if (usuarioLocalizacao) map.flyTo([usuarioLocalizacao.lat, usuarioLocalizacao.lng], 15, { duration: 1 });
+        });
+        document.getElementById('btn-nearby-units').addEventListener('click', localizarUnidadesProximas);
         obterLocalizacaoUsuario();
         carregarDadosDoBanco();
     </script> 
